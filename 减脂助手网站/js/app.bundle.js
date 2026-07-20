@@ -6,7 +6,7 @@
 "use strict";
 
 /* 来源：js/catalog.js */
-const 核验日期 = "2026-07-20";
+const 核验日期 = "2026-07-21";
 
 const 类别 = [
   {category:"米饭杂粮", state:"熟重", p:[128,2.8,0.5,27.5,1.2], rawRatio:.38, names:["白米饭","糙米饭","黑米饭","红米饭","小米饭","藜麦饭","燕麦米饭","荞麦饭","玉米碴饭","薏米饭","高粱米饭","紫米饭","杂豆饭","糙米藜麦饭","二米饭"]},
@@ -70,6 +70,8 @@ const references = [
   {title:"肥胖症诊疗指南（2024年版）",org:"国家卫生健康委员会",note:"用于中国成人BMI分类与风险边界。",url:"https://www.nhc.gov.cn/wjw/c100378/202410/bcf804e19e0c4246b5aea6cd338b55e1.shtml"},
   {title:"中国居民膳食指南（2022）",org:"中国营养学会",note:"用于食物多样性、谷薯、蔬果与平衡膳食结构。",url:"https://dg.cnsoc.org/article/04/J4-AsD_DR3OLQMnHG0-jZA.html"},
   {title:"WHO身体活动与久坐行为指南",org:"世界卫生组织",note:"成人每周有氧活动与肌力活动的公共健康建议。",url:"https://www.who.int/publications/i/item/9789240015128"},
+  {title:"Resistance Training Prescription for Muscle Function, Hypertrophy, and Physical Performance（2026）",org:"American College of Sports Medicine",note:"综合137篇系统综述，支持每周至少2次抗阻训练、渐进负荷与按目标调整训练量。",url:"https://pubmed.ncbi.nlm.nih.gov/41843416/"},
+  {title:"Progression Models in Resistance Training for Healthy Adults",org:"American College of Sports Medicine",note:"支持达到目标次数上限后小幅加重，以及新手每周2～3次训练的进阶原则。",url:"https://pubmed.ncbi.nlm.nih.gov/11828249/"},
   {title:"ACSM减重与体重反弹预防立场文件",org:"American College of Sports Medicine",note:"体力活动剂量与体重管理的经典立场文件。",url:"https://pubmed.ncbi.nlm.nih.gov/19127177/"},
   {title:"FoodData Central 下载与数据说明",org:"USDA",note:"部分食物营养参考值及每100克换算规则。",url:"https://fdc.nal.usda.gov/download-datasets/"},
   {title:"蛋白质摄入与抗阻训练荟萃分析",org:"British Journal of Sports Medicine",note:"支持抗阻训练人群蛋白质摄入的参考区间；不是越高越好。",url:"https://pubmed.ncbi.nlm.nih.gov/28698222/"},
@@ -77,13 +79,18 @@ const references = [
 ];
 
 const videos = [
-  {platform:"YouTube",author:"Jeff Nippard",title:"科学减脂的训练与营养框架",url:"https://www.youtube.com/@JeffNippard",views:"频道数据待API更新",likes:"—",checkedOn:核验日期,status:"待正式API核验",summary:"可用于理解热量缺口、蛋白质和抗阻训练的关系。"},
-  {platform:"YouTube",author:"Renaissance Periodization",title:"减脂期如何安排训练量",url:"https://www.youtube.com/@RenaissancePeriodization",views:"频道数据待API更新",likes:"—",checkedOn:核验日期,status:"待正式API核验",summary:"强调疲劳管理与逐步调整。"},
-  {platform:"哔哩哔哩",author:"健身运动营养科普",title:"健身新手的减肥减脂完全手册",url:"https://www.bilibili.com/video/BV1AM411r7z3/",views:"约228.5万（单条公开页快照）",likes:"约12.2万",checkedOn:核验日期,status:"人工已核验",summary:"长视频梳理减脂理论；热度不等同于医学证据。"},
-  {platform:"哔哩哔哩",author:"帅soserious",title:"到底哪种运动最减脂？",url:"https://www.bilibili.com/video/BV1qq4y1E7GN/",views:"约113.3万（单条公开页快照）",likes:"约4.1万",checkedOn:核验日期,status:"人工已核验",summary:"比较常见运动方式；具体训练仍需按关节与恢复能力筛选。"},
-  {platform:"哔哩哔哩",author:"叔贵",title:"无跑跳减脂训练",url:"https://www.bilibili.com/video/BV1aU4y1G7ek/",views:"约395.2万（公开页快照）",likes:"约2.5万",checkedOn:核验日期,status:"人工已核验",summary:"低冲击跟练样本；“不伤膝腰”不能对所有人作绝对保证。"},
-  {platform:"抖音",author:"待白名单确认",title:"高热度减脂内容样本",url:"https://www.douyin.com/search/%E7%A7%91%E5%AD%A6%E5%87%8F%E8%84%82",views:"不自动抓取",likes:"不自动抓取",checkedOn:核验日期,status:"仅人工导入",summary:"没有稳定合法公开统计接口时不自动更新。"},
-  {platform:"小红书",author:"待白名单确认",title:"中式减脂餐内容样本",url:"https://www.xiaohongshu.com/explore",views:"不自动抓取",likes:"不自动抓取",checkedOn:核验日期,status:"仅人工导入",summary:"只纳入人工核验的作者、链接与查询时间。"}
+  {platform:"YouTube",provider:"youtube",embedId:"ytN366VCGls",author:"Jeff Nippard",title:"为什么不必追求绝对“干净饮食”",url:"https://www.youtube.com/watch?v=ytN366VCGls",views:"约120万（第三方快照）",likes:"待官方API更新",checkedOn:核验日期,status:"内容已复核·指标待API",summary:"讨论依从性、热量缺口与食物选择，不把单一食物贴上绝对好坏标签。"},
+  {platform:"YouTube",provider:"youtube",embedId:"Z0_72YUZ15Y",author:"Renaissance Periodization",title:"减脂阶段如何设置与结束",url:"https://www.youtube.com/watch?v=Z0_72YUZ15Y",views:"约7.3万（第三方快照）",likes:"待官方API更新",checkedOn:核验日期,status:"内容已复核·指标待API",summary:"解释减脂期、维持期与可持续节奏；不是医疗建议。"},
+  {platform:"YouTube",provider:"youtube",embedId:"I_2cX8BzkcM",author:"Renaissance Periodization",title:"如何建立可执行的热量缺口",url:"https://www.youtube.com/watch?v=I_2cX8BzkcM",views:"待官方API更新",likes:"待官方API更新",checkedOn:核验日期,status:"内容已复核·指标待API",summary:"用饮食和活动共同创造缺口，并强调观察两周趋势再调整。"},
+  {platform:"YouTube",provider:"youtube",embedId:"2bAjfXcj5Fs",author:"Renaissance Periodization",title:"更早掌握的5个营养原则",url:"https://www.youtube.com/watch?v=2bAjfXcj5Fs",views:"待官方API更新",likes:"待官方API更新",checkedOn:核验日期,status:"内容已复核·指标待API",summary:"蛋白质、便利性、食物质量与依从性的实用讨论。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1AM411r7z3",author:"健身运动营养科普",title:"健身新手的减肥减脂完全手册",url:"https://www.bilibili.com/video/BV1AM411r7z3/",views:"约228.5万",likes:"约12.2万",checkedOn:核验日期,status:"人工快照已核验",summary:"长视频梳理减脂理论；热度不等同于医学证据。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1qq4y1E7GN",author:"帅soserious",title:"到底哪种运动最减脂？",url:"https://www.bilibili.com/video/BV1qq4y1E7GN/",views:"约113.3万",likes:"约4.1万",checkedOn:核验日期,status:"人工快照已核验",summary:"比较常见运动方式；仍需按关节与恢复能力筛选。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1aU4y1G7ek",author:"叔贵",title:"无跑跳低冲击减脂训练",url:"https://www.bilibili.com/video/BV1aU4y1G7ek/",views:"约395.2万",likes:"约2.5万",checkedOn:核验日期,status:"人工快照已核验",summary:"低冲击跟练样本；任何动作都不能对所有人承诺绝对不伤膝腰。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1534y1x78m",author:"范老师硬核减脂",title:"为什么总是反复减不下去？",url:"https://www.bilibili.com/video/BV1534y1x78m/",views:"约44.3万",likes:"约2.4万",checkedOn:核验日期,status:"人工快照已核验",summary:"讨论减脂执行和反复问题；个别观点需结合指南判断。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1v89iYqE8C",author:"李祥JasonLee",title:"每日蛋白质与食物量怎么安排",url:"https://www.bilibili.com/video/BV1v89iYqE8C/",views:"约4.2万",likes:"约560",checkedOn:核验日期,status:"公开页快照",summary:"提供蛋白质食物换算思路；本站克重仍按个人目标重新计算。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV13ZZUYrEjE",author:"健身食材科普",title:"16种高蛋白食材",url:"https://www.bilibili.com/video/BV13ZZUYrEjE/",views:"约25.7万",likes:"约9533",checkedOn:核验日期,status:"公开页快照",summary:"扩展蛋白质来源选择，不意味着必须购买补剂。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1SP4y1Q7Le",author:"运动营养科普",title:"蛋白质摄入的7个常见问题",url:"https://www.bilibili.com/video/BV1SP4y1Q7Le/",views:"约3.6万",likes:"约1379",checkedOn:核验日期,status:"公开页快照",summary:"回答常见蛋白质问题；肾病等特殊情况需咨询临床专业人员。"},
+  {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1SD421T7Pc",author:"暴躁野哥讲健身",title:"减脂期的练后餐怎么吃",url:"https://www.bilibili.com/video/BV1SD421T7Pc/",views:"约33.9万",likes:"约1.8万",checkedOn:核验日期,status:"公开页快照",summary:"强调总摄入和练后正餐；具体克重以全天目标为准。"}
 ];
 
 const dataMeta = {verifiedOn:核验日期,foodCount:foods.length,mealCount:mealTemplates.length,version:"2026.07-a",reviewStatus:"待营养专业逐条审核",disclaimer:"营养值为离线规划参考快照，尤其外卖和混合菜误差较大。正式发布前应由营养专业人员逐条审核。"};
@@ -117,22 +124,23 @@ function calculateTargets(profile){
 
 const exercises={
   squat:[
-    {name:"高脚杯深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"箱式徒手深蹲",equipment:["none","home","gym"],limits:[],pattern:"蹲"},{name:"腿举",equipment:["gym"],limits:["knee"],pattern:"蹲"}],
+    {name:"高脚杯深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"箱式徒手深蹲",equipment:["none","home","gym"],limits:[],pattern:"蹲"},{name:"腿举",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"史密斯箱式深蹲",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"哈克深蹲",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"哑铃相扑深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"坐站训练",equipment:["none","home","gym"],limits:[],pattern:"蹲"}],
   hinge:[
-    {name:"哑铃罗马尼亚硬拉",equipment:["home","gym"],limits:["back"],pattern:"髋铰链"},{name:"臀桥",equipment:["none","home","gym"],limits:[],pattern:"髋铰链"},{name:"器械腿弯举",equipment:["gym"],limits:[],pattern:"髋铰链"}],
+    {name:"哑铃罗马尼亚硬拉",equipment:["home","gym"],limits:["back"],pattern:"髋铰链"},{name:"臀桥",equipment:["none","home","gym"],limits:[],pattern:"髋铰链"},{name:"器械腿弯举",equipment:["gym"],limits:[],pattern:"髋铰链"},{name:"杠铃罗马尼亚硬拉",equipment:["gym"],limits:["back"],pattern:"髋铰链"},{name:"绳索拉臀",equipment:["gym"],limits:["back"],pattern:"髋铰链"},{name:"哑铃臀推",equipment:["home","gym"],limits:[],pattern:"髋铰链"},{name:"健身球腿弯举",equipment:["home","gym"],limits:[],pattern:"髋铰链"}],
   push:[
-    {name:"上斜俯卧撑",equipment:["none","home","gym"],limits:["shoulder"],pattern:"水平推"},{name:"哑铃卧推",equipment:["home","gym"],limits:["shoulder"],pattern:"水平推"},{name:"器械推胸",equipment:["gym"],limits:["shoulder"],pattern:"水平推"}],
+    {name:"上斜俯卧撑",equipment:["none","home","gym"],limits:["shoulder"],pattern:"水平推"},{name:"哑铃卧推",equipment:["home","gym"],limits:["shoulder"],pattern:"水平推"},{name:"器械推胸",equipment:["gym"],limits:["shoulder"],pattern:"水平推"},{name:"跪姿俯卧撑",equipment:["none","home","gym"],limits:["shoulder"],pattern:"水平推"},{name:"地板哑铃卧推",equipment:["home","gym"],limits:["shoulder"],pattern:"水平推"},{name:"史密斯卧推",equipment:["gym"],limits:["shoulder"],pattern:"水平推"},{name:"绳索夹胸",equipment:["gym"],limits:["shoulder"],pattern:"水平推"}],
   pull:[
-    {name:"弹力带划船",equipment:["home","gym"],limits:[],pattern:"水平拉"},{name:"单臂哑铃划船",equipment:["home","gym"],limits:["back"],pattern:"水平拉"},{name:"坐姿划船",equipment:["gym"],limits:[],pattern:"水平拉"},{name:"毛巾等长划船",equipment:["none"],limits:[],pattern:"水平拉"}],
+    {name:"弹力带划船",equipment:["home","gym"],limits:[],pattern:"水平拉"},{name:"单臂哑铃划船",equipment:["home","gym"],limits:["back"],pattern:"水平拉"},{name:"坐姿划船",equipment:["gym"],limits:[],pattern:"水平拉"},{name:"毛巾等长划船",equipment:["none"],limits:[],pattern:"水平拉"},{name:"胸托哑铃划船",equipment:["home","gym"],limits:[],pattern:"水平拉"},{name:"器械高位划船",equipment:["gym"],limits:[],pattern:"水平拉"},{name:"反向飞鸟",equipment:["home","gym"],limits:["shoulder"],pattern:"水平拉"}],
   vertical:[
-    {name:"半跪姿哑铃推举",equipment:["home","gym"],limits:["shoulder","back"],pattern:"垂直推"},{name:"高位下拉",equipment:["gym"],limits:["shoulder"],pattern:"垂直拉"},{name:"弹力带下拉",equipment:["home"],limits:["shoulder"],pattern:"垂直拉"},{name:"墙壁滑动",equipment:["none"],limits:["shoulder"],pattern:"肩胛控制"}],
+    {name:"半跪姿哑铃推举",equipment:["home","gym"],limits:["shoulder","back"],pattern:"垂直推"},{name:"高位下拉",equipment:["gym"],limits:["shoulder"],pattern:"垂直拉"},{name:"弹力带下拉",equipment:["home"],limits:["shoulder"],pattern:"垂直拉"},{name:"墙壁滑动",equipment:["none"],limits:["shoulder"],pattern:"肩胛控制"},{name:"中立握下拉",equipment:["gym"],limits:["shoulder"],pattern:"垂直拉"},{name:"坐姿哑铃推举",equipment:["home","gym"],limits:["shoulder","back"],pattern:"垂直推"},{name:"地雷管推举",equipment:["gym"],limits:["shoulder"],pattern:"垂直推"}],
   single:[
-    {name:"扶墙反向箭步蹲",equipment:["none","home","gym"],limits:["knee"],pattern:"单腿"},{name:"低台阶踏步",equipment:["none","home","gym"],limits:["knee"],pattern:"单腿"},{name:"单腿臀桥",equipment:["none","home","gym"],limits:[],pattern:"单腿"}],
+    {name:"扶墙反向箭步蹲",equipment:["none","home","gym"],limits:["knee"],pattern:"单腿"},{name:"低台阶踏步",equipment:["none","home","gym"],limits:["knee"],pattern:"单腿"},{name:"单腿臀桥",equipment:["none","home","gym"],limits:[],pattern:"单腿"},{name:"分腿蹲扶墙版",equipment:["none","home","gym"],limits:["knee"],pattern:"单腿"},{name:"侧向台阶踏步",equipment:["home","gym"],limits:["knee"],pattern:"单腿"},{name:"单腿腿举",equipment:["gym"],limits:["knee"],pattern:"单腿"}],
   core:[
-    {name:"死虫",equipment:["none","home","gym"],limits:[],pattern:"核心"},{name:"鸟狗",equipment:["none","home","gym"],limits:[],pattern:"核心"},{name:"Pallof抗旋转",equipment:["home","gym"],limits:[],pattern:"核心"},{name:"侧桥",equipment:["none","home","gym"],limits:["shoulder"],pattern:"核心"}],
+    {name:"死虫",equipment:["none","home","gym"],limits:[],pattern:"核心"},{name:"鸟狗",equipment:["none","home","gym"],limits:[],pattern:"核心"},{name:"Pallof抗旋转",equipment:["home","gym"],limits:[],pattern:"核心"},{name:"侧桥",equipment:["none","home","gym"],limits:["shoulder"],pattern:"核心"},{name:"前臂平板支撑",equipment:["none","home","gym"],limits:["shoulder"],pattern:"核心"},{name:"跪姿绳索卷腹",equipment:["gym"],limits:["back"],pattern:"核心"},{name:"仰卧交替抬腿",equipment:["none","home","gym"],limits:["back"],pattern:"核心"}],
   carry:[
-    {name:"农夫行走",equipment:["home","gym"],limits:[],pattern:"负重行走"},{name:"原地高抬腿慢走",equipment:["none"],limits:["knee"],pattern:"行走"},{name:"跑步机坡度走",equipment:["gym"],limits:[],pattern:"行走"}]
+    {name:"农夫行走",equipment:["home","gym"],limits:[],pattern:"负重行走"},{name:"原地高抬腿慢走",equipment:["none"],limits:["knee"],pattern:"行走"},{name:"跑步机坡度走",equipment:["gym"],limits:[],pattern:"行走"},{name:"单侧提重行走",equipment:["home","gym"],limits:[],pattern:"负重行走"},{name:"雪橇推行",equipment:["gym"],limits:["knee"],pattern:"负重行走"},{name:"低台阶连续踏步",equipment:["home","gym"],limits:["knee"],pattern:"行走"}]
 };
+const exerciseCount=Object.values(exercises).flat().length;
 
 function pickExercise(group,profile,index=0){
   const limits=profile.limits||[];
@@ -150,13 +158,27 @@ function generateTraining(profile){
   if(days<=3) base=Array.from({length:days},(_,i)=>strengthSession(profile,`全身训练 ${String.fromCharCode(65+i)}`,i));
   else if(days===4) base=[strengthSession(profile,"上肢 A"),strengthSession(profile,"下肢 A",1),strengthSession(profile,"上肢 B",2),strengthSession(profile,"下肢 B",3)];
   else {base=[strengthSession(profile,"全身 A"),strengthSession(profile,"全身 B",1),strengthSession(profile,"全身 C",2)];while(base.length<days)base.push({type:base.length===days-1?"恢复":"有氧",label:base.length===days-1?"恢复与活动度":"低冲击有氧",cardio:{mode:getCardio(profile),minutes:Math.min(45,Number(profile.minutes)),intensity:"中等强度谈话测试"},exercises:[]})}
-  const weeks=[
-    {week:1,focus:"建立基线",instruction:"选择能稳定完成且保留2～3次余力的负荷；记录实际次数。"},
-    {week:2,focus:"增加完成量",instruction:"动作稳定时，每组增加1次；有氧每次增加5分钟。"},
-    {week:3,focus:"渐进负荷",instruction:"达到次数上限后，负荷增加约2.5%～5%，仍保留约2次余力。"},
-    {week:4,focus:"降低疲劳并复测",instruction:"力量组数减少约30%，保持动作质量；复测腰围与训练表现。"}
-  ].map(w=>({...w,sessions:base}));
-  return {structure:days<=3?"全身训练":days===4?"上下肢拆分":"3次力量＋有氧/恢复",weeks};
+  const weekRules=[
+    {week:1,focus:"建立基线",change:"基线周",instruction:"选择能稳定完成且保留2～3次余力的负荷；记录每组实际次数、负荷和完成感受。"},
+    {week:2,focus:"增加完成量",change:"每组 +1次 · 有氧 +5分钟",instruction:"动作质量不变时每组增加1次；到不了目标就维持，不强行加量。"},
+    {week:3,focus:"渐进负荷",change:"主动作加重2.5%～5% · RIR 1～2",instruction:"已连续达到次数上限的动作增加约2.5%～5%负荷；未达上限的动作继续用原重量。"},
+    {week:4,focus:"降低疲劳并复测",change:"组数约 -30% · 有氧 -5分钟",instruction:"减少力量组数并保留3～4次余力；周末复测腰围、平均体重和同动作表现。"}
+  ];
+  const progressSession=(session,rule)=>{
+    const next=structuredClone(session);
+    next.week=rule.week;
+    next.exercises=(next.exercises||[]).map((e,i)=>{
+      if(rule.week===2)return {...e,reps:e.reps.includes("/侧")?"9～13/侧":"9～13",rir:"2"};
+      if(rule.week===3)return {...e,reps:i<4?"6～10":e.reps,rir:"1～2",loadCue:"达到上周上限才加重2.5%～5%"};
+      if(rule.week===4)return {...e,sets:Math.max(1,Math.floor(e.sets*.7)),reps:e.reps.includes("/侧")?"8～10/侧":"8～10",rir:"3～4",loadCue:"使用第3周约85%～90%的负荷"};
+      return {...e,loadCue:"先记录可重复的基线负荷"};
+    });
+    if(next.cardio){const baseMinutes=next.cardio.minutes;next.cardio.minutes=rule.week===2?baseMinutes+5:rule.week===3?baseMinutes+5:rule.week===4?Math.max(10,baseMinutes-5):baseMinutes;next.cardio.intensity=rule.week===3?"中等偏上：只能说短句，但不追求冲刺":rule.week===4?"轻到中等：可正常交谈，主动恢复":next.cardio.intensity;}
+    next.estimatedMinutes=Math.min(Number(profile.minutes),Math.round((next.exercises?.length||0)*6+(next.cardio?.minutes||0)));
+    return next;
+  };
+  const weeks=weekRules.map(rule=>({...rule,sessions:base.map(s=>progressSession(s,rule))}));
+  return {structure:days<=3?"全身训练":days===4?"上下肢拆分":"3次力量＋有氧/恢复",weeks,exerciseDatabaseSize:exerciseCount};
 }
 
 function allowedFood(food,profile){
@@ -187,19 +209,20 @@ function calibrateDay(meals,targets){
   if(Math.abs(delta)>20&&staples.length){const each=delta/staples.length;for(const x of staples)x.grams=Math.max(20,Math.round((x.grams+each/(x.food.kcal/100))/5)*5)}
   for(const meal of meals)meal.total=calculateMeal(meal.items);return {meals,total:calculateMeal(all())};
 }
-function generateMeals(profile,targets){
+function generateMeals(profile,targets,variant=0){
   const allowed=filterFoods(profile),conflicts=[];
   const pools={staple:["米饭杂粮","面食","薯类","全谷早餐"],protein:["禽肉","畜肉","鱼类","虾贝","蛋类","豆制品","豆类","便捷蛋白"],veg:["叶菜","瓜茄菌菇"],fruit:["水果"],breakfast:["全谷早餐","常见早餐","米饭杂粮","薯类"]};
   for(const [key,cats] of Object.entries(pools))if(!allowed.some(f=>cats.includes(f.category)))conflicts.push(`没有可用的${key}食物：可能与过敏或饮食模式冲突`);
   if(conflicts.length)return {days:[],conflicts,allowedCount:allowed.length};
   const distribution={早餐:.25,午餐:.35,晚餐:.32,加餐:.08};
   const days=Array.from({length:7},(_,d)=>{
+    const seed=d+variant*7;
     const create=(name,di)=>{
       const mealKcal=targets.calories*distribution[name];
       let items;
-      if(name==="早餐")items=[item(foodByCategory(allowed,pools.breakfast,d),Math.round(mealKcal*.45/(foodByCategory(allowed,pools.breakfast,d).kcal/100))),item(foodByCategory(allowed,pools.protein,d+2),90),item(foodByCategory(allowed,pools.fruit,d),150)];
-      else if(name==="加餐")items=[item(foodByCategory(allowed,["水果"],d+2),150),item(foodByCategory(allowed,["奶类","豆制品","便捷蛋白"],d+5),150)];
-      else items=[item(foodByCategory(allowed,pools.staple,d+di),Math.round(mealKcal*.35/(foodByCategory(allowed,pools.staple,d+di).kcal/100))),item(foodByCategory(allowed,pools.protein,d*2+di),Math.max(100,Math.round((targets.protein*distribution[name])/(foodByCategory(allowed,pools.protein,d*2+di).protein/100)))),item(foodByCategory(allowed,pools.veg,d+di),250)];
+      if(name==="早餐")items=[item(foodByCategory(allowed,pools.breakfast,seed),Math.round(mealKcal*.45/(foodByCategory(allowed,pools.breakfast,seed).kcal/100))),item(foodByCategory(allowed,pools.protein,seed+2),90),item(foodByCategory(allowed,pools.fruit,seed),150)];
+      else if(name==="加餐")items=[item(foodByCategory(allowed,["水果"],seed+2),150),item(foodByCategory(allowed,["奶类","豆制品","便捷蛋白"],seed+5),150)];
+      else items=[item(foodByCategory(allowed,pools.staple,seed+di),Math.round(mealKcal*.35/(foodByCategory(allowed,pools.staple,seed+di).kcal/100))),item(foodByCategory(allowed,pools.protein,seed*2+di),Math.max(100,Math.round((targets.protein*distribution[name])/(foodByCategory(allowed,pools.protein,seed*2+di).protein/100)))),item(foodByCategory(allowed,pools.veg,seed+di),250)];
       items=items.filter(x=>x.food).map(x=>({...x,grams:Math.min(500,Math.max(30,Math.round(x.grams/5)*5))}));
       return {name,items,total:calculateMeal(items),method:name==="加餐"?"洗净或直接食用；不额外加糖。":"主食按熟重称量；蛋白少油煎/蒸/煮；蔬菜焯拌或快炒，全餐用油计入目标。"};
     };
@@ -217,8 +240,42 @@ function replaceMealItem(profile,day,mealIndex,itemIndex){
   day.meals[mealIndex].total=calculateMeal(day.meals[mealIndex].items);
   day.total=calculateMeal(day.meals.flatMap(m=>m.items));return day;
 }
+function nextFood(allowed,categories,currentId,offset=1){
+  const list=allowed.filter(f=>categories.includes(f.category)&&f.id!==currentId);
+  return list.length?list[offset%list.length]:null;
+}
+function replaceWholeMeal(profile,day,mealIndex,strategy,targets,variant=1){
+  const meal=day.meals[mealIndex],allowed=filterFoods(profile);
+  if(!meal||!allowed.length)return {ok:false,message:"当前硬性筛选后没有可替换食物。"};
+  const oldItems=meal.items;
+  const stapleCats=["米饭杂粮","面食","薯类","全谷早餐","常见早餐"],proteinCats=["禽肉","畜肉","鱼类","虾贝","蛋类","豆制品","豆类","便捷蛋白","奶类"],vegCats=["叶菜","瓜茄菌菇"],fruitCats=["水果"];
+  const replaceGroup=(items,cats,offset)=>items.map(x=>{
+    if(!cats.includes(x.food.category))return x;
+    const next=nextFood(allowed,cats,x.food.id,offset);if(!next)return x;
+    return item(next,Math.max(20,Math.round((x.food.kcal*x.grams/Math.max(1,next.kcal))/5)*5));
+  });
+  let items=structuredClone(oldItems);
+  if(strategy==="staple")items=replaceGroup(items,stapleCats,variant);
+  else if(strategy==="protein")items=replaceGroup(items,proteinCats,variant+2);
+  else if(strategy==="volume"){
+    items=replaceGroup(items,vegCats,variant+3).map(x=>vegCats.includes(x.food.category)?{...x,grams:Math.min(400,Math.max(300,x.grams+100))}:stapleCats.includes(x.food.category)?{...x,grams:Math.max(40,Math.round(x.grams*.75/5)*5)}:x);
+  }else{
+    const groups=meal.name==="加餐"?[fruitCats,["奶类","豆制品","便捷蛋白"]]:meal.name==="早餐"?[stapleCats,proteinCats,fruitCats]:[stapleCats,proteinCats,vegCats];
+    items=groups.map((cats,i)=>{const old=oldItems.find(x=>cats.includes(x.food.category));const next=nextFood(allowed,cats,old?.food.id,variant+i*3);if(!next)return old;const targetKcal=old?old.food.kcal*old.grams:meal.total.kcal*100/groups.length;return item(next,Math.max(20,Math.min(500,Math.round((targetKcal/Math.max(1,next.kcal))/5)*5)))}).filter(Boolean);
+  }
+  const changed=items.some((x,i)=>x.food.id!==oldItems[i]?.food.id||x.grams!==oldItems[i]?.grams);
+  if(!changed)return {ok:false,message:"该类别没有更多符合忌口和过敏筛选的食物。"};
+  meal.items=items;meal.total=calculateMeal(items);calibrateDay(day.meals,targets);day.total=calculateMeal(day.meals.flatMap(m=>m.items));
+  return {ok:true,day};
+}
+function replaceDayMenu(profile,day,targets,variant=1){
+  const generated=generateMeals(profile,targets,variant);
+  if(generated.conflicts.length||!generated.days.length)return {ok:false,message:generated.conflicts.join("；")||"无法生成新菜单"};
+  const replacement=structuredClone(generated.days[(day.day-1)%generated.days.length]);replacement.day=day.day;
+  return {ok:true,day:replacement};
+}
 function generatePlan(profile,previousVersions=[]){
-  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案重新计算",adjustments:[]};
+  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:3,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案重新计算",adjustments:[]};
 }
 function assessRisk(profile){
   const flags=[...(profile.risks||[])];const value=bmi(profile.weight,profile.height);
@@ -268,11 +325,12 @@ async function syncRequest(action,body){
 const $=(s,root=document)=>root.querySelector(s), $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const KEYS={profile:"hengran_profile_v2",plans:"hengran_plans_v2",records:"hengran_records_v2"};
 const 已存方案=read(KEYS.plans,[]),已存记录=read(KEYS.records,[]);
-const state={profile:read(KEYS.profile,null),plans:Array.isArray(已存方案)?已存方案:[],records:Array.isArray(已存记录)?已存记录:[],week:0,day:0,foodId:foods[0].id};
+const state={profile:read(KEYS.profile,null),plans:Array.isArray(已存方案)?已存方案:[],records:Array.isArray(已存记录)?已存记录:[],week:0,day:0,foodId:foods[0].id,mealVariant:1};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(error){toast("浏览器拒绝保存，请检查隐私模式或存储权限");console.error("保存失败",error);return false}}
 function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2400)}
 const currentPlan=()=>state.plans.length?state.plans[state.plans.length-1]:null;
+function upgradeLegacyPlan(){const old=currentPlan();if(!old||old.schemaVersion>=3||!state.profile)return false;const upgraded=generatePlan(state.profile,state.plans);upgraded.reason=`从旧版 v${old.version} 自动升级：四周进阶、整餐替换与动作库更新`;state.plans.push(upgraded);write(KEYS.plans,state.plans);return true}
 let profileDirty=false,progressDirty=false,pendingNavigation=null;
 
 function showPage(id){
@@ -317,11 +375,20 @@ function renderOverview(){
   const assessment=state.profile&&currentPlan()?assessProgress(state.records,state.profile,currentPlan()):null;metrics[3].innerHTML=assessment?.ready?`<small>趋势判断</small><strong>${assessment.status}</strong><span>近段7日均重 ${assessment.lastAvg} kg</span>`:`<small>趋势判断</small><strong>等待数据</strong><span>${assessment?.message||"至少14天体重或3次腰围"}</span>`;
 }
 function renderSummary(plan){const t=plan.targets,profile=state.profile||plan.input||{},goal=profile.goal==="recomp"?"体态重组":profile.goal==="faster"?"较快减脂":"稳定减脂",first=plan.training.weeks[0]?.sessions[0];$("#summaryPanel").innerHTML=`<article class="plan-hero"><div class="plan-hero-top"><div><span class="badge">当前执行方案 · v${plan.version}</span><h2>${goal}</h2><p>先执行4周，再依据7日平均体重、腰围和训练表现判断是否需要调整。不要因单日体重波动改变计划。</p></div><div class="plan-hero-score"><strong>${t.calories}</strong><span>每日目标 kcal</span></div></div><div class="plan-focus"><span>每周训练 ${profile.days} 天</span><span>${plan.training.structure}</span><span>蛋白质 ${t.protein} g/日</span><span>参考心率 ${t.moderate[0]}～${t.moderate[1]}</span></div></article><div class="summary-grid"><article class="summary-tile"><small>估算维持热量</small><strong>${t.tdee}</strong><span>kcal / 日，后续用趋势校准</span></article><article class="summary-tile"><small>蛋白质目标</small><strong>${t.protein} g</strong><span>参考体重 ${t.referenceWeight} kg</span></article><article class="summary-tile"><small>脂肪与碳水</small><strong>${t.fat} / ${t.carbs}</strong><span>脂肪 g / 碳水 g</span></article><article class="summary-tile"><small>4周训练结构</small><strong>${profile.days} 天</strong><span>${plan.training.structure}</span></article></div><article class="today-card"><div class="today-icon">↗</div><div><h3>第一步：${first?.label||"建立训练基线"}</h3><p>${first?.exercises?.slice(0,3).map(x=>x.name).join("、")||"中等强度有氧与活动度"}。动作保留2～3次余力。</p></div><button class="secondary-button" id="openTrainingTab">查看完整训练</button></article><div class="plan-note"><b>计算依据与边界</b><p>Mifflin-St Jeor估算静息代谢 ${t.resting} kcal，活动系数后约 ${t.tdee} kcal。公式对个体可有明显误差，请在至少两周规范记录后校准。</p>${plan.validation?.length?`<p class="trend-warn"><b>数据提示：</b>${plan.validation.join("；")}</p>`:""}</div>`;$("#openTrainingTab").onclick=()=>$(".tab[data-tab='training']").click()}
-function renderTraining(plan){const week=plan.training.weeks[state.week]||plan.training.weeks[0];$("#trainingPanel").innerHTML=`<div class="week-selector">${plan.training.weeks.map((w,i)=>`<button class="${i===state.week?"active":""}" data-week="${i}">第${w.week}周 · ${w.focus}</button>`).join("")}</div><div class="plan-note"><b>${week.focus}</b><p>${week.instruction}</p></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="training-day"><div class="meal-head"><div><span class="badge">训练 ${i+1}</span><h3>${s.label}</h3></div><small>${s.type}</small></div>${s.exercises?.length?`<div class="exercise-list"><div class="exercise"><b>动作</b><span>组数</span><span>次数</span><span>RIR</span><span>休息</span></div>${s.exercises.map(e=>`<div class="exercise"><b>${e.name}<small> · ${e.pattern}</small></b><span>${e.sets}</span><span>${e.reps}</span><span>${e.rir}</span><span>${e.rest}</span></div>`).join("")}</div>`:""}<p class="muted">有氧：${s.cardio.mode} · ${s.cardio.minutes}分钟 · ${s.cardio.intensity}</p></article>`).join("")}</div>`;$$('[data-week]').forEach(b=>b.onclick=()=>{state.week=Number(b.dataset.week);renderTraining(plan)})}
+function renderTraining(plan){
+  const week=plan.training.weeks[state.week]||plan.training.weeks[0],strengthSessions=week.sessions.filter(s=>s.exercises?.length),sets=strengthSessions.reduce((sum,s)=>sum+s.exercises.reduce((n,e)=>n+Number(e.sets),0),0),cardio=week.sessions.reduce((sum,s)=>sum+(s.cardio?.minutes||0),0);
+  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${plan.training.exerciseDatabaseSize||"50+"}</b>动作库</span></div></article><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.type} · 预计约 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3></div><span class="session-status">待完成</span></header>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><b>${e.name}</b><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">进阶采用“先完成目标次数，再小幅加重”的双重进阶；RIR 是主观余力，不要求每组力竭。动作已按器械、膝/腰/肩限制过滤。</p></section>`;
+  $$('[data-week]').forEach(b=>b.onclick=()=>{state.week=Number(b.dataset.week);renderTraining(plan)});
+}
 function renderMeals(plan){
   if(plan.meals.conflicts.length){$("#mealsPanel").innerHTML=`<div class="notice"><b>无法安全生成</b><p>${plan.meals.conflicts.join("；")}。请调整硬性排除条件，或由营养专业人员设计。</p></div>`;return}
-  const day=plan.meals.days[state.day];$("#mealsPanel").innerHTML=`<div class="day-selector">${plan.meals.days.map((d,i)=>`<button class="${i===state.day?"active":""}" data-day="${i}">第${d.day}天</button>`).join("")}</div><article class="meal-day"><div class="meal-head"><div><h3>第${day.day}天 · 三餐＋可选加餐</h3><p class="muted">全天 ${day.total.kcal} kcal · 蛋白质 ${day.total.protein} g · 碳水 ${day.total.carbs} g · 脂肪 ${day.total.fat} g</p></div><span class="badge">目标 ${plan.targets.calories} kcal</span></div>${day.meals.map((meal,mi)=>`<div class="meal-card"><div class="meal-head"><h3>${meal.name}</h3><div class="macro-row"><span>${meal.total.kcal} kcal</span><span>蛋白 ${meal.total.protein} g</span></div></div>${meal.items.map((x,ii)=>`<div class="food-line"><span><b>${x.food.name}</b><br><small>${x.food.state} · ${x.food.confidence}置信度 · 待专业复核</small></span><span>${x.food.carbs}g 碳水/100g</span><label><input class="meal-grams" data-meal="${mi}" data-item="${ii}" type="number" value="${x.grams}" min="10" max="800" step="5"> g</label><button class="text-button replace-food" data-meal="${mi}" data-item="${ii}">替换</button></div>`).join("")}<p class="muted">做法：${meal.method}</p></div>`).join("")}</article>`;
-  $$('[data-day]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.day);renderMeals(plan)});$$('.replace-food').forEach(b=>b.onclick=()=>{replaceMealItem(state.profile,day,Number(b.dataset.meal),Number(b.dataset.item));write(KEYS.plans,state.plans);renderMeals(plan);toast("已按同类食物等热量替换")});$$('.meal-grams').forEach(input=>input.onchange=()=>{const mi=Number(input.dataset.meal),ii=Number(input.dataset.item);day.meals[mi].items[ii].grams=Number(input.value);day.meals[mi].total=calculateMeal(day.meals[mi].items);day.total=calculateMeal(day.meals.flatMap(m=>m.items));write(KEYS.plans,state.plans);renderMeals(plan)});
+  const day=plan.meals.days[state.day],delta=Math.round((day.total.kcal-plan.targets.calories)/plan.targets.calories*100),mealIcons={早餐:"☀",午餐:"◐",晚餐:"☾",加餐:"◇"};
+  $("#mealsPanel").innerHTML=`<section class="meal-dashboard"><div class="day-selector">${plan.meals.days.map((d,i)=>`<button class="${i===state.day?"active":""}" data-day="${i}"><span>DAY</span>${d.day}</button>`).join("")}</div><article class="nutrition-hero"><div><span class="badge">第 ${day.day} 天菜单</span><h2>${day.total.kcal} <small>kcal</small></h2><p>与目标相比 ${delta===0?"刚好":delta>0?`高 ${delta}%`:`低 ${Math.abs(delta)}%`}；克重可直接编辑。</p></div><div class="macro-dashboard"><span><b>${day.total.protein}</b>蛋白质 g<progress max="${plan.targets.protein}" value="${Math.min(day.total.protein,plan.targets.protein)}"></progress></span><span><b>${day.total.carbs}</b>碳水 g<progress max="${plan.targets.carbs}" value="${Math.min(day.total.carbs,plan.targets.carbs)}"></progress></span><span><b>${day.total.fat}</b>脂肪 g<progress max="${plan.targets.fat}" value="${Math.min(day.total.fat,plan.targets.fat)}"></progress></span></div><button class="primary-button replace-day">换一整天菜单</button></article><div class="meal-grid">${day.meals.map((meal,mi)=>`<article class="meal-card-v2"><header><div class="meal-icon">${mealIcons[meal.name]||"◇"}</div><div><small>${meal.name}</small><h3>${meal.total.kcal} kcal</h3></div><div class="macro-row"><span>P ${meal.total.protein}g</span><span>C ${meal.total.carbs}g</span><span>F ${meal.total.fat}g</span></div></header><div class="food-stack">${meal.items.map((x,ii)=>`<div class="food-item-v2"><div><b>${x.food.name}</b><small>${x.food.state} · 每100g含碳水 ${x.food.carbs}g</small></div><label><input class="meal-grams" data-meal="${mi}" data-item="${ii}" type="number" value="${x.grams}" min="10" max="800" step="5"><span>克</span></label><button class="icon-swap replace-food" data-meal="${mi}" data-item="${ii}" title="同类等热量替换" aria-label="替换${x.food.name}">↻</button></div>`).join("")}</div><p class="method"><b>3步内做法</b>${meal.method}</p><footer><select class="meal-strategy" data-meal="${mi}" aria-label="${meal.name}整餐替换方式"><option value="all">整餐全新组合</option><option value="staple">只换主食类别</option><option value="protein">只换蛋白类别</option><option value="volume">高蔬菜量组合</option></select><button class="secondary-button replace-meal" data-meal="${mi}">替换整餐</button></footer></article>`).join("")}</div><p class="evidence-footnote">替换会先执行过敏原、饮食模式和“绝对不吃”筛选，再按全天目标重算。外卖、烹调油和熟重含水量会造成明显误差。</p></section>`;
+  $$('[data-day]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.day);renderMeals(plan)});
+  $$('.replace-food').forEach(b=>b.onclick=()=>{replaceMealItem(state.profile,day,Number(b.dataset.meal),Number(b.dataset.item));write(KEYS.plans,state.plans);renderMeals(plan);toast("已按同类食物近似等热量替换")});
+  $$('.replace-meal').forEach(b=>b.onclick=()=>{const mi=Number(b.dataset.meal),strategy=$(`.meal-strategy[data-meal="${mi}"]`).value,result=replaceWholeMeal(state.profile,day,mi,strategy,plan.targets,state.mealVariant++);if(!result.ok){toast(result.message);return}write(KEYS.plans,state.plans);renderMeals(plan);toast("整餐已替换并重算全天营养")});
+  $('.replace-day').onclick=()=>{const result=replaceDayMenu(state.profile,day,plan.targets,state.mealVariant++);if(!result.ok){toast(result.message);return}plan.meals.days[state.day]=result.day;write(KEYS.plans,state.plans);renderMeals(plan);toast("已更换整天菜单")};
+  $$('.meal-grams').forEach(input=>input.onchange=()=>{const mi=Number(input.dataset.meal),ii=Number(input.dataset.item);day.meals[mi].items[ii].grams=Number(input.value);day.meals[mi].total=calculateMeal(day.meals[mi].items);day.total=calculateMeal(day.meals.flatMap(m=>m.items));write(KEYS.plans,state.plans);renderMeals(plan)});
 }
 function renderSwap(){
   const food=foods.find(f=>f.id===state.foodId)||foods[0];$("#swapPanel").innerHTML=`<div class="swap-grid"><div class="food-search"><input id="foodQuery" placeholder="搜索食物"><select id="foodCategory"><option value="all">全部类别</option>${[...new Set(foods.map(f=>f.category))].map(c=>`<option>${c}</option>`).join("")}</select><div class="food-results" id="foodResults"></div></div><div class="converter"><span class="badge">实时克重换算</span><h2 id="converterName">${food.name}</h2><p class="muted">${food.state} · ${food.source}</p><label>食物重量 <input id="convertGrams" type="range" min="10" max="500" value="100" step="5"> <b id="gramsLabel">100 g</b></label><div class="converter-output" id="calorieOutput">${food.kcal} kcal</div><div class="macro-row" id="convertMacros"></div><p id="rawNote" class="muted"></p><p class="notice"><b>误差提示</b><span>${food.note}</span></p></div></div>`;
@@ -343,7 +410,11 @@ $("#progressForm").addEventListener("submit",e=>{e.preventDefault();saveProgress
 $("#clearRecords").onclick=()=>{if(confirm("确定清空全部进度记录？可先导出备份。")){state.records=[];write(KEYS.records,[]);renderAll()}};
 
 function renderEvidence(){$("#referenceList").innerHTML=references.map((r,i)=>`<article class="reference"><div class="reference-index">${String(i+1).padStart(2,"0")}</div><div><h3>${r.title}</h3><p>${r.org} · ${r.note}</p></div><a href="${r.url}" target="_blank" rel="noopener">查看来源 ↗</a></article>`).join("");$("#foodCount").textContent=foods.length;$("#mealCount").textContent=mealTemplates.length;$("#dataDate").textContent=dataMeta.verifiedOn}
-function renderVideos(filter="all"){$("#videoGrid").innerHTML=videos.filter(v=>filter==="all"||v.platform===filter).map(v=>`<article class="video-card"><div class="video-cover"><b>▶</b><span>${v.platform}</span></div><div class="video-body"><span class="reviewed">${v.status}</span><h3>${v.title}</h3><p>${v.author} · ${v.summary}</p><div class="video-metrics"><span>播放：${v.views}</span><span>点赞：${v.likes}</span></div><p>查询：${v.checkedOn}</p><a href="${v.url}" target="_blank" rel="noopener">打开来源 ↗</a></div></article>`).join("")}
+function renderVideos(filter="all"){
+  const filtered=videos.filter(v=>filter==="all"||v.platform===filter);
+  $("#videoGrid").innerHTML=filtered.map((v,i)=>{const cover=v.provider==="youtube"?`<img src="https://i.ytimg.com/vi/${v.embedId}/hqdefault.jpg" alt="${v.title}视频封面" loading="lazy">`:`<div class="bili-cover"><b>哔哩哔哩</b><strong>${v.title}</strong><small>${v.author}</small></div>`;return `<article class="video-card-v2"><div class="video-media"><button class="video-poster ${v.provider}" data-video="${i}" aria-label="在页面内播放：${v.title}">${cover}<span>▶</span><small>${v.platform}</small></button></div><div class="video-body"><div class="video-kicker"><span>${v.platform}</span><em>${v.status}</em></div><h3>${v.title}</h3><p><b>${v.author}</b> · ${v.summary}</p><div class="video-metrics"><span>▶ ${v.views}</span><span>♥ ${v.likes}</span></div><footer><small>数据查询：${v.checkedOn}</small><a href="${v.url}" target="_blank" rel="noopener">来源页 ↗</a></footer></div></article>`}).join("");
+  $$('.video-poster').forEach(button=>button.onclick=()=>{const video=filtered[Number(button.dataset.video)],iframe=document.createElement("iframe");iframe.className="video-frame";iframe.src=video.provider==="youtube"?`https://www.youtube-nocookie.com/embed/${video.embedId}?autoplay=1&rel=0`:`https://player.bilibili.com/player.html?bvid=${video.embedId}&high_quality=1&danmaku=0&autoplay=1`;iframe.title=video.title;iframe.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";iframe.allowFullscreen=true;iframe.referrerPolicy="strict-origin-when-cross-origin";button.replaceWith(iframe)});
+}
 $("#videoPlatform").onchange=e=>renderVideos(e.target.value);
 
 function exportPayload(){return {schemaVersion:2,exportedAt:new Date().toISOString(),profile:state.profile,plans:state.plans,records:state.records}}
@@ -369,7 +440,7 @@ async function deleteCloud(){try{const {syncId,code}=syncCredentials();if(!syncI
 $("#createCloud").onclick=createCloud;$("#pushCloud").onclick=pushCloud;$("#restoreCloud").onclick=restoreCloud;$("#deleteCloud").onclick=deleteCloud;
 
 function renderAll(){renderOverview();renderPlan();renderRecords();renderTrend();refreshCompletion()}
-fillForm(state.profile);setProfileDirty(false);$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);renderEvidence();renderVideos();if(state.profile&&!currentPlan())ensurePlan();renderAll();
+fillForm(state.profile);setProfileDirty(false);$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);renderEvidence();renderVideos();if(state.profile&&!currentPlan())ensurePlan();else if(upgradeLegacyPlan())toast("旧方案已保留，并自动升级为新的渐进方案");renderAll();
 $("#storageMode").textContent=syncConfigured()?"可用加密同步":"仅本地存储";$(".online-dot").classList.toggle("ready",syncConfigured());
 $("#syncUnavailable").hidden=syncConfigured();$("#syncOnline").hidden=!syncConfigured();$("#syncIdInput").value=localStorage.getItem(syncKeys.id)||"";
 const initial=location.hash.slice(1);if(initial&&document.getElementById(initial)?.classList.contains("page"))showPage(initial);
