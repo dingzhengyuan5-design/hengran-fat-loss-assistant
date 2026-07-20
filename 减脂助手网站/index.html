@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="面向18至64岁健康成人的循证个性化减脂规划工具">
+  <title>衡燃 · 个性化减脂助手</title>
+  <link rel="icon" href="assets/衡燃图标.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark"><img src="assets/衡燃图标.svg" alt="衡燃图标"></span>
+        <div><strong>衡燃</strong><small>循证减脂助手</small></div>
+      </div>
+      <nav aria-label="主导航" class="nav-list">
+        <button class="nav-item active" data-page="overview"><span>01</span>总览</button>
+        <button class="nav-item" data-page="profile"><span>02</span>个人信息 <i id="profileDot" class="status-dot"></i></button>
+        <button class="nav-item" data-page="plan"><span>03</span>我的个性化方案</button>
+        <button class="nav-item" data-page="progress"><span>04</span>测量与进度</button>
+        <button class="nav-item" data-page="knowledge"><span>05</span>减脂知识库</button>
+        <button class="nav-item" data-page="evidence"><span>06</span>文献与数据更新</button>
+        <button class="nav-item" data-page="videos"><span>07</span>视频参考</button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="online-dot"></span><span id="storageMode">本地模式</span>
+        <button class="text-button" id="openSettings">同步设置</button>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <button id="menuButton" class="icon-button mobile-only" aria-label="打开菜单">☰</button>
+        <div><p class="eyebrow" id="pageEyebrow">你的减脂控制台</p><h1 id="pageTitle">今天从可持续的一步开始</h1></div>
+        <div class="top-actions">
+          <button class="secondary-button" id="printButton">打印 / PDF</button>
+          <button class="primary-button" data-jump="profile">完善档案</button>
+        </div>
+      </header>
+
+      <main id="main">
+        <section class="page active" id="overview" data-title="今天从可持续的一步开始" data-eyebrow="你的减脂控制台">
+          <div class="hero-grid">
+            <article class="hero-card">
+              <div><span class="badge">科学不是捷径，是导航</span><h2>减脂看趋势，训练保能力</h2><p>体重不变不等于无效。腰围、7日平均体重、训练表现与恢复状态，才构成更完整的判断。</p></div>
+              <div class="hero-actions"><button class="primary-button" data-jump="profile">建立个人档案</button><button class="secondary-button" data-jump="knowledge">先了解原理</button></div>
+              <div class="hero-rule"><span>01</span><p><strong>先筛查风险</strong><br>再生成训练与饮食方案</p><span>02</span><p><strong>执行与记录</strong><br>两周后依据趋势建议调整</p></div>
+            </article>
+            <article class="score-card">
+              <div class="score-ring" id="completionRing"><b id="completionScore">0%</b><small>档案完成度</small></div>
+              <div class="score-list"><p><span>档案状态</span><strong id="overviewProfile">未填写</strong></p><p><span>方案版本</span><strong id="overviewVersion">—</strong></p><p><span>近期记录</span><strong id="overviewRecords">0 条</strong></p></div>
+            </article>
+          </div>
+          <div class="metric-grid" id="overviewMetrics">
+            <article class="metric"><small>当前 BMI</small><strong>—</strong><span>完成档案后计算</span></article>
+            <article class="metric"><small>每日热量目标</small><strong>—</strong><span>公式只提供起点</span></article>
+            <article class="metric"><small>每周训练</small><strong>—</strong><span>按时间和条件生成</span></article>
+            <article class="metric"><small>趋势判断</small><strong>等待数据</strong><span>至少14天体重或3次腰围</span></article>
+          </div>
+          <article class="notice"><b>适用边界</b><p>本工具面向18～64岁一般健康成人，不能诊断疾病，也不能替代医生、注册营养师或康复专业人员。快速掉秤常包含水分与糖原变化，不等同于脂肪快速减少。</p></article>
+        </section>
+
+        <section class="page" id="profile" data-title="先认识你，再谈方案" data-eyebrow="个人信息">
+          <div class="section-intro"><div><h2>个人档案与风险筛查</h2><p>带“必填”的字段决定基础方案；选填项用于减少不合适的动作与食物。</p></div><div class="progress-pill"><span id="profileCompletion">0%</span> 完成</div></div>
+          <form id="profileForm" novalidate>
+            <div class="form-section"><div class="form-heading"><span>01</span><div><h3>基础资料</h3><p>用于估算能量、训练冲击和恢复能力</p></div></div>
+              <div class="form-grid">
+                <label>年龄 <em>必填</em><input name="age" type="number" min="18" max="64" required placeholder="例如 30"></label>
+                <label>生理性别 <em>必填</em><select name="sex" required><option value="">请选择</option><option value="male">男性</option><option value="female">女性</option></select></label>
+                <label>身高 cm <em>必填</em><input name="height" type="number" min="130" max="220" required placeholder="175"></label>
+                <label>体重 kg <em>必填</em><input name="weight" type="number" min="35" max="250" step="0.1" required placeholder="85"></label>
+                <label>体脂率 % <small>选填</small><input name="bodyFat" type="number" min="5" max="60" step="0.1"></label>
+                <label>静息心率 次/分 <small>选填</small><input name="restingHr" type="number" min="35" max="120"></label>
+                <label>腰围 cm <small>选填</small><input name="waist" type="number" min="45" max="200" step="0.1"></label>
+                <label>臀围 cm <small>选填</small><input name="hip" type="number" min="50" max="220" step="0.1"></label>
+                <label>颈围 cm <small>选填</small><input name="neck" type="number" min="20" max="70" step="0.1"></label>
+              </div>
+            </div>
+            <div class="form-section"><div class="form-heading"><span>02</span><div><h3>日常与训练条件</h3><p>让训练量与你真正拥有的时间匹配</p></div></div>
+              <div class="form-grid">
+                <label>减脂目标 <em>必填</em><select name="goal" required><option value="">请选择</option><option value="steady">稳定减脂</option><option value="faster">较快减脂</option><option value="recomp">体态重组</option></select></label>
+                <label>日常活动 <em>必填</em><select name="activity" required><option value="">请选择</option><option value="1.2">久坐，少走动</option><option value="1.375">轻活动</option><option value="1.55">中等活动</option><option value="1.725">高活动</option></select></label>
+                <label>训练经验 <em>必填</em><select name="experience" required><option value="">请选择</option><option value="new">少于6个月</option><option value="some">6～24个月</option><option value="trained">2年以上</option></select></label>
+                <label>每周训练天数 <em>必填</em><select name="days" required><option value="">请选择</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+                <label>单次时间 <em>必填</em><select name="minutes" required><option value="">请选择</option><option value="30">30分钟</option><option value="45">45分钟</option><option value="60">60分钟</option><option value="75">75分钟以上</option></select></label>
+                <label>训练条件 <em>必填</em><select name="equipment" required><option value="">请选择</option><option value="none">徒手</option><option value="home">家庭哑铃/弹力带</option><option value="gym">健身房</option></select></label>
+                <label>日均步数 <small>选填</small><input name="steps" type="number" min="0" max="50000" step="500"></label>
+                <label>职业久坐 小时/日 <small>选填</small><input name="sitting" type="number" min="0" max="18" step="0.5"></label>
+                <label>睡眠 小时/日 <small>选填</small><input name="sleep" type="number" min="3" max="12" step="0.5"></label>
+                <label>压力水平 <small>选填</small><select name="stress"><option value="">未填写</option><option value="low">低</option><option value="medium">中</option><option value="high">高</option></select></label>
+                <label>当前训练量 分钟/周 <small>选填</small><input name="currentMinutes" type="number" min="0" max="1500"></label>
+                <label>习惯训练时段 <small>选填</small><select name="trainingTime"><option value="">不限</option><option>早晨</option><option>午间</option><option>晚间</option></select></label>
+              </div>
+              <fieldset><legend>限制与偏好 <small>选填，可多选</small></legend><div class="chip-grid" id="trainingChips">
+                <label><input type="checkbox" name="limits" value="knee">膝部不适</label><label><input type="checkbox" name="limits" value="back">腰背不适</label><label><input type="checkbox" name="limits" value="shoulder">肩部不适</label><label><input type="checkbox" name="dislikes" value="jump">不喜欢跳跃</label><label><input type="checkbox" name="dislikes" value="run">不喜欢跑步</label><label><input type="checkbox" name="preferences" value="strength">偏好力量</label><label><input type="checkbox" name="preferences" value="cardio">偏好有氧</label>
+              </div></fieldset>
+            </div>
+            <div class="form-section"><div class="form-heading"><span>03</span><div><h3>饮食偏好</h3><p>硬性排除优先于营养目标</p></div></div>
+              <div class="form-grid">
+                <label>饮食模式 <em>必填</em><select name="diet" required><option value="">请选择</option><option value="normal">均衡饮食</option><option value="vegetarian">蛋奶素</option><option value="vegan">纯素</option><option value="no-pork">不吃猪肉</option></select></label>
+                <label>地区口味 <small>选填</small><select name="region"><option value="">不限</option><option>家常清淡</option><option>北方</option><option>江浙</option><option>川湘</option><option>粤式</option></select></label>
+                <label>每日餐费预算 <small>选填</small><select name="budget"><option value="">不限</option><option value="low">30元内</option><option value="medium">30～60元</option><option value="high">60元以上</option></select></label>
+                <label>单餐烹饪时间 <small>选填</small><select name="cookTime"><option value="">不限</option><option value="quick">10分钟内</option><option value="normal">10～30分钟</option><option value="long">30分钟以上</option></select></label>
+                <label>外食频率 <small>选填</small><select name="eatingOut"><option value="">未填写</option><option value="rare">很少</option><option value="some">每周1～4餐</option><option value="often">每天至少1餐</option></select></label>
+                <label>喜欢的食物 <small>选填</small><input name="likedFoods" placeholder="用逗号分隔，如鸡蛋、米饭"></label>
+                <label class="span-2">绝对不吃的食物 <small>选填</small><input name="excludedFoods" placeholder="用逗号分隔；生成器不会静默加入"></label>
+              </div>
+              <fieldset><legend>过敏与不耐受 <small>选填，可多选</small></legend><div class="chip-grid">
+                <label><input type="checkbox" name="allergens" value="milk">牛奶/乳糖</label><label><input type="checkbox" name="allergens" value="egg">蛋</label><label><input type="checkbox" name="allergens" value="fish">鱼虾</label><label><input type="checkbox" name="allergens" value="nuts">坚果</label><label><input type="checkbox" name="allergens" value="soy">大豆</label><label><input type="checkbox" name="allergens" value="gluten">麸质</label>
+              </div></fieldset>
+            </div>
+            <div class="form-section danger-section"><div class="form-heading"><span>04</span><div><h3>风险筛查</h3><p>任一项为“是”时暂停常规处方</p></div></div><div class="risk-grid" id="riskGrid">
+              <label><input type="checkbox" name="risks" value="minor">未满18岁或已满65岁</label><label><input type="checkbox" name="risks" value="pregnancy">孕期或哺乳期</label><label><input type="checkbox" name="risks" value="eating-disorder">进食障碍史</label><label><input type="checkbox" name="risks" value="chest">运动时胸痛、晕厥或异常气促</label><label><input type="checkbox" name="risks" value="chronic">未控制的慢性病</label><label><input type="checkbox" name="risks" value="medication">使用影响心率的药物</label>
+            </div></div>
+            <div id="formErrors" class="form-errors" role="alert" aria-live="polite"></div>
+            <div class="sticky-submit"><div class="save-copy"><span id="saveState" class="save-state saved">已保存</span><span id="saveHint">资料仅保存在此浏览器，除非你主动启用加密同步。</span></div><div><button type="button" class="secondary-button" id="clearProfile">清空</button><button type="submit" class="primary-button" id="saveProfileButton">保存并生成方案</button></div></div>
+          </form>
+        </section>
+
+        <section class="page" id="plan" data-title="你的方案，随数据迭代" data-eyebrow="我的个性化方案">
+          <div id="planEmpty" class="empty-state"><span>03</span><h2>方案尚未生成</h2><p>先完成个人信息与风险筛查，我们会据此生成训练和饮食建议。</p><button class="primary-button" data-jump="profile">去填写档案</button></div>
+          <div id="planContent" hidden>
+            <div class="section-intro"><div><h2 id="planHeadline">个性化方案</h2><p id="planMeta"></p></div><button class="secondary-button" id="regeneratePlan">重新生成</button></div>
+            <div class="tab-list" role="tablist"><button class="tab active" data-tab="summary">方案摘要</button><button class="tab" data-tab="training">4周训练</button><button class="tab" data-tab="meals">7天饮食</button><button class="tab" data-tab="swap">食物换算</button><button class="tab" data-tab="history">调整记录</button></div>
+            <div class="tab-panel active" id="summaryPanel"></div>
+            <div class="tab-panel" id="trainingPanel"></div>
+            <div class="tab-panel" id="mealsPanel"></div>
+            <div class="tab-panel" id="swapPanel"></div>
+            <div class="tab-panel" id="historyPanel"></div>
+          </div>
+        </section>
+
+        <section class="page" id="progress" data-title="记录最少，但记录关键" data-eyebrow="测量与进度">
+          <div class="section-intro"><div><h2>趋势而非单点</h2><p>尽量在相似条件下记录；体重取7日均值，腰围至少重复测量两次。</p></div><button class="secondary-button" id="exportData">导出本地数据</button></div>
+          <div class="two-column">
+            <form class="panel" id="progressForm"><div class="panel-head"><h3>新增记录</h3><span id="progressSaveState" class="badge">已保存</span></div><div class="form-grid compact">
+              <label>日期<input name="date" type="date" required></label><label>晨起体重 kg<input name="weight" type="number" min="30" max="300" step="0.1"></label><label>腰围 cm<input name="waist" type="number" min="40" max="220" step="0.1"></label><label>步数<input name="steps" type="number" min="0" max="80000"></label><label>睡眠 小时<input name="sleep" type="number" min="0" max="16" step="0.5"></label><label>疲劳 1～5<select name="fatigue"><option value="">未填</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label><label>训练完成率 %<input name="adherence" type="number" min="0" max="100" step="5"></label><label>力量表现<select name="performance"><option value="">未填</option><option value="up">上升</option><option value="same">稳定</option><option value="down">下降</option></select></label>
+            </div><button class="primary-button full" type="submit">保存记录</button></form>
+            <article class="panel" id="trendPanel"><h3>当前判断</h3><div class="empty-mini">尚无足够记录</div></article>
+          </div>
+          <div class="panel table-panel"><div class="panel-head"><h3>记录明细</h3><button class="text-button" id="clearRecords">清空记录</button></div><div class="table-scroll"><table><thead><tr><th>日期</th><th>体重</th><th>腰围</th><th>步数</th><th>睡眠</th><th>疲劳</th><th>完成率</th><th></th></tr></thead><tbody id="recordsBody"></tbody></table></div></div>
+          <article class="measurement-guide"><h3>规范测量</h3><div class="guide-grid"><div><b>体重</b><p>晨起排空后、进食前、相近衣着。关注7日平均，不为单日波动改方案。</p></div><div><b>腰围</b><p>自然呼气末，在髂嵴上缘或固定标志处水平测量；每次使用同一位置。</p></div><div><b>体脂率</b><p>家用体脂秤更适合观察同条件下趋势，单次绝对值可能受水分显著影响。</p></div></div></article>
+        </section>
+
+        <section class="page" id="knowledge" data-title="把常见误区拆开看" data-eyebrow="减脂知识库">
+          <div class="knowledge-grid">
+            <article class="knowledge-card accent"><span>核心原则</span><h2>局部训练不能定向消除局部脂肪</h2><p>腹肌和腿部训练能增强相应肌群，但脂肪减少主要由长期能量缺口与全身代谢调节决定。视觉变化通常晚于体能变化。</p></article>
+            <article class="knowledge-card"><span>稳定减脂</span><h3>优先推荐</h3><p>温和热量缺口、每周2～4次力量训练、逐步提高日常活动。更利于保留瘦体重和维持训练表现。</p></article>
+            <article class="knowledge-card"><span>较快减脂</span><h3>不是越快越好</h3><p>较大缺口需要更严格监控疲劳、力量和饥饿感。每周下降超过体重1%持续出现时应重新评估。</p></article>
+            <article class="knowledge-card"><span>快速掉秤</span><h3>水分不是脂肪</h3><p>减少碳水、盐分或胃肠内容物可造成短期掉秤，但不能等同于脂肪减少，也不建议用脱水手段追求数字。</p></article>
+            <article class="knowledge-card"><span>心率</span><h3>用谈话测试校准</h3><p>中等强度通常还能说完整短句；心率公式只是范围。药物、温度、睡眠和个体差异都会改变心率反应。</p></article>
+            <article class="knowledge-card"><span>力量训练</span><h3>用RIR控制强度</h3><p>多数工作组保留约2～3次余力（RIR 2～3）；动作技术稳定后再增加次数或负荷。</p></article>
+          </div>
+          <article class="panel"><h3>BMI与体脂的边界</h3><div class="bodyfat-scale"><span>偏低<br>&lt;18.5</span><span>正常<br>18.5～23.9</span><span>超重<br>24～27.9</span><span>肥胖<br>≥28</span></div><p class="muted">以上为中国成人BMI分类。BMI不能区分肌肉与脂肪；腰围、身体组成和代谢指标可提供补充信息。</p></article>
+        </section>
+
+        <section class="page" id="evidence" data-title="知道结论从哪里来" data-eyebrow="文献与数据更新">
+          <div class="section-intro"><div><h2>证据与数据版本</h2><p>指南用于边界和原则，食物数据库用于近似换算；二者都不代表个体诊断。</p></div><span class="badge">人工审核后发布</span></div>
+          <div class="reference-list" id="referenceList"></div>
+          <article class="panel update-panel"><div><h3>当前数据快照</h3><p>首版条目为近似规划数据，状态为“待营养专业逐条审核”；自动检查只生成差异，不把未审核内容直接发布。</p></div><div class="update-stats"><span><b id="foodCount">0</b> 食物条目</span><span><b id="mealCount">0</b> 套餐模板</span><span><b id="dataDate">—</b> 快照日期</span></div></article>
+        </section>
+
+        <section class="page" id="videos" data-title="热度是线索，不是证据等级" data-eyebrow="视频参考">
+          <div class="section-intro"><div><h2>代表性高热度内容</h2><p>播放和点赞只反映传播，不证明结论正确。本站对要点进行人工审核，不宣称“全网排名”。</p></div><select id="videoPlatform" aria-label="筛选平台"><option value="all">全部平台</option><option>YouTube</option><option>哔哩哔哩</option><option>抖音</option><option>小红书</option></select></div>
+          <div class="video-grid" id="videoGrid"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="syncDialog"><form method="dialog" class="dialog-card"><div class="dialog-head"><div><span class="eyebrow">匿名密文同步</span><h2>同步设置</h2></div><button class="icon-button" value="cancel" aria-label="关闭">×</button></div><div id="syncUnavailable" class="notice"><b>当前为本地模式</b><p>部署者尚未配置 Supabase。你的数据仅保存在当前浏览器，可使用导入/导出迁移。</p></div><div id="syncOnline" hidden><p class="muted">服务端只保存密文。恢复码遗失后无法找回；请下载并离线保管。</p><div class="sync-actions"><button type="button" class="primary-button" id="createCloud">新建云端档案</button><button type="button" class="secondary-button" id="pushCloud">上传当前数据</button></div><div class="form-grid compact"><label>同步 ID<input id="syncIdInput" autocomplete="off"></label><label>恢复码<input id="recoveryInput" autocomplete="off" placeholder="8位-8位-8位…"></label></div><div class="sync-actions"><button type="button" class="secondary-button" id="restoreCloud">从云端恢复</button><button type="button" class="danger-button" id="deleteCloud">删除云端档案</button></div><p id="syncStatus" class="muted"></p></div><div class="sync-actions"><button type="button" class="secondary-button" id="downloadBackup">导出备份</button><label class="secondary-button file-label">导入备份<input id="importBackup" type="file" accept="application/json"></label><button type="button" class="danger-button" id="deleteLocal">删除本地数据</button></div><details><summary>部署者配置说明</summary><p>复制 <code>config.example.js</code> 为 <code>config.js</code> 并填写 Edge Function 地址和正式域名。恢复码只由用户持有，服务端不保存明文。</p></details></form></dialog>
+  <dialog id="unsavedDialog"><div class="dialog-card unsaved-dialog"><div class="dialog-head"><div><span class="eyebrow">检测到未保存修改</span><h2>要先保存吗？</h2></div></div><p id="unsavedMessage">当前页面的修改还没有保存。保存后再离开，可避免数据丢失。</p><div class="unsaved-actions"><button type="button" class="primary-button" id="saveAndLeave">保存并离开</button><button type="button" class="secondary-button" id="discardAndLeave">不保存</button><button type="button" class="text-button" id="cancelLeave">取消</button></div></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="config.js" onerror="this.remove()"></script>
+  <script defer src="js/app.bundle.js"></script>
+</body>
+</html>

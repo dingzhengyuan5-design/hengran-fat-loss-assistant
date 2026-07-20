@@ -1,0 +1,31 @@
+name: 减脂数据月度检查
+on:
+  schedule:
+    - cron: "20 2 1 * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 验证当前已审核快照
+        working-directory: 减脂助手网站
+        run: npm run validate
+      - name: 生成来源可用性报告
+        working-directory: 减脂助手网站
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: node scripts/check-sources.mjs
+      - name: 创建人工审核PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: codex/monthly-fatloss-data-check
+          title: "数据：月度来源检查（待人工审核）"
+          commit-message: "数据：生成月度来源检查报告"
+          body: "此PR只包含来源差异和视频指标快照，不会自动改写健康结论。请人工审核后再合并。"
