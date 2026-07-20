@@ -1,0 +1,9 @@
+{
+  "说明": "只有人工确认作者、主题和链接后才加入。YouTube ID用于官方Data API月度更新。",
+  "youtubeVideoIds": [],
+  "bilibili": [
+    {"bvid":"BV1AM411r7z3","status":"人工已核验"},
+    {"bvid":"BV1qq4y1E7GN","status":"人工已核验"},
+    {"bvid":"BV1aU4y1G7ek","status":"人工已核验"}
+  ]
+}
