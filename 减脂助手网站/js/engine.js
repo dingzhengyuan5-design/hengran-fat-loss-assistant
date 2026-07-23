@@ -1,4 +1,6 @@
 import {foods, mealTemplates} from "./catalog.js";
+import {exerciseLibrary,exerciseLibraryCount,getExerciseByName} from "./exercise-catalog.js";
+import {standardRecipes,calculateRecipe,recipeAllowed} from "./recipe-catalog.js";
 
 export const round=(n,d=0)=>Number(Number(n).toFixed(d));
 export function bmi(weight,height){return round(weight/((height/100)**2),1)}
@@ -44,12 +46,18 @@ const exercises={
   carry:[
     {name:"农夫行走",equipment:["home","gym"],limits:[],pattern:"负重行走"},{name:"原地高抬腿慢走",equipment:["none"],limits:["knee"],pattern:"行走"},{name:"跑步机坡度走",equipment:["gym"],limits:[],pattern:"行走"},{name:"单侧提重行走",equipment:["home","gym"],limits:[],pattern:"负重行走"},{name:"雪橇推行",equipment:["gym"],limits:["knee"],pattern:"负重行走"},{name:"低台阶连续踏步",equipment:["home","gym"],limits:["knee"],pattern:"行走"}]
 };
-export const exerciseCount=Object.values(exercises).flat().length;
+export const exerciseCount=exerciseLibraryCount;
 
 function pickExercise(group,profile,index=0){
   const limits=profile.limits||[];
-  const valid=exercises[group].filter(x=>x.equipment.includes(profile.equipment)&&!x.limits.some(l=>limits.includes(l))&&!(profile.dislikes||[]).some(d=>d==="jump"&&x.name.includes("跳")));
-  return valid[index%valid.length]||exercises[group].find(x=>x.equipment.includes(profile.equipment))||exercises[group][0];
+  const groupExercises=exerciseLibrary.filter(exercise=>exercise.group===group);
+  const valid=groupExercises.filter(x=>x.equipment.includes(profile.equipment)&&!x.limits.some(l=>limits.includes(l))&&!(profile.dislikes||[]).some(d=>d==="jump"&&x.name.includes("跳")));
+  if(valid.length)return valid[index%valid.length];
+  // 某些限制会排除整个动作模式（例如膝部限制下的深蹲与单腿模式）。
+  // 此时用无冲突的髋铰链/核心稳定动作代替，不回退到已被筛除的动作。
+  const substitutes=(group==="squat"||group==="single")?["hinge","core"]:["core","mobility"];
+  const safe=exerciseLibrary.filter(exercise=>substitutes.includes(exercise.group)&&exercise.equipment.includes(profile.equipment)&&!exercise.limits.some(limit=>limits.includes(limit)));
+  return safe[index%Math.max(1,safe.length)]||exerciseLibrary.find(exercise=>!exercise.limits.some(limit=>limits.includes(limit)));
 }
 function strengthSession(profile,label,offset=0){
   const count=Number(profile.minutes)>=60?6:Number(profile.minutes)>=45?5:4;
@@ -101,12 +109,13 @@ function mealTotal(items){return items.reduce((a,x)=>{const ratio=x.grams/100;fo
 export function calculateMeal(items){const total=mealTotal(items);return Object.fromEntries(Object.entries(total).map(([k,v])=>[k,round(v,1)]))}
 function calibrateDay(meals,targets){
   const all=()=>meals.flatMap(m=>m.items),total=()=>calculateMeal(all());
-  const tune=(nutrient,target,categories)=>{
+  const tune=(nutrient,target,categories,minFactor=.45)=>{
     const candidates=all().filter(x=>categories.includes(x.food.category));const contribution=candidates.reduce((s,x)=>s+x.food[nutrient]*x.grams/100,0);const other=total()[nutrient]-contribution;
-    if(contribution<=0)return;const factor=Math.max(.45,Math.min(2.2,(target-other)/contribution));for(const x of candidates)x.grams=Math.max(20,Math.round(x.grams*factor/5)*5);
+    if(contribution<=0)return;const factor=Math.max(minFactor,Math.min(2.2,(target-other)/contribution));for(const x of candidates){const seasoning=x.food.category==="油脂调味",minimum=seasoning?1:20,step=seasoning?1:5;x.grams=Math.max(minimum,Math.round(x.grams*factor/step)*step)}
   };
   tune("protein",targets.protein,["禽肉","畜肉","鱼类","虾贝","蛋类","豆制品","豆类","便捷蛋白","奶类"]);
   tune("carbs",targets.carbs,["米饭杂粮","面食","薯类","全谷早餐","常见早餐"]);
+  tune("fat",targets.fat,["油脂调味","坚果种子"],.1);
   const missingFat=targets.fat-total().fat;if(missingFat>2){const oil=foods.find(f=>f.name==="橄榄油");meals[1].items.push(item(oil,Math.max(2,Math.round(missingFat))))}
   // 油脂补足后用主食微调总热量；目标宏量按Atwater系数本身与热量目标相近。
   const delta=targets.calories-total().kcal,staples=all().filter(x=>["米饭杂粮","面食","薯类","全谷早餐","常见早餐"].includes(x.food.category));
@@ -115,6 +124,7 @@ function calibrateDay(meals,targets){
 }
 export function generateMeals(profile,targets,variant=0){
   const allowed=filterFoods(profile),conflicts=[];
+  const recipePool=standardRecipes.filter(recipe=>["炒饭","炒面与汤面","盖饭与焖饭"].includes(recipe.category)&&recipeAllowed(recipe,profile));
   const pools={staple:["米饭杂粮","面食","薯类","全谷早餐"],protein:["禽肉","畜肉","鱼类","虾贝","蛋类","豆制品","豆类","便捷蛋白"],veg:["叶菜","瓜茄菌菇"],fruit:["水果"],breakfast:["全谷早餐","常见早餐","米饭杂粮","薯类"]};
   for(const [key,cats] of Object.entries(pools))if(!allowed.some(f=>cats.includes(f.category)))conflicts.push(`没有可用的${key}食物：可能与过敏或饮食模式冲突`);
   if(conflicts.length)return {days:[],conflicts,allowedCount:allowed.length};
@@ -123,12 +133,20 @@ export function generateMeals(profile,targets,variant=0){
     const seed=d+variant*7;
     const create=(name,di)=>{
       const mealKcal=targets.calories*distribution[name];
-      let items;
+      let items,recipeName="",method=name==="加餐"?"洗净或直接食用；不额外加糖。":"主食按熟重称量；蛋白少油煎/蒸/煮；蔬菜焯拌或快炒，全餐用油计入目标。";
       if(name==="早餐")items=[item(foodByCategory(allowed,pools.breakfast,seed),Math.round(mealKcal*.45/(foodByCategory(allowed,pools.breakfast,seed).kcal/100))),item(foodByCategory(allowed,pools.protein,seed+2),90),item(foodByCategory(allowed,pools.fruit,seed),150)];
       else if(name==="加餐")items=[item(foodByCategory(allowed,["水果"],seed+2),150),item(foodByCategory(allowed,["奶类","豆制品","便捷蛋白"],seed+5),150)];
-      else items=[item(foodByCategory(allowed,pools.staple,seed+di),Math.round(mealKcal*.35/(foodByCategory(allowed,pools.staple,seed+di).kcal/100))),item(foodByCategory(allowed,pools.protein,seed*2+di),Math.max(100,Math.round((targets.protein*distribution[name])/(foodByCategory(allowed,pools.protein,seed*2+di).protein/100)))),item(foodByCategory(allowed,pools.veg,seed+di),250)];
-      items=items.filter(x=>x.food).map(x=>({...x,grams:Math.min(500,Math.max(30,Math.round(x.grams/5)*5))}));
-      return {name,items,total:calculateMeal(items),method:name==="加餐"?"洗净或直接食用；不额外加糖。":"主食按熟重称量；蛋白少油煎/蒸/煮；蔬菜焯拌或快炒，全餐用油计入目标。"};
+      else if(recipePool.length){
+        const recipe=recipePool[(seed*2+di)%recipePool.length],nutrition=calculateRecipe(recipe),scale=Math.max(.55,Math.min(1.5,mealKcal/Math.max(1,nutrition.total.kcal)));
+        items=recipe.ingredients.map(ingredient=>item(foods.find(food=>food.id===ingredient.foodId),Math.round(ingredient.grams*scale/5)*5)).filter(entry=>entry.food);
+        recipeName=recipe.name;method=recipe.method;
+      }else items=[item(foodByCategory(allowed,pools.staple,seed+di),Math.round(mealKcal*.35/(foodByCategory(allowed,pools.staple,seed+di).kcal/100))),item(foodByCategory(allowed,pools.protein,seed*2+di),Math.max(100,Math.round((targets.protein*distribution[name])/(foodByCategory(allowed,pools.protein,seed*2+di).protein/100)))),item(foodByCategory(allowed,pools.veg,seed+di),250)];
+      items=items.filter(x=>x.food).map(x=>{
+        // 油与调味料不能套用主食/蔬菜的30克下限，否则10克油会被错误放大到30克。
+        const isSeasoning=x.food.category==="油脂调味",minimum=isSeasoning?1:10,step=isSeasoning?1:5;
+        return {...x,grams:Math.min(500,Math.max(minimum,Math.round(x.grams/step)*step))};
+      });
+      return {name,recipeName,items,total:calculateMeal(items),method};
     };
     const meals=[create("早餐",0),create("午餐",1),create("晚餐",3),create("加餐",4)],calibrated=calibrateDay(meals,targets);
     return {day:d+1,...calibrated};
@@ -141,6 +159,7 @@ export function replaceMealItem(profile,day,mealIndex,itemIndex){
   const next=allowed[Math.floor(Math.random()*allowed.length)];
   const grams=Math.max(20,Math.round((old.food.kcal*old.grams/next.kcal)/5)*5);
   day.meals[mealIndex].items[itemIndex]={foodId:next.id,food:next,grams};
+  day.meals[mealIndex].recipeName="";
   day.meals[mealIndex].total=calculateMeal(day.meals[mealIndex].items);
   day.total=calculateMeal(day.meals.flatMap(m=>m.items));return day;
 }
@@ -169,7 +188,7 @@ export function replaceWholeMeal(profile,day,mealIndex,strategy,targets,variant=
   }
   const changed=items.some((x,i)=>x.food.id!==oldItems[i]?.food.id||x.grams!==oldItems[i]?.grams);
   if(!changed)return {ok:false,message:"该类别没有更多符合忌口和过敏筛选的食物。"};
-  meal.items=items;meal.total=calculateMeal(items);calibrateDay(day.meals,targets);day.total=calculateMeal(day.meals.flatMap(m=>m.items));
+  meal.items=items;meal.recipeName=strategy==="volume"?"高蔬菜量自选组合":"自选替换组合";meal.total=calculateMeal(items);calibrateDay(day.meals,targets);day.total=calculateMeal(day.meals.flatMap(m=>m.items));
   return {ok:true,day};
 }
 export function replaceDayMenu(profile,day,targets,variant=1){
@@ -179,7 +198,7 @@ export function replaceDayMenu(profile,day,targets,variant=1){
   return {ok:true,day:replacement};
 }
 export function generatePlan(profile,previousVersions=[]){
-  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:3,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案重新计算",adjustments:[]};
+  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:4,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案、220项动作库与标准中餐菜谱重新计算",adjustments:[]};
 }
 export function assessRisk(profile){
   const flags=[...(profile.risks||[])];const value=bmi(profile.weight,profile.height);

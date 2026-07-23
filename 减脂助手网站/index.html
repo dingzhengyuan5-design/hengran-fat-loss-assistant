@@ -21,9 +21,11 @@
         <button class="nav-item" data-page="profile"><span>02</span>个人信息 <i id="profileDot" class="status-dot"></i></button>
         <button class="nav-item" data-page="plan"><span>03</span>我的个性化方案</button>
         <button class="nav-item" data-page="progress"><span>04</span>测量与进度</button>
-        <button class="nav-item" data-page="knowledge"><span>05</span>减脂知识库</button>
-        <button class="nav-item" data-page="evidence"><span>06</span>文献与数据更新</button>
-        <button class="nav-item" data-page="videos"><span>07</span>视频参考</button>
+        <button class="nav-item" data-page="calculator"><span>05</span>热量计算器</button>
+        <button class="nav-item" data-page="exercises"><span>06</span>动作指导库</button>
+        <button class="nav-item" data-page="knowledge"><span>07</span>减脂知识库</button>
+        <button class="nav-item" data-page="evidence"><span>08</span>文献与数据更新</button>
+        <button class="nav-item" data-page="videos"><span>09</span>视频参考</button>
       </nav>
       <div class="sidebar-foot">
         <span class="online-dot"></span><span id="storageMode">本地模式</span>
@@ -36,7 +38,8 @@
         <button id="menuButton" class="icon-button mobile-only" aria-label="打开菜单">☰</button>
         <div><p class="eyebrow" id="pageEyebrow">你的减脂控制台</p><h1 id="pageTitle">今天从可持续的一步开始</h1></div>
         <div class="top-actions">
-          <button class="secondary-button" id="printButton">打印 / PDF</button>
+          <button class="member-switch-button" id="memberButton" aria-label="切换或管理成员"><span class="member-avatar" id="memberAvatar">1</span><span><small>当前成员</small><b id="activeMemberName">成员 1</b></span><i>⌄</i></button>
+          <button class="secondary-button" id="printButton">导出成员报告</button>
           <button class="primary-button" data-jump="profile">完善档案</button>
         </div>
       </header>
@@ -145,6 +148,24 @@
           <article class="measurement-guide"><h3>规范测量</h3><div class="guide-grid"><div><b>体重</b><p>晨起排空后、进食前、相近衣着。关注7日平均，不为单日波动改方案。</p></div><div><b>腰围</b><p>自然呼气末，在髂嵴上缘或固定标志处水平测量；每次使用同一位置。</p></div><div><b>体脂率</b><p>家用体脂秤更适合观察同条件下趋势，单次绝对值可能受水分显著影响。</p></div></div></article>
         </section>
 
+        <section class="page" id="calculator" data-title="把菜名拆成可以核算的原料" data-eyebrow="热量计算器">
+          <div class="section-intro"><div><h2>标准菜谱与自定义热量计算</h2><p>标准家庭配方按原料和用油计算；餐馆与外卖只能作为低置信度区间估算。</p></div><div class="recipe-stats"><b id="recipeCount">0</b><span>套标准中餐</span></div></div>
+          <div class="calculator-layout">
+            <aside class="recipe-browser">
+              <div class="recipe-filters"><input id="recipeSearch" placeholder="搜索炒饭、炒面、家常菜"><select id="recipeCategory"><option value="all">全部类别</option></select></div>
+              <div id="recipeList" class="recipe-list"></div>
+            </aside>
+            <section class="recipe-editor" id="recipeEditor"></section>
+          </div>
+        </section>
+
+        <section class="page" id="exercises" data-title="先看懂，再开始做" data-eyebrow="动作指导库">
+          <div class="section-intro"><div><h2>主流训练动作指导库</h2><p>示意图用于理解动作阶段，不具备摄像头姿态识别能力；出现锐痛、麻木或眩晕时应停止。</p></div><div class="exercise-stats"><b id="exerciseCount">0</b><span>项结构化动作</span></div></div>
+          <div class="exercise-toolbar"><input id="exerciseSearch" placeholder="搜索动作、肌群或器械"><select id="exercisePattern"><option value="all">全部动作模式</option></select><select id="exerciseEquipment"><option value="all">全部器械</option><option value="徒手">徒手</option><option value="哑铃">哑铃</option><option value="杠铃">杠铃</option><option value="壶铃">壶铃</option><option value="弹力带">弹力带</option><option value="固定器械">固定器械</option></select><select id="exerciseDifficulty"><option value="all">全部难度</option><option>入门</option><option>基础</option><option>进阶</option></select></div>
+          <div class="exercise-library-grid" id="exerciseLibraryGrid"></div>
+          <button class="secondary-button exercise-load-more" id="exerciseLoadMore">显示更多动作</button>
+        </section>
+
         <section class="page" id="knowledge" data-title="把常见误区拆开看" data-eyebrow="减脂知识库">
           <div class="knowledge-grid">
             <article class="knowledge-card accent"><span>核心原则</span><h2>局部训练不能定向消除局部脂肪</h2><p>腹肌和腿部训练能增强相应肌群，但脂肪减少主要由长期能量缺口与全身代谢调节决定。视觉变化通常晚于体能变化。</p></article>
@@ -171,7 +192,12 @@
     </div>
   </div>
 
-  <dialog id="syncDialog"><form method="dialog" class="dialog-card"><div class="dialog-head"><div><span class="eyebrow">匿名密文同步</span><h2>同步设置</h2></div><button class="icon-button" value="cancel" aria-label="关闭">×</button></div><div id="syncUnavailable" class="notice"><b>当前为本地模式</b><p>部署者尚未配置 Supabase。你的数据仅保存在当前浏览器，可使用导入/导出迁移。</p></div><div id="syncOnline" hidden><p class="muted">服务端只保存密文。恢复码遗失后无法找回；请下载并离线保管。</p><div class="sync-actions"><button type="button" class="primary-button" id="createCloud">新建云端档案</button><button type="button" class="secondary-button" id="pushCloud">上传当前数据</button></div><div class="form-grid compact"><label>同步 ID<input id="syncIdInput" autocomplete="off"></label><label>恢复码<input id="recoveryInput" autocomplete="off" placeholder="8位-8位-8位…"></label></div><div class="sync-actions"><button type="button" class="secondary-button" id="restoreCloud">从云端恢复</button><button type="button" class="danger-button" id="deleteCloud">删除云端档案</button></div><p id="syncStatus" class="muted"></p></div><div class="sync-actions"><button type="button" class="secondary-button" id="downloadBackup">导出备份</button><label class="secondary-button file-label">导入备份<input id="importBackup" type="file" accept="application/json"></label><button type="button" class="danger-button" id="deleteLocal">删除本地数据</button></div><details><summary>部署者配置说明</summary><p>复制 <code>config.example.js</code> 为 <code>config.js</code> 并填写 Edge Function 地址和正式域名。恢复码只由用户持有，服务端不保存明文。</p></details></form></dialog>
+  <section id="printReport" class="print-report" aria-hidden="true"></section>
+
+  <dialog id="syncDialog"><form method="dialog" class="dialog-card"><div class="dialog-head"><div><span class="eyebrow">匿名密文同步</span><h2>同步设置</h2></div><button class="icon-button" value="cancel" aria-label="关闭">×</button></div><div id="syncUnavailable" class="notice"><b>当前为本地模式</b><p>你的成员资料库仅保存在当前浏览器，可使用导入/导出迁移。</p></div><div id="syncOnline" hidden><p class="muted">整个成员资料库在浏览器内加密后同步。服务端只保存密文；恢复码遗失后无法找回。</p><div class="sync-actions"><button type="button" class="primary-button" id="createCloud">新建云端资料库</button><button type="button" class="secondary-button" id="pushCloud">上传整个资料库</button></div><div class="form-grid compact"><label>同步 ID<input id="syncIdInput" autocomplete="off"></label><label>恢复码<input id="recoveryInput" autocomplete="off" placeholder="8位-8位-8位…"></label></div><div class="sync-actions"><button type="button" class="secondary-button" id="restoreCloud">从云端恢复</button><button type="button" class="danger-button" id="deleteCloud">删除云端资料库</button></div><p id="syncStatus" class="muted"></p></div><div class="sync-actions"><button type="button" class="secondary-button" id="downloadBackup">备份整个成员库</button><button type="button" class="secondary-button" id="downloadCurrentMember">仅导出当前成员</button><label class="secondary-button file-label">导入备份<input id="importBackup" type="file" accept="application/json"></label><button type="button" class="danger-button" id="deleteLocal">删除本地资料库</button></div><details><summary>部署者配置说明</summary><p>复制 <code>config.example.js</code> 为 <code>config.js</code> 并填写 Edge Function 地址和正式域名。恢复码只由用户持有，服务端不保存明文。</p></details></form></dialog>
+  <dialog id="memberDialog"><div class="dialog-card member-dialog-card"><div class="dialog-head"><div><span class="eyebrow">成员资料库</span><h2>切换与管理成员</h2></div><button class="icon-button" id="closeMemberDialog" aria-label="关闭">×</button></div><div id="memberList" class="member-list"></div><form id="newMemberForm" class="member-create-row"><input id="newMemberName" maxlength="20" required placeholder="输入新成员名称"><button class="primary-button" type="submit">新建成员</button></form><p class="muted">每位成员拥有独立档案、方案、记录和个人菜谱；共享菜谱对所有成员可见。</p></div></dialog>
+  <dialog id="reportDialog"><form method="dialog" class="dialog-card report-dialog-card" id="reportForm"><div class="dialog-head"><div><span class="eyebrow">当前成员完整报告</span><h2>导出为PDF</h2></div><button class="icon-button" value="cancel" aria-label="关闭">×</button></div><p>报告将包含个人信息、完整4周训练、完整7天饮食及所选范围的进度记录。</p><label>进度时间范围<select id="reportRange"><option value="30">最近30天</option><option value="45" selected>最近45天（默认）</option><option value="90">最近90天</option><option value="all">全部记录</option></select></label><div class="report-summary"><span>成员：<b id="reportMemberName">—</b></span><span>方案：<b id="reportPlanVersion">—</b></span></div><div class="sync-actions"><button type="button" class="primary-button" id="generateReport">生成并打开打印窗口</button><button value="cancel" class="secondary-button">取消</button></div><small class="muted">在浏览器打印窗口中选择“另存为PDF”。静态网站不能绕过浏览器权限自动静默保存。</small></form></dialog>
+  <dialog id="exerciseDialog"><div class="dialog-card exercise-dialog-card"><div class="dialog-head"><div><span class="eyebrow">动作标准与指导画面</span><h2 id="exerciseDialogTitle">动作指导</h2></div><button class="icon-button" id="closeExerciseDialog" aria-label="关闭">×</button></div><div id="exerciseDialogBody"></div></div></dialog>
   <dialog id="unsavedDialog"><div class="dialog-card unsaved-dialog"><div class="dialog-head"><div><span class="eyebrow">检测到未保存修改</span><h2>要先保存吗？</h2></div></div><p id="unsavedMessage">当前页面的修改还没有保存。保存后再离开，可避免数据丢失。</p><div class="unsaved-actions"><button type="button" class="primary-button" id="saveAndLeave">保存并离开</button><button type="button" class="secondary-button" id="discardAndLeave">不保存</button><button type="button" class="text-button" id="cancelLeave">取消</button></div></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="config.js" onerror="this.remove()"></script>

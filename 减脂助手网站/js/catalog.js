@@ -65,6 +65,8 @@ export const references = [
   {title:"Resistance Training Prescription for Muscle Function, Hypertrophy, and Physical Performance（2026）",org:"American College of Sports Medicine",note:"综合137篇系统综述，支持每周至少2次抗阻训练、渐进负荷与按目标调整训练量。",url:"https://pubmed.ncbi.nlm.nih.gov/41843416/"},
   {title:"Progression Models in Resistance Training for Healthy Adults",org:"American College of Sports Medicine",note:"支持达到目标次数上限后小幅加重，以及新手每周2～3次训练的进阶原则。",url:"https://pubmed.ncbi.nlm.nih.gov/11828249/"},
   {title:"ACSM减重与体重反弹预防立场文件",org:"American College of Sports Medicine",note:"体力活动剂量与体重管理的经典立场文件。",url:"https://pubmed.ncbi.nlm.nih.gov/19127177/"},
+  {title:"ACSM 2026抗阻训练指南更新",org:"American College of Sports Medicine",note:"用于训练频率、渐进负荷、居家训练和不必每组力竭等原则；不代表本站每个示意动作经过个体医学审核。",url:"https://acsm.org/resistance-training-guidelines-update-2026/"},
+  {title:"ACE动作库",org:"American Council on Exercise",note:"用于动作模式、部位与器械分类框架；本站中文步骤和自绘示意为教学性整理。",url:"https://www.acefitness.org/resources/everyone/exercise-library/"},
   {title:"FoodData Central 下载与数据说明",org:"USDA",note:"部分食物营养参考值及每100克换算规则。",url:"https://fdc.nal.usda.gov/download-datasets/"},
   {title:"蛋白质摄入与抗阻训练荟萃分析",org:"British Journal of Sports Medicine",note:"支持抗阻训练人群蛋白质摄入的参考区间；不是越高越好。",url:"https://pubmed.ncbi.nlm.nih.gov/28698222/"},
   {title:"饮食与运动对体重及瘦体重影响的随机试验",org:"New England Journal of Medicine",note:"说明能量限制结合运动对体重组成和体能的影响。",url:"https://pubmed.ncbi.nlm.nih.gov/28514618/"}
@@ -85,4 +87,4 @@ export const videos = [
   {platform:"哔哩哔哩",provider:"bilibili",embedId:"BV1SD421T7Pc",author:"暴躁野哥讲健身",title:"减脂期的练后餐怎么吃",url:"https://www.bilibili.com/video/BV1SD421T7Pc/",views:"约33.9万",likes:"约1.8万",checkedOn:核验日期,status:"公开页快照",summary:"强调总摄入和练后正餐；具体克重以全天目标为准。"}
 ];
 
-export const dataMeta = {verifiedOn:核验日期,foodCount:foods.length,mealCount:mealTemplates.length,version:"2026.07-a",reviewStatus:"待营养专业逐条审核",disclaimer:"营养值为离线规划参考快照，尤其外卖和混合菜误差较大。正式发布前应由营养专业人员逐条审核。"};
+export const dataMeta = {verifiedOn:核验日期,foodCount:foods.length,mealCount:mealTemplates.length,version:"2026.07-b",reviewStatus:"待营养专业逐条审核",disclaimer:"营养值为离线规划参考快照，尤其外卖和混合菜误差较大。正式发布前应由营养专业人员逐条审核。"};
