@@ -96,7 +96,17 @@
                 <label>压力水平 <small>选填</small><select name="stress"><option value="">未填写</option><option value="low">低</option><option value="medium">中</option><option value="high">高</option></select></label>
                 <label>当前训练量 分钟/周 <small>选填</small><input name="currentMinutes" type="number" min="0" max="1500"></label>
                 <label>习惯训练时段 <small>选填</small><select name="trainingTime"><option value="">不限</option><option>早晨</option><option>午间</option><option>晚间</option></select></label>
+                <label>日程安排方式 <small>选填</small><select name="scheduleMode" id="scheduleMode"><option value="auto">由系统推荐</option><option value="weekdays">指定星期</option><option value="dates">指定具体日期</option></select></label>
+                <label>计划开始日期 <small>选填</small><input name="planStart" type="date"></label>
+                <label>建议开始时间 <small>选填</small><input name="preferredTime" type="time"></label>
+                <label>最早可训练 <small>选填</small><input name="earliestTime" type="time"></label>
+                <label>最晚结束时间 <small>选填</small><input name="latestTime" type="time"></label>
+                <label>训练前最近一餐 <small>选填</small><select name="mealGap"><option value="">未填写</option><option value="1">约1小时前</option><option value="2">约2小时前</option><option value="3">约3小时前</option><option value="fasted">尚未进餐</option></select></label>
               </div>
+              <fieldset id="weekdayField"><legend>可训练星期 <small>选填；未选时自动错峰</small></legend><div class="chip-grid">
+                <label><input type="checkbox" name="weekdays" value="1">周一</label><label><input type="checkbox" name="weekdays" value="2">周二</label><label><input type="checkbox" name="weekdays" value="3">周三</label><label><input type="checkbox" name="weekdays" value="4">周四</label><label><input type="checkbox" name="weekdays" value="5">周五</label><label><input type="checkbox" name="weekdays" value="6">周六</label><label><input type="checkbox" name="weekdays" value="7">周日</label>
+              </div></fieldset>
+              <fieldset id="specificDateField"><legend>指定具体训练日期 <small>可连续添加；不足4周时系统补齐</small></legend><div class="specific-date-picker"><input id="specificDatePicker" type="date"><button class="secondary-button" type="button" id="addSpecificDate">添加日期</button></div><input type="hidden" name="specificDates" id="specificDates"><div class="selected-date-chips" id="selectedDateChips"></div></fieldset>
               <fieldset><legend>限制与偏好 <small>选填，可多选</small></legend><div class="chip-grid" id="trainingChips">
                 <label><input type="checkbox" name="limits" value="knee">膝部不适</label><label><input type="checkbox" name="limits" value="back">腰背不适</label><label><input type="checkbox" name="limits" value="shoulder">肩部不适</label><label><input type="checkbox" name="dislikes" value="jump">不喜欢跳跃</label><label><input type="checkbox" name="dislikes" value="run">不喜欢跑步</label><label><input type="checkbox" name="preferences" value="strength">偏好力量</label><label><input type="checkbox" name="preferences" value="cardio">偏好有氧</label>
               </div></fieldset>
@@ -149,13 +159,24 @@
         </section>
 
         <section class="page" id="calculator" data-title="把菜名拆成可以核算的原料" data-eyebrow="热量计算器">
-          <div class="section-intro"><div><h2>标准菜谱与自定义热量计算</h2><p>标准家庭配方按原料和用油计算；餐馆与外卖只能作为低置信度区间估算。</p></div><div class="recipe-stats"><b id="recipeCount">0</b><span>套标准中餐</span></div></div>
-          <div class="calculator-layout">
+          <div class="section-intro"><div><h2>家庭菜谱与中国大陆外食热量</h2><p>标准家庭配方按原料和用油计算；品牌菜品按份展示，并明确区分官方入口与配方估算。</p></div><div class="recipe-stats"><b id="recipeCount">0</b><span>条可查询内容</span></div></div>
+          <div class="calculator-tabs"><button class="active" data-calculator-tab="recipe">家庭菜谱</button><button data-calculator-tab="dining">外食与连锁品牌</button></div>
+          <div class="calculator-layout calculator-tab-panel active" id="recipeCalculatorPanel">
             <aside class="recipe-browser">
               <div class="recipe-filters"><input id="recipeSearch" placeholder="搜索炒饭、炒面、家常菜"><select id="recipeCategory"><option value="all">全部类别</option></select></div>
               <div id="recipeList" class="recipe-list"></div>
             </aside>
             <section class="recipe-editor" id="recipeEditor"></section>
+          </div>
+          <div class="dining-calculator calculator-tab-panel" id="diningCalculatorPanel">
+            <aside class="dining-browser">
+              <div class="dining-stats"><b id="diningBrandCount">0</b><span>个中国大陆常见品牌</span><b id="diningItemCount">0</b><span>款菜品/饮品</span></div>
+              <input id="diningSearch" placeholder="搜索品牌、汉堡、拌饭、奶茶">
+              <select id="diningGroup"><option value="all">全部餐饮类别</option></select>
+              <select id="diningBrand"><option value="all">全部品牌</option></select>
+              <div id="diningList" class="dining-list"></div>
+            </aside>
+            <section id="diningDetail" class="dining-detail"></section>
           </div>
         </section>
 

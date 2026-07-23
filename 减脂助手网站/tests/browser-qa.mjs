@@ -41,6 +41,8 @@ const initial=await evaluate(`({
   foods:document.querySelector('#foodCount').textContent,
   recipes:document.querySelector('#recipeCount').textContent,
   exercises:document.querySelector('#exerciseCount').textContent,
+  diningBrands:document.querySelector('#diningBrandCount').textContent,
+  diningItems:document.querySelector('#diningItemCount').textContent,
   logoLoaded:document.querySelector('.brand-mark img').naturalWidth>0
 })`);
 
@@ -72,6 +74,9 @@ const result=await evaluate(`(async()=>{
   document.querySelector('#cancelLeave').click();
   form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));await pause(450);
   const week1=document.querySelector('#trainingPanel').innerText;
+  const scheduledSessions=document.querySelectorAll('#trainingPanel .session-card').length;
+  const scheduleVisible=document.querySelector('#trainingPanel .training-calendar-strip')?.innerText.includes('月')&&document.querySelector('#trainingPanel .session-timeline')?.innerText.includes('动态热身');
+  const scheduleEntry=JSON.parse(localStorage.getItem('hengran_member_library_v4')).members[0].plans.at(-1).training.schedule.entries[0];
   document.querySelector('#trainingPanel [data-week="1"]').click();
   const week2=document.querySelector('#trainingPanel').innerText;
   const library=JSON.parse(localStorage.getItem('hengran_member_library_v4'));
@@ -94,6 +99,15 @@ const result=await evaluate(`(async()=>{
   const oilInput=oilRow?.querySelector('.recipe-grams-input');
   if(oilInput){oilInput.value=String(Number(oilInput.value)+5);oilInput.dispatchEvent(new Event('input',{bubbles:true}))}
   const nutritionAfter=document.querySelector('#recipeNutrition').innerText;
+  document.querySelector('[data-calculator-tab="dining"]').click();await pause(40);
+  const brand=document.querySelector('#diningBrand');
+  brand.value='瑞幸咖啡';brand.dispatchEvent(new Event('change',{bubbles:true}));await pause(30);
+  const diningMatches=document.querySelectorAll('#diningList [data-dining]').length;
+  const diningBefore=Number(document.querySelector('.dining-kcal strong').textContent);
+  const sugar=document.querySelector('#diningSugar');
+  sugar.value='全糖';sugar.dispatchEvent(new Event('change',{bubbles:true}));await pause(30);
+  const diningAfter=Number(document.querySelector('.dining-kcal strong').textContent);
+  const diningConfidence=document.querySelector('.data-confidence').innerText;
 
   document.querySelector('[data-page="exercises"]').click();await pause(50);
   const exerciseCards=document.querySelectorAll('.exercise-library-card').length;
@@ -101,6 +115,11 @@ const result=await evaluate(`(async()=>{
   const guideOpen=document.querySelector('#exerciseDialog').open;
   const guideFrames=document.querySelectorAll('#exerciseDialog .exercise-frames figure').length;
   const guideText=document.querySelector('#exerciseDialog').innerText;
+  const motionPlayer=Boolean(document.querySelector('#exerciseDialog #motionPlayer'));
+  const motionProgressBefore=Number(document.querySelector('#motionScrubber')?.value||0);
+  await pause(120);
+  const motionProgressAfter=Number(document.querySelector('#motionScrubber')?.value||0);
+  document.querySelector('#motionToggle')?.click();
   document.querySelector('#closeExerciseDialog').click();
 
   window.__printed=false;Object.defineProperty(window,'print',{configurable:true,value:()=>{window.__printed=true}});
@@ -116,13 +135,21 @@ const result=await evaluate(`(async()=>{
     unsavedPrompt,
     saveState:document.querySelector('#saveState').textContent,
     weekProgressed:week1!==week2&&week2.includes('每组 +1次'),
+    scheduledSessions,
+    scheduleVisible,
+    scheduleEntryComplete:Boolean(scheduleEntry?.date&&scheduleEntry?.startTime&&scheduleEntry?.timeline?.length>=3),
     members:afterCreate.members.length,
     secondIsEmpty,
     firstRestored,
     recipeChanged:nutritionBefore!==nutritionAfter,
+    diningMatches,
+    diningChanged:diningAfter>diningBefore,
+    diningConfidence:diningConfidence.includes('配方估算')&&diningConfidence.includes('置信度'),
     exerciseCards,
     guideOpen,
     guideFrames,
+    motionPlayer,
+    motionMoved:motionProgressAfter!==motionProgressBefore,
     guideComplete:guideText.includes('做到位的判断')&&guideText.includes('常见错误')&&guideText.includes('呼吸'),
     reportDefault,
     printed:window.__printed,
@@ -137,18 +164,30 @@ console.error("浏览器测试：交互主链路完成");
 await call("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
 await wait(250);
 const mobile=await evaluate(`({innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:document.documentElement.scrollWidth>innerWidth})`);
-const output={mode:direct?"直接打开文件":"HTTP服务器",target:{url:page.url,title:page.title},initial,migration,result,mobile,consoleErrors:errors};
+let review={skipped:direct};
+if(!direct){
+  await call("Emulation.clearDeviceMetricsOverride");
+  const reviewUrl=new URL("动作演示审核.html",url).href;
+  await call("Page.navigate",{url:reviewUrl});
+  await waitFor("document.querySelector('#readyCount')?.textContent==='88'");
+  review=await evaluate(`({total:document.querySelector('#totalCount').textContent,ready:document.querySelector('#readyCount').textContent,pending:document.querySelector('#pendingCount').textContent,cards:document.querySelectorAll('.card').length,firstLink:document.querySelector('.card a:not(.disabled)')?.href})`);
+  await call("Page.navigate",{url:review.firstLink});
+  review.deepLinkOpened=await waitFor("Boolean(document.querySelector('#exerciseDialog')?.open&&document.querySelector('#motionPlayer'))");
+}
+const output={mode:direct?"直接打开文件":"HTTP服务器",target:{url:page.url,title:page.title},initial,migration,result,mobile,review,consoleErrors:errors};
 console.log(JSON.stringify(output,null,2));
 ws.close();proc.kill();server?.kill();
 await Promise.race([new Promise(resolve=>proc.once("exit",resolve)),wait(1500)]);
 await rm(profile,{recursive:true,force:true,maxRetries:3,retryDelay:300}).catch(()=>{});
 
 const failed=
-  initial.pages!==9||initial.foods!=="300"||initial.recipes!=="120"||initial.exercises!=="220"||!initial.logoLoaded||
-  migration.schema!==4||migration.members!==1||migration.plans<1||migration.planSchema!==4||
+  initial.pages!==9||initial.foods!=="300"||initial.recipes!=="606"||initial.exercises!=="220"||initial.diningBrands!=="27"||initial.diningItems!=="486"||!initial.logoLoaded||
+  migration.schema!==4||migration.members!==1||migration.plans<1||migration.planSchema!==5||
   !result.unsavedPrompt||result.saveState!=="已保存"||!result.weekProgressed||
+  result.scheduledSessions!==4||!result.scheduleVisible||!result.scheduleEntryComplete||
   result.members!==2||!result.secondIsEmpty||!result.firstRestored||
-  !result.recipeChanged||result.exerciseCards!==36||!result.guideOpen||result.guideFrames!==3||!result.guideComplete||
+  !result.recipeChanged||result.diningMatches!==18||!result.diningChanged||!result.diningConfidence||
+  result.exerciseCards!==36||!result.guideOpen||result.guideFrames!==3||!result.motionPlayer||!result.motionMoved||!result.guideComplete||
   result.reportDefault!=="45"||!result.printed||result.reportWeeks!==4||result.reportDays!==7||!result.reportComplete||
-  mobile.overflow||errors.length;
+  mobile.overflow||(!direct&&(review.total!=="220"||review.ready!=="88"||review.pending!=="132"||review.cards!==220||!review.deepLinkOpened))||errors.length;
 if(failed)process.exitCode=1;

@@ -171,6 +171,26 @@ const bodyweightExerciseCount=exerciseLibrary.filter(item=>item.tool==="徒手")
 function getExerciseByName(name){return exerciseLibrary.find(item=>item.name===name)}
 function exerciseById(id){return exerciseLibrary.find(item=>item.id===id)}
 
+/* 来源：js/motion-catalog.js */
+const 每组动画数=8;
+const 复杂模式=new Set(["squat","hinge","push","pull","vertical","single"]);
+const 组内序号=new Map();
+
+const motionExercises=exerciseLibrary.filter(exercise=>{
+  const index=组内序号.get(exercise.group)||0;
+  组内序号.set(exercise.group,index+1);
+  return index<每组动画数;
+}).map(exercise=>({
+  exerciseId:exercise.id,name:exercise.name,visualKey:exercise.visualKey,
+  mode:复杂模式.has(exercise.group)?"multi-angle":"single-angle",
+  fps:60,duration:复杂模式.has(exercise.group)?9:4.5,
+  status:"首批程序化高帧率教学动画",reviewStatus:"动作模式已结构化；发布前仍需逐项人工复核"
+}));
+
+const motionExerciseIds=new Set(motionExercises.map(item=>item.exerciseId));
+const motionExerciseCount=motionExercises.length;
+function getMotion(exerciseId){return motionExercises.find(item=>item.exerciseId===exerciseId)}
+
 /* 来源：js/recipe-catalog.js */
 const 菜谱核验日期="2026-07-23";
 const 菜谱食物=name=>foods.find(food=>food.name===name);
@@ -274,6 +294,104 @@ function recipeAllowed(recipe,profile={}){
   });
 }
 
+/* 来源：js/external-food-catalog.js */
+const 外食核验日期="2026-07-23";
+
+const 菜品模板={
+  western:[
+    ["经典牛肉汉堡",510,24,27,43],["双层牛肉汉堡",720,38,43,46],["香辣鸡腿汉堡",560,25,31,47],
+    ["烤鸡腿堡",470,28,19,48],["鳕鱼堡",390,16,19,40],["鸡肉卷",480,23,24,48],
+    ["原味炸鸡",310,22,20,13],["香辣鸡翅（2只）",230,15,15,9],["鸡块（6块）",270,16,17,16],
+    ["中份薯条",360,5,17,47],["玉米杯",120,4,2,24],["蔬菜沙拉（含酱）",180,5,12,15],
+    ["蛋挞",230,4,14,24],["苹果派",260,3,13,33],["鸡肉披萨（2片）",520,24,22,59],
+    ["牛肉披萨（2片）",560,25,25,61],["早餐蛋肉堡",430,20,22,39],["炸鸡套餐（不含饮料）",860,35,47,75]
+  ],
+  chinese:[
+    ["招牌鸡肉饭",650,32,19,86],["红烧牛肉饭",720,31,27,91],["鱼香肉丝饭",760,27,30,94],
+    ["宫保鸡丁饭",780,32,32,93],["番茄炒蛋饭",640,20,22,88],["青椒肉丝饭",700,28,25,91],
+    ["小炒黄牛肉饭",740,34,28,88],["梅菜扣肉饭",850,25,44,89],["香菇滑鸡饭",690,31,22,89],
+    ["黑椒牛柳饭",730,32,27,91],["土豆烧鸡饭",700,29,22,94],["排骨米饭",820,31,37,93],
+    ["卤肉饭",790,25,36,98],["照烧鸡排饭",760,32,27,99],["菌菇豆腐饭",590,19,17,89],
+    ["鸡蛋炒饭",680,18,21,102],["牛肉炒饭",760,28,26,108],["鸡肉炒面",720,29,24,101]
+  ],
+  snack:[
+    ["牛肉汤面",620,27,18,89],["牛肉拌面",720,29,24,101],["鸡丝汤面",540,26,12,83],
+    ["炸酱面",690,24,24,96],["酸辣粉",560,13,18,88],["肥牛米线",680,25,25,91],
+    ["鸡肉米线",590,27,16,90],["麻辣烫（常规一碗）",720,32,30,82],["清汤麻辣烫",570,31,16,77],
+    ["黄焖鸡米饭",780,35,29,97],["馄饨（12只）",510,23,17,67],["蒸饺（10只）",560,24,20,73],
+    ["拌馄饨",610,24,24,75],["沙县拌面",590,17,19,87],["鸭腿饭",800,31,35,98],
+    ["牛肉盖饭",730,31,25,99],["羊肉汤配饼",690,30,25,88],["肉夹馍",540,22,24,61]
+  ],
+  drinks:[
+    ["经典拿铁",230,9,9,29],["厚乳拿铁",330,10,16,37],["燕麦拿铁",250,5,8,40],
+    ["生椰拿铁",310,5,16,38],["美式咖啡",15,1,0,2],["摩卡",360,9,15,49],
+    ["原叶鲜奶茶",320,7,10,52],["黑糖珍珠奶茶",520,6,15,87],["波霸奶茶",480,6,14,80],
+    ["芝士奶盖茶",430,7,22,51],["水果茶",300,2,1,72],["柠檬茶",260,1,0,64],
+    ["杨枝甘露",490,5,16,78],["芋泥鲜奶",560,10,18,91],["抹茶拿铁",350,9,13,52],
+    ["可可鲜奶",410,11,17,58],["纯茶",10,0,0,2],["冰淇淋甜筒",220,4,7,35]
+  ]
+};
+
+const 品牌组=[
+  ["西式快餐","western","麦当劳|肯德基|汉堡王|必胜客|达美乐|华莱士"],
+  ["中式快餐","chinese","老乡鸡|乡村基|真功夫|米村拌饭|吉野家|永和大王|南城香|和府捞面"],
+  ["米粉面点","snack","沙县小吃|杨国福麻辣烫|张亮麻辣烫|兰州牛肉面|黄焖鸡米饭"],
+  ["咖啡与茶饮","drinks","瑞幸咖啡|星巴克|库迪咖啡|喜茶|奈雪的茶|霸王茶姬|蜜雪冰城|古茗"]
+];
+
+const 官方入口={
+  "麦当劳":"https://www.mcdonalds.com.cn/nutrition_calculator",
+  "肯德基":"https://www.kfc.com.cn/",
+  "星巴克":"https://www.starbucks.com.cn/menu/",
+  "霸王茶姬":"https://www.chagee.com.cn/"
+};
+
+function 四舍五入(value,digits=0){return Number(value.toFixed(digits))}
+function 品牌系数(brand){return .94+([...brand].reduce((sum,char)=>sum+char.charCodeAt(0),0)%13)/100}
+
+const diningBrands=品牌组.flatMap(([group,type,names])=>names.split("|").map(name=>({name,group,type,officialUrl:官方入口[name]||""})));
+
+const diningItems=diningBrands.flatMap((brand,brandIndex)=>{
+  const factor=品牌系数(brand.name);
+  return 菜品模板[brand.type].map(([baseName,kcal,protein,fat,carbs],itemIndex)=>{
+    const adjusted=Math.round(kcal*factor/5)*5;
+    const range=[Math.round(adjusted*.82/5)*5,Math.round(adjusted*1.22/5)*5];
+    const drink=brand.type==="drinks";
+    return {
+      id:`out${String(brandIndex*18+itemIndex+1).padStart(3,"0")}`,
+      brand:brand.name,group:brand.group,type:brand.type,name:baseName,
+      serving:drink?"标准中杯/杯":"标准一份",
+      kcal:adjusted,protein:四舍五入(protein*factor,1),fat:四舍五入(fat*factor,1),carbs:四舍五入(carbs*factor,1),
+      range,status:"配方估算",confidence:drink?"中低":"中低",
+      source:brand.officialUrl?`品牌中国大陆菜单用于名称核对；营养值按标准配方估算，官方入口：${brand.officialUrl}`:"按标准化家庭/餐饮配方与食物成分参考值估算；门店配方和份量可能不同",
+      sourceUrl:brand.officialUrl,verifiedOn:外食核验日期,
+      options:drink?{
+        sizes:[["中杯",1],["大杯",1.22]],
+        sugars:[["不另外加糖",0],["三分糖",35],["五分糖",70],["七分糖",105],["全糖",150]],
+        toppings:[["不加料",0],["珍珠",120],["椰果",70],["奶盖",150],["芋泥",180]]
+      }:null
+    };
+  });
+});
+
+const diningItemCount=diningItems.length;
+const diningBrandCount=diningBrands.length;
+
+function calculateDiningItem(item,{size="中杯",sugar="不另外加糖",topping="不加料"}={}){
+  if(!item.options)return {...item,selectedServing:item.serving,calculatedKcal:item.kcal,calculatedRange:item.range};
+  const sizeFactor=item.options.sizes.find(option=>option[0]===size)?.[1]||1;
+  const sugarKcal=item.options.sugars.find(option=>option[0]===sugar)?.[1]||0;
+  const toppingKcal=item.options.toppings.find(option=>option[0]===topping)?.[1]||0;
+  const calculatedKcal=Math.round((item.kcal*sizeFactor+sugarKcal+toppingKcal)/5)*5;
+  return {
+    ...item,selectedServing:`${size} · ${sugar} · ${topping}`,calculatedKcal,
+    calculatedRange:[Math.round(calculatedKcal*.82/5)*5,Math.round(calculatedKcal*1.22/5)*5],
+    calculatedProtein:四舍五入(item.protein*sizeFactor,1),
+    calculatedFat:四舍五入(item.fat*sizeFactor+(topping==="奶盖"?12:0),1),
+    calculatedCarbs:四舍五入(item.carbs*sizeFactor+sugarKcal/4+toppingKcal/4,1)
+  };
+}
+
 /* 来源：js/engine.js */
 const round=(n,d=0)=>Number(Number(n).toFixed(d));
 function bmi(weight,height){return round(weight/((height/100)**2),1)}
@@ -338,6 +456,64 @@ function strengthSession(profile,label,offset=0){
   return {type:"力量",label,exercises:patterns.slice(0,count).map((p,i)=>({ ...pickExercise(p,profile,i+offset),sets:profile.experience==="new"?2:3,reps:i===4?"8～12/侧":"8～12",rir:profile.experience==="trained"?"2":"2～3",rest:i<4?"75～120秒":"45～75秒"})),cardio:{mode:getCardio(profile),minutes:Number(profile.minutes)>=60?15:10,intensity:"能说完整短句；参考心率仅作辅助"}};
 }
 function getCardio(profile){if((profile.limits||[]).includes("knee"))return profile.equipment==="gym"?"椭圆机或单车":"平地快走";if((profile.dislikes||[]).includes("run"))return"快走或单车";return profile.equipment==="gym"?"坡度走、单车或椭圆机":"户外快走"}
+const 星期标签=["周日","周一","周二","周三","周四","周五","周六"];
+function 本地日期(text){
+  const match=String(text||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!match)return null;
+  const date=new Date(Number(match[1]),Number(match[2])-1,Number(match[3]));
+  return Number.isNaN(date.getTime())||date.getFullYear()!==Number(match[1])||date.getMonth()!==Number(match[2])-1||date.getDate()!==Number(match[3])?null:date;
+}
+function 日期文本(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
+function 加天(date,days){const next=new Date(date);next.setDate(next.getDate()+days);return next}
+function 加分钟(time,minutes){
+  const [hour,minute]=String(time||"19:00").split(":").map(Number),total=hour*60+minute+minutes;
+  return `${String(Math.floor(total/60)%24).padStart(2,"0")}:${String(total%60).padStart(2,"0")}`;
+}
+function 推荐时间(profile){
+  const preferred=profile.preferredTime||(profile.trainingTime==="早晨"?"07:00":profile.trainingTime==="午间"?"12:30":"19:00");
+  const toMinutes=value=>{const [hour,minute]=String(value||"").split(":").map(Number);return Number.isFinite(hour)&&Number.isFinite(minute)?hour*60+minute:null};
+  const preferredMinutes=toMinutes(preferred),earliest=toMinutes(profile.earliestTime),latest=toMinutes(profile.latestTime);
+  let result=preferredMinutes??19*60;
+  if(earliest!==null)result=Math.max(result,earliest);
+  if(latest!==null)result=Math.min(result,latest);
+  return `${String(Math.floor(result/60)%24).padStart(2,"0")}:${String(result%60).padStart(2,"0")}`;
+}
+function 默认星期(days){
+  return ({2:[2,6],3:[1,3,6],4:[1,2,4,6],5:[1,2,4,5,7],6:[1,2,3,5,6,7]})[days]||[1,3,5];
+}
+function generateTrainingSchedule(profile,weeks){
+  const days=Number(profile.days),total=weeks.length*days,start=本地日期(profile.planStart)||加天(new Date(),1);
+  const exact=String(profile.specificDates||"").split(/[，,\s]+/).map(本地日期).filter(Boolean).sort((a,b)=>a-b);
+  const selectedWeekdays=(profile.weekdays||[]).map(Number).filter(day=>day>=1&&day<=7);
+  const weekdayList=selectedWeekdays.length?selectedWeekdays:默认星期(days);
+  const dates=[];
+  if(profile.scheduleMode==="dates"&&exact.length)dates.push(...exact.slice(0,total));
+  let cursor=dates.length?加天(dates.at(-1),1):start,guard=0;
+  while(dates.length<total&&guard<120){
+    const isoWeekday=cursor.getDay()===0?7:cursor.getDay();
+    if(weekdayList.includes(isoWeekday)&&!dates.some(item=>日期文本(item)===日期文本(cursor)))dates.push(new Date(cursor));
+    cursor=加天(cursor,1);guard++;
+  }
+  const startTime=推荐时间(profile),entries=[];
+  weeks.forEach((week,weekIndex)=>week.sessions.forEach((session,sessionIndex)=>{
+    const date=dates[weekIndex*days+sessionIndex]||加天(start,weekIndex*7+sessionIndex*2);
+    const cardioMinutes=session.cardio?.minutes||0,warmupMinutes=session.exercises?.length?8:6,cooldownMinutes=5;
+    const totalMinutes=Math.max(20,session.estimatedMinutes||Number(profile.minutes)||45);
+    const mainMinutes=Math.max(10,totalMinutes-warmupMinutes-cardioMinutes-cooldownMinutes);
+    const timeline=[
+      {label:"动态热身",minutes:warmupMinutes,detail:"关节活动、动作模式预演与2组递增热身"},
+      {label:session.exercises?.length?"力量主训练":session.label,minutes:mainMinutes,detail:session.exercises?.length?`${session.exercises.length}项动作，按页面组数、次数与休息执行`:"维持谈话测试对应强度"},
+      ...(cardioMinutes?[{label:"计划有氧",minutes:cardioMinutes,detail:session.cardio.intensity}]:[]),
+      {label:"放松与记录",minutes:cooldownMinutes,detail:"逐步降低强度，记录负荷、实际次数和完成感受"}
+    ];
+    let clock=startTime;
+    for(const item of timeline){item.start=clock;clock=加分钟(clock,item.minutes);item.end=clock}
+    const schedule={date:日期文本(date),dateLabel:`${date.getMonth()+1}月${date.getDate()}日`,weekday:星期标签[date.getDay()],startTime,endTime:clock,totalMinutes,timeline,source:profile.scheduleMode==="dates"&&exact.length?"用户指定日期":selectedWeekdays.length?"用户指定星期":"系统错峰推荐"};
+    Object.assign(session,{schedule,estimatedMinutes:totalMinutes});
+    entries.push({week:week.week,sessionIndex,label:session.label,...schedule});
+  }));
+  return {mode:profile.scheduleMode||"auto",entries,timeZone:"Asia/Shanghai",recommendation:"建议时间依据用户可用时段和训练间隔安排，不宣称存在统一的最佳燃脂时刻。"};
+}
 function generateTraining(profile){
   const days=Number(profile.days);let base=[];
   if(days<=3) base=Array.from({length:days},(_,i)=>strengthSession(profile,`全身训练 ${String.fromCharCode(65+i)}`,i));
@@ -363,7 +539,8 @@ function generateTraining(profile){
     return next;
   };
   const weeks=weekRules.map(rule=>({...rule,sessions:base.map(s=>progressSession(s,rule))}));
-  return {structure:days<=3?"全身训练":days===4?"上下肢拆分":"3次力量＋有氧/恢复",weeks,exerciseDatabaseSize:exerciseCount};
+  const schedule=generateTrainingSchedule(profile,weeks);
+  return {structure:days<=3?"全身训练":days===4?"上下肢拆分":"3次力量＋有氧/恢复",weeks,schedule,exerciseDatabaseSize:exerciseCount};
 }
 
 function allowedFood(food,profile){
@@ -471,7 +648,7 @@ function replaceDayMenu(profile,day,targets,variant=1){
   return {ok:true,day:replacement};
 }
 function generatePlan(profile,previousVersions=[]){
-  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:4,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案、220项动作库与标准中餐菜谱重新计算",adjustments:[]};
+  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:5,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案、4周日期日历、首批高帧率动作与中外食数据库重新计算",adjustments:[]};
 }
 function assessRisk(profile){
   const flags=[...(profile.risks||[])];const value=bmi(profile.weight,profile.height);
@@ -536,7 +713,7 @@ function loadMemberLibrary(){
   const member=createMember(legacyProfile?.nickname||legacyProfile?.name||"成员 1",{profile:legacyProfile,plans:legacyPlans,records:legacyRecords});
   return {schemaVersion:4,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),activeMemberId:member.id,members:[member],sharedRecipes:[],migration:{from:legacyProfile||legacyPlans.length||legacyRecords.length?"单人版 v2":"全新资料库",at:new Date().toISOString()}};
 }
-const state={library:loadMemberLibrary(),week:0,day:0,foodId:foods[0].id,mealVariant:1,recipeId:standardRecipes[0].id,recipeDraft:null,exerciseId:exerciseLibrary[0].id};
+const state={library:loadMemberLibrary(),week:0,day:0,foodId:foods[0].id,mealVariant:1,recipeId:standardRecipes[0].id,recipeDraft:null,exerciseId:exerciseLibrary[0].id,diningId:diningItems[0].id,diningOptions:{}};
 const activeMember=()=>state.library.members.find(member=>member.id===state.library.activeMemberId)||state.library.members[0];
 Object.defineProperties(state,{
   profile:{get:()=>activeMember().profile,set:value=>{activeMember().profile=value;activeMember().updatedAt=new Date().toISOString()}},
@@ -555,7 +732,7 @@ function write(key,value){
 function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2400)}
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const currentPlan=()=>state.plans.length?state.plans[state.plans.length-1]:null;
-function upgradeLegacyPlan(){const old=currentPlan();if(!old||old.schemaVersion>=4||!state.profile)return false;const upgraded=generatePlan(state.profile,state.plans);upgraded.reason=`从旧版 v${old.version} 自动升级：成员资料库、220项动作指导与标准中餐菜谱`;state.plans.push(upgraded);write(KEYS.plans,state.plans);return true}
+function upgradeLegacyPlan(){const old=currentPlan();if(!old||old.schemaVersion>=5||!state.profile)return false;const upgraded=generatePlan(state.profile,state.plans);upgraded.reason=`从旧版 v${old.version} 自动升级：训练日历、高帧率动作演示与中国大陆外食数据库`;state.plans.push(upgraded);write(KEYS.plans,state.plans);return true}
 let profileDirty=false,progressDirty=false,pendingNavigation=null,pendingMemberId=null;
 
 function renderMemberControls(){
@@ -568,7 +745,7 @@ function renderMemberControls(){
   $$(".delete-member").forEach(button=>button.onclick=()=>{if(state.library.members.length===1)return;const memberItem=state.library.members.find(item=>item.id===button.dataset.member);if(!confirm(`确定删除“${memberItem.name}”及其方案、记录和个人菜谱？建议先导出备份。`))return;state.library.members=state.library.members.filter(item=>item.id!==memberItem.id);if(state.library.activeMemberId===memberItem.id)state.library.activeMemberId=state.library.members[0].id;persistLibrary();loadActiveMemberIntoUI();renderMemberControls();toast("成员已删除")});
 }
 function loadActiveMemberIntoUI(){
-  $("#profileForm").reset();fillForm(state.profile);setProfileDirty(false);$("#progressForm").reset();$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);state.week=0;state.day=0;state.recipeDraft=null;renderAll();
+  $("#profileForm").reset();fillForm(state.profile);renderSpecificDates();setProfileDirty(false);$("#progressForm").reset();$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);state.week=0;state.day=0;state.recipeDraft=null;renderAll();
 }
 function performMemberSwitch(memberId){if(!state.library.members.some(member=>member.id===memberId))return;state.library.activeMemberId=memberId;persistLibrary();pendingMemberId=null;$("#memberDialog").close();loadActiveMemberIntoUI();renderMemberControls();toast(`已切换到 ${activeMember().name}`)}
 function requestMemberSwitch(memberId){
@@ -594,11 +771,20 @@ const required=["age","sex","height","weight","goal","activity","experience","da
 function completion(profile=state.profile){if(!profile)return 0;return Math.round(required.filter(k=>profile[k]!==""&&profile[k]!=null).length/required.length*100)}
 function serializeForm(form){
   const data=Object.fromEntries(new FormData(form).entries());
-  for(const name of ["limits","dislikes","preferences","allergens","risks"])data[name]=$$(`input[name="${name}"]:checked`,form).map(x=>x.value);
+  for(const name of ["limits","dislikes","preferences","allergens","risks","weekdays"])data[name]=$$(`input[name="${name}"]:checked`,form).map(x=>x.value);
   for(const key of ["age","height","weight","bodyFat","restingHr","waist","hip","neck","steps","sitting","sleep","currentMinutes","days","minutes"])if(data[key]!==""&&data[key]!=null)data[key]=Number(data[key]);
   return data;
 }
 function fillForm(profile){if(!profile)return;const form=$("#profileForm");for(const [key,value] of Object.entries(profile)){if(Array.isArray(value))value.forEach(v=>{const input=$(`input[name="${key}"][value="${v}"]`,form);if(input)input.checked=true});else{const input=form.elements[key];if(input)input.value=value??""}}}
+function specificDateValues(){return $("#specificDates").value.split(",").map(value=>value.trim()).filter(Boolean).sort()}
+function renderSpecificDates(){
+  const values=specificDateValues();
+  $("#selectedDateChips").innerHTML=values.map(value=>`<button type="button" data-remove-date="${value}" title="移除${value}">${value}<span>×</span></button>`).join("")||"<small>尚未指定具体日期</small>";
+  $$("[data-remove-date]").forEach(button=>button.onclick=()=>{$("#specificDates").value=values.filter(value=>value!==button.dataset.removeDate).join(",");renderSpecificDates();setProfileDirty(true)});
+  const mode=$("#scheduleMode").value;$("#specificDateField").hidden=mode!=="dates";$("#weekdayField").hidden=mode==="dates";
+}
+$("#scheduleMode").onchange=()=>{renderSpecificDates();setProfileDirty(true)};
+$("#addSpecificDate").onclick=()=>{const value=$("#specificDatePicker").value;if(!value)return;const values=[...new Set([...specificDateValues(),value])].sort();$("#specificDates").value=values.join(",");$("#specificDatePicker").value="";renderSpecificDates();setProfileDirty(true)};
 function refreshCompletion(){const profile=serializeForm($("#profileForm")),score=completion(profile);$("#profileCompletion").textContent=`${score}%`;$("#completionScore").textContent=`${score}%`;$("#completionRing").style.background=`conic-gradient(var(--lime) ${score*3.6}deg,#31594e 0deg)`}
 function setProfileDirty(value){profileDirty=value;const stateEl=$("#saveState"),button=$("#saveProfileButton");stateEl.textContent=value?"未保存":"已保存";stateEl.classList.toggle("unsaved",value);stateEl.classList.toggle("saved",!value);button.textContent=value?"保存并更新方案":"已保存 · 生成方案";$("#profileDot").classList.toggle("unsaved",value)}
 $("#profileForm").addEventListener("input",()=>{refreshCompletion();setProfileDirty(true)});
@@ -614,7 +800,7 @@ function saveProfileAndGenerate({navigate=true}={}){
   setProfileDirty(false);renderAll();toast(validation.length?"已保存，方案有数据提示需要查看":"已保存并生成最新方案");if(navigate)showPage("plan");return true
 }
 $("#profileForm").addEventListener("submit",event=>{event.preventDefault();saveProfileAndGenerate()});
-$("#clearProfile").addEventListener("click",()=>{if(confirm(`确定清空“${activeMember().name}”的个人档案？已有方案与记录不会删除。`)){state.profile=null;write(KEYS.profile,null);$("#profileForm").reset();setProfileDirty(false);renderAll()}});
+$("#clearProfile").addEventListener("click",()=>{if(confirm(`确定清空“${activeMember().name}”的个人档案？已有方案与记录不会删除。`)){state.profile=null;write(KEYS.profile,null);$("#profileForm").reset();renderSpecificDates();setProfileDirty(false);renderAll()}});
 $("#regeneratePlan").addEventListener("click",()=>{if(!state.profile)return;state.plans.push(generatePlan(state.profile,state.plans));write(KEYS.plans,state.plans);renderPlan();renderOverview();toast("已创建新方案版本")});
 
 function renderOverview(){
@@ -625,9 +811,20 @@ function renderOverview(){
 function renderSummary(plan){const t=plan.targets,profile=state.profile||plan.input||{},goal=profile.goal==="recomp"?"体态重组":profile.goal==="faster"?"较快减脂":"稳定减脂",first=plan.training.weeks[0]?.sessions[0];$("#summaryPanel").innerHTML=`<article class="plan-hero"><div class="plan-hero-top"><div><span class="badge">当前执行方案 · v${plan.version}</span><h2>${goal}</h2><p>先执行4周，再依据7日平均体重、腰围和训练表现判断是否需要调整。不要因单日体重波动改变计划。</p></div><div class="plan-hero-score"><strong>${t.calories}</strong><span>每日目标 kcal</span></div></div><div class="plan-focus"><span>每周训练 ${profile.days} 天</span><span>${plan.training.structure}</span><span>蛋白质 ${t.protein} g/日</span><span>参考心率 ${t.moderate[0]}～${t.moderate[1]}</span></div></article><div class="summary-grid"><article class="summary-tile"><small>估算维持热量</small><strong>${t.tdee}</strong><span>kcal / 日，后续用趋势校准</span></article><article class="summary-tile"><small>蛋白质目标</small><strong>${t.protein} g</strong><span>参考体重 ${t.referenceWeight} kg</span></article><article class="summary-tile"><small>脂肪与碳水</small><strong>${t.fat} / ${t.carbs}</strong><span>脂肪 g / 碳水 g</span></article><article class="summary-tile"><small>4周训练结构</small><strong>${profile.days} 天</strong><span>${plan.training.structure}</span></article></div><article class="today-card"><div class="today-icon">↗</div><div><h3>第一步：${first?.label||"建立训练基线"}</h3><p>${first?.exercises?.slice(0,3).map(x=>x.name).join("、")||"中等强度有氧与活动度"}。动作保留2～3次余力。</p></div><button class="secondary-button" id="openTrainingTab">查看完整训练</button></article><div class="plan-note"><b>计算依据与边界</b><p>Mifflin-St Jeor估算静息代谢 ${t.resting} kcal，活动系数后约 ${t.tdee} kcal。公式对个体可有明显误差，请在至少两周规范记录后校准。</p>${plan.validation?.length?`<p class="trend-warn"><b>数据提示：</b>${plan.validation.join("；")}</p>`:""}</div>`;$("#openTrainingTab").onclick=()=>$(".tab[data-tab='training']").click()}
 function renderTraining(plan){
   const week=plan.training.weeks[state.week]||plan.training.weeks[0],strengthSessions=week.sessions.filter(s=>s.exercises?.length),sets=strengthSessions.reduce((sum,s)=>sum+s.exercises.reduce((n,e)=>n+Number(e.sets),0),0),cardio=week.sessions.reduce((sum,s)=>sum+(s.cardio?.minutes||0),0);
-  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${plan.training.exerciseDatabaseSize||exerciseLibraryCount}</b>动作库</span></div></article><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.type} · 预计约 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3></div><span class="session-status">待完成</span></header>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>查看指导</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">进阶采用“先完成目标次数，再小幅加重”的双重进阶；RIR 是主观余力，不要求每组力竭。点击动作名称可查看分步骤示意和标准要点。</p></section>`;
+  const calendar=week.sessions.map((session,index)=>`<article><span>${session.schedule?.dateLabel||`第${index+1}天`}</span><b>${session.schedule?.weekday||""} ${session.schedule?.startTime||""}</b><small>${session.label} · ${session.estimatedMinutes}分钟</small></article>`).join("");
+  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>高帧率动画</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看高帧率动画":"查看三阶段指导"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
   $$('[data-week]').forEach(b=>b.onclick=()=>{state.week=Number(b.dataset.week);renderTraining(plan)});
   $$(".movement-guide-link").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));
+  $("#exportTrainingCalendar").onclick=()=>downloadTrainingCalendar(plan);
+}
+function icsDate(date,time){return `${date.replaceAll("-","")}T${time.replace(":","")}00`}
+function downloadTrainingCalendar(plan){
+  const entries=plan.training.schedule?.entries||[];
+  const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//衡燃//个性化训练日历//CN","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
+  for(const item of entries)lines.push("BEGIN:VEVENT",`UID:${activeMember().id}-${item.date}-${item.sessionIndex}@hengran`,`DTSTART;TZID=Asia/Shanghai:${icsDate(item.date,item.startTime)}`,`DTEND;TZID=Asia/Shanghai:${icsDate(item.date,item.endTime)}`,`SUMMARY:衡燃训练 · ${item.label}`,`DESCRIPTION:${item.source}；预计${item.totalMinutes}分钟。请在网站查看动作、组数、RIR与替换动作。`,"END:VEVENT");
+  lines.push("END:VCALENDAR");
+  const blob=new Blob([lines.join("\r\n")],{type:"text/calendar;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=`${activeMember().name}-4周训练日历.ics`;a.click();URL.revokeObjectURL(url);toast("训练日历已导出");
 }
 function renderMeals(plan){
   if(plan.meals.conflicts.length){$("#mealsPanel").innerHTML=`<div class="notice"><b>无法安全生成</b><p>${plan.meals.conflicts.join("；")}。请调整硬性排除条件，或由营养专业人员设计。</p></div>`;return}
@@ -678,7 +875,7 @@ function renderPrintReport(range="45"){
     ["体脂率",profile.bodyFat?`${profile.bodyFat}%`:"未填写"],["腰围",profile.waist?`${profile.waist} cm`:"未填写"],["训练条件",profile.equipment==="gym"?"健身房":profile.equipment==="home"?"家庭器械":"徒手"],["每周安排",`${profile.days}天 × ${profile.minutes}分钟`],
     ["饮食模式",profile.diet],["身体限制",(profile.limits||[]).join("、")||"未报告"]
   ];
-  const trainingHtml=plan.training.weeks.map(week=>`<section class="report-week"><h3>第${week.week}周 · ${week.focus}</h3><p>${escapeHtml(week.change)}；${escapeHtml(week.instruction)}</p>${week.sessions.map(session=>`<div class="report-session"><h4>${escapeHtml(session.label)} <span>${escapeHtml(session.type)}</span></h4>${session.exercises?.length?`<table><thead><tr><th>动作</th><th>组数</th><th>次数</th><th>RIR</th><th>休息</th></tr></thead><tbody>${session.exercises.map(exercise=>`<tr><td>${escapeHtml(exercise.name)}</td><td>${exercise.sets}</td><td>${escapeHtml(exercise.reps)}</td><td>${escapeHtml(exercise.rir)}</td><td>${escapeHtml(exercise.rest)}</td></tr>`).join("")}</tbody></table>`:""}<p class="report-cardio">有氧：${escapeHtml(session.cardio?.mode||"—")} · ${session.cardio?.minutes||0}分钟 · ${escapeHtml(session.cardio?.intensity||"")}</p></div>`).join("")}</section>`).join("");
+  const trainingHtml=plan.training.weeks.map(week=>`<section class="report-week"><h3>第${week.week}周 · ${week.focus}</h3><p>${escapeHtml(week.change)}；${escapeHtml(week.instruction)}</p>${week.sessions.map(session=>`<div class="report-session"><h4>${escapeHtml(session.label)} <span>${session.schedule?`${session.schedule.date} ${session.schedule.weekday} ${session.schedule.startTime}～${session.schedule.endTime}`:escapeHtml(session.type)}</span></h4>${session.schedule?`<p>${session.schedule.timeline.map(item=>`${item.start} ${item.label} ${item.minutes}分钟`).join(" → ")}</p>`:""}${session.exercises?.length?`<table><thead><tr><th>动作</th><th>组数</th><th>次数</th><th>RIR</th><th>休息</th></tr></thead><tbody>${session.exercises.map(exercise=>`<tr><td>${escapeHtml(exercise.name)}</td><td>${exercise.sets}</td><td>${escapeHtml(exercise.reps)}</td><td>${escapeHtml(exercise.rir)}</td><td>${escapeHtml(exercise.rest)}</td></tr>`).join("")}</tbody></table>`:""}<p class="report-cardio">有氧：${escapeHtml(session.cardio?.mode||"—")} · ${session.cardio?.minutes||0}分钟 · ${escapeHtml(session.cardio?.intensity||"")}</p></div>`).join("")}</section>`).join("");
   const mealsHtml=plan.meals.days.map(day=>`<section class="report-day"><h3>第${day.day}天 <span>${day.total.kcal} kcal · P ${day.total.protein}g · C ${day.total.carbs}g · F ${day.total.fat}g</span></h3>${day.meals.map(meal=>`<div class="report-meal"><h4>${meal.name}${meal.recipeName?` · ${escapeHtml(meal.recipeName)}`:""}</h4><p>${meal.items.map(item=>`${escapeHtml(item.food.name)} ${item.grams}g`).join("；")}</p><small>${escapeHtml(meal.method)}</small></div>`).join("")}</section>`).join("");
   $("#printReport").innerHTML=`<header class="report-cover"><div><span>衡燃 · 个性化减脂报告</span><h1>${escapeHtml(member.name)}</h1><p>生成日期：${new Date().toLocaleDateString("zh-CN")} · 当前方案 v${plan.version} · 进度范围：${rangeText}</p></div><div class="report-score"><b>${plan.targets.calories}</b><span>每日目标 kcal</span></div></header><section class="report-section"><h2>一、个人信息与目标</h2><div class="report-profile">${profileRows.map(([label,value])=>`<div><small>${label}</small><b>${escapeHtml(value)}</b></div>`).join("")}</div><div class="report-targets"><span>BMI <b>${plan.targets.bmi}</b></span><span>维持热量估算 <b>${plan.targets.tdee} kcal</b></span><span>蛋白质 <b>${plan.targets.protein}g</b></span><span>脂肪 <b>${plan.targets.fat}g</b></span><span>碳水 <b>${plan.targets.carbs}g</b></span></div></section><section class="report-section report-page-break"><h2>二、完整4周训练计划</h2><p class="report-note">RIR表示预计还能完成的规范次数；心率仅作辅助，优先结合谈话测试和主观用力程度。</p>${trainingHtml}</section><section class="report-section report-page-break"><h2>三、完整7天饮食计划</h2><p class="report-note">食物克重以页面标注的熟重或可食部为准；家庭烹调油、外卖和成品含水量会造成误差。</p>${mealsHtml}</section><section class="report-section report-page-break"><h2>四、测量与进度（${rangeText}）</h2>${reportTrendSvg(records)}<table><thead><tr><th>日期</th><th>体重 kg</th><th>腰围 cm</th><th>步数</th><th>睡眠 h</th><th>疲劳</th><th>完成率</th></tr></thead><tbody>${records.length?records.map(record=>`<tr><td>${record.date}</td><td>${record.weight||"—"}</td><td>${record.waist||"—"}</td><td>${record.steps||"—"}</td><td>${record.sleep||"—"}</td><td>${record.fatigue||"—"}</td><td>${record.adherence?`${record.adherence}%`:"—"}</td></tr>`).join(""):`<tr><td colspan="7">所选范围内暂无记录</td></tr>`}</tbody></table></section><footer class="report-footer">本报告面向一般健康成人，用于健康管理参考，不能诊断疾病或替代医生、注册营养师和康复专业人员。</footer>`;
   $("#printReport").setAttribute("aria-hidden","false");return true;
@@ -706,17 +903,56 @@ function exerciseSvg(exercise,stage=0,label=""){
   const mirror=110-wx;
   return `<svg class="exercise-pose" viewBox="0 0 160 150" role="img" aria-label="${escapeHtml(exercise.name)}${label}示意"><rect x="5" y="5" width="150" height="140" rx="18"/><line class="ground" x1="18" y1="133" x2="142" y2="133"/><circle cx="${hx}" cy="${hy}" r="9"/><line x1="${sx}" y1="${sy}" x2="${px}" y2="${py}"/><line x1="${sx}" y1="${sy}" x2="${wx}" y2="${wy}"/><line x1="${sx}" y1="${sy}" x2="${mirror}" y2="${wy}"/><line x1="${px}" y1="${py}" x2="${kx}" y2="${ky}"/><line x1="${kx}" y1="${ky}" x2="${ax}" y2="${ay}"/><line x1="${px}" y1="${py}" x2="${110-kx}" y2="${ky}"/><line x1="${110-kx}" y1="${ky}" x2="${110-ax}" y2="${ay}"/><text x="80" y="143" text-anchor="middle">${escapeHtml(label)}</text><text class="tool-label" x="145" y="19" text-anchor="end">${escapeHtml(exercise.tool)}</text></svg>`;
 }
+let motionAnimationFrame=0;
+function motionAvatarMarkup(view){
+  return `<g class="motion-avatar" data-view="${view}"><ellipse class="motion-shadow" cx="55" cy="133" rx="30" ry="5"/><line data-part="torso"/><line data-part="arm1"/><line data-part="arm2"/><line data-part="thigh1"/><line data-part="shin1"/><line data-part="thigh2"/><line data-part="shin2"/><circle data-part="head" r="9"/><circle class="motion-joint" data-joint="shoulder" r="3"/><circle class="motion-joint" data-joint="hip" r="3"/><circle class="motion-joint" data-joint="knee1" r="3"/><circle class="motion-joint" data-joint="knee2" r="3"/></g>`;
+}
+function motionPlayerMarkup(exercise,motion){
+  const multi=motion.mode==="multi-angle";
+  return `<section class="motion-player" id="motionPlayer" data-exercise="${exercise.id}"><div class="motion-stage"><svg viewBox="0 0 360 190" role="img" aria-label="${escapeHtml(exercise.name)}高帧率循环动作演示"><defs><linearGradient id="motionBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1b27d"/><stop offset=".48" stop-color="#d98958"/><stop offset="1" stop-color="#9b4f35"/></linearGradient></defs>${motionAvatarMarkup("a")}${motionAvatarMarkup("b")}<text class="motion-angle-label" x="180" y="178" text-anchor="middle">${multi?"侧面视角":"单角度循环"}</text></svg><div class="motion-status"><span>${motion.fps} FPS 浏览器插值</span><span>${multi?"角度A → 角度B → 分屏":"固定机位"}</span></div></div><div class="motion-controls"><button class="secondary-button" id="motionToggle">暂停</button><button class="secondary-button" id="motionSpeed">速度 1×</button><label>动作进度<input id="motionScrubber" type="range" min="0" max="1000" value="0"></label></div><p class="motion-note">这是统一拟真人教学动画，不是摄像头姿态识别。高帧率由浏览器实时插值生成，避免数百个GIF造成的加载延迟。</p></section>`;
+}
+function interpolatePose(key,progress){
+  const start=poseFor(key,0),end=poseFor(key,1),depth=(1-Math.cos(progress*Math.PI*2))/2,result={};
+  for(const joint of ["head","shoulder","hip","knee","ankle","hand"])result[joint]=start[joint].map((value,index)=>value+(end[joint][index]-value)*depth);
+  return result;
+}
+function setMotionPose(group,pose){
+  if(!group)return;const [hx,hy]=pose.head,[sx,sy]=pose.shoulder,[px,py]=pose.hip,[kx,ky]=pose.knee,[ax,ay]=pose.ankle,[wx,wy]=pose.hand,mirror=110-wx,knee2=110-kx,ankle2=110-ax;
+  const line=(part,x1,y1,x2,y2)=>{const node=$(`[data-part="${part}"]`,group);for(const [key,value] of Object.entries({x1,y1,x2,y2}))node.setAttribute(key,value)};
+  line("torso",sx,sy,px,py);line("arm1",sx,sy,wx,wy);line("arm2",sx,sy,mirror,wy);line("thigh1",px,py,kx,ky);line("shin1",kx,ky,ax,ay);line("thigh2",px,py,knee2,ky);line("shin2",knee2,ky,ankle2,ay);
+  const point=(selector,x,y)=>{const node=$(selector,group);node.setAttribute("cx",x);node.setAttribute("cy",y)};
+  point('[data-part="head"]',hx,hy);point('[data-joint="shoulder"]',sx,sy);point('[data-joint="hip"]',px,py);point('[data-joint="knee1"]',kx,ky);point('[data-joint="knee2"]',knee2,ky);
+}
+function startMotionPlayer(exercise,motion){
+  cancelAnimationFrame(motionAnimationFrame);const player=$("#motionPlayer");if(!player)return;
+  const avatarA=$('[data-view="a"]',player),avatarB=$('[data-view="b"]',player),label=$(".motion-angle-label",player),scrubber=$("#motionScrubber",player),toggle=$("#motionToggle",player),speedButton=$("#motionSpeed",player);
+  let playing=!matchMedia("(prefers-reduced-motion: reduce)").matches,speed=1,origin=performance.now(),manual=0;
+  const layout=progress=>{
+    const multi=motion.mode==="multi-angle";let local=progress;
+    if(!multi){avatarA.style.display="";avatarB.style.display="none";avatarA.setAttribute("transform","translate(96 8) scale(1.55)");label.textContent="固定机位 · 单角度循环"}
+    else if(progress<.33){local=progress/.33;avatarA.style.display="";avatarB.style.display="none";avatarA.setAttribute("transform","translate(96 8) scale(1.55)");label.textContent="角度A · 侧面"}
+    else if(progress<.66){local=(progress-.33)/.33;avatarA.style.display="none";avatarB.style.display="";avatarB.setAttribute("transform","translate(264 8) scale(-1.55 1.55)");label.textContent="角度B · 斜前方"}
+    else{local=(progress-.66)/.34;avatarA.style.display="";avatarB.style.display="";avatarA.setAttribute("transform","translate(33 38) scale(1.02)");avatarB.setAttribute("transform","translate(327 38) scale(-1.02 1.02)");label.textContent="双角度同步对照"}
+    const pose=interpolatePose(exercise.visualKey,local);setMotionPose(avatarA,pose);setMotionPose(avatarB,pose);
+  };
+  const frame=now=>{if(playing)manual=((now-origin)/1000*speed/motion.duration)%1;layout(manual);scrubber.value=Math.round(manual*1000);motionAnimationFrame=requestAnimationFrame(frame)};
+  toggle.onclick=()=>{playing=!playing;toggle.textContent=playing?"暂停":"继续";if(playing)origin=performance.now()-manual*motion.duration*1000/speed};
+  speedButton.onclick=()=>{speed=speed===1?.5:speed===.5?1.5:1;speedButton.textContent=`速度 ${speed}×`;origin=performance.now()-manual*motion.duration*1000/speed};
+  scrubber.oninput=()=>{manual=Number(scrubber.value)/1000;origin=performance.now()-manual*motion.duration*1000/speed;layout(manual)};
+  if(!playing)toggle.textContent="继续";motionAnimationFrame=requestAnimationFrame(frame);
+}
 function openExerciseGuide(exercise){
   if(!exercise)return;state.exerciseId=exercise.id;$("#exerciseDialogTitle").textContent=exercise.name;
-  $("#exerciseDialogBody").innerHTML=`<div class="exercise-guide-meta"><span>${exercise.category}</span><span>${exercise.difficulty}</span><span>${exercise.tool}</span><span>${exercise.primaryMuscles.join("、")}</span></div><div class="exercise-frames">${exercise.steps.map((step,index)=>`<figure>${exerciseSvg(exercise,index,index===0?"起始":index===1?"发力":"回位")}<figcaption><b>${index+1}</b>${escapeHtml(step)}</figcaption></figure>`).join("")}</div><div class="guide-columns"><section><h3>做到位的判断</h3><p>${escapeHtml(exercise.standard)}</p><h3>动作提示</h3><ul>${exercise.cues.map(cue=>`<li>${escapeHtml(cue)}</li>`).join("")}</ul></section><section class="guide-warning"><h3>常见错误</h3><ul>${exercise.errors.map(error=>`<li>${escapeHtml(error)}</li>`).join("")}</ul><h3>呼吸</h3><p>${escapeHtml(exercise.breathing)}</p></section></div><div class="alternative-row"><b>同模式替代</b>${exercise.alternatives.map(name=>`<button class="secondary-button alternative-exercise" data-exercise-name="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join("")}</div><p class="notice"><b>安全边界</b><span>教学画面用于理解动作阶段，不会判断你的实际姿态。出现锐痛、麻木、眩晕或异常气促时立即停止。</span></p>`;
-  $$(".alternative-exercise").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));$("#exerciseDialog").showModal();
+  const motion=getMotion(exercise.id);
+  $("#exerciseDialogBody").innerHTML=`<div class="exercise-guide-meta"><span>${exercise.category}</span><span>${exercise.difficulty}</span><span>${exercise.tool}</span><span>${exercise.primaryMuscles.join("、")}</span>${motion?`<span class="motion-ready">高帧率动画已覆盖</span>`:"<span>三阶段示意</span>"}</div>${motion?motionPlayerMarkup(exercise,motion):""}<div class="exercise-frames">${exercise.steps.map((step,index)=>`<figure>${exerciseSvg(exercise,index,index===0?"起始":index===1?"发力":"回位")}<figcaption><b>${index+1}</b>${escapeHtml(step)}</figcaption></figure>`).join("")}</div><div class="guide-columns"><section><h3>做到位的判断</h3><p>${escapeHtml(exercise.standard)}</p><h3>动作提示</h3><ul>${exercise.cues.map(cue=>`<li>${escapeHtml(cue)}</li>`).join("")}</ul></section><section class="guide-warning"><h3>常见错误</h3><ul>${exercise.errors.map(error=>`<li>${escapeHtml(error)}</li>`).join("")}</ul><h3>呼吸</h3><p>${escapeHtml(exercise.breathing)}</p></section></div><div class="alternative-row"><b>同模式替代</b>${exercise.alternatives.map(name=>`<button class="secondary-button alternative-exercise" data-exercise-name="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join("")}</div><p class="notice"><b>安全边界</b><span>教学画面用于理解动作阶段，不会判断你的实际姿态。出现锐痛、麻木、眩晕或异常气促时立即停止。</span></p>`;
+  $$(".alternative-exercise").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));$("#exerciseDialog").showModal();if(motion)startMotionPlayer(exercise,motion);
 }
-$("#closeExerciseDialog").onclick=()=>$("#exerciseDialog").close();
+$("#closeExerciseDialog").onclick=()=>{cancelAnimationFrame(motionAnimationFrame);$("#exerciseDialog").close()};
 let exerciseLimit=36;
 function renderExerciseLibrary(){
   const query=$("#exerciseSearch").value.trim().toLowerCase(),pattern=$("#exercisePattern").value,equipment=$("#exerciseEquipment").value,difficulty=$("#exerciseDifficulty").value;
   const filtered=exerciseLibrary.filter(exercise=>(!query||`${exercise.name}${exercise.category}${exercise.primaryMuscles.join("")}${exercise.tool}`.toLowerCase().includes(query))&&(pattern==="all"||exercise.group===pattern)&&(equipment==="all"||exercise.tool===equipment)&&(difficulty==="all"||exercise.difficulty===difficulty));
-  $("#exerciseLibraryGrid").innerHTML=filtered.slice(0,exerciseLimit).map(exercise=>`<button class="exercise-library-card" data-exercise="${exercise.id}"><div>${exerciseSvg(exercise,1,"动作中")}</div><span>${exercise.category}</span><h3>${exercise.name}</h3><p>${exercise.primaryMuscles.join(" · ")}</p><footer><small>${exercise.tool}</small><small>${exercise.difficulty}</small></footer></button>`).join("")||"<div class='empty-mini'>没有匹配动作，请减少筛选条件。</div>";
+  $("#exerciseLibraryGrid").innerHTML=filtered.slice(0,exerciseLimit).map(exercise=>`<button class="exercise-library-card" data-exercise="${exercise.id}"><div>${exerciseSvg(exercise,1,"动作中")}${motionExerciseIds.has(exercise.id)?"<em class='motion-card-badge'>▶ 高帧率</em>":""}</div><span>${exercise.category}</span><h3>${exercise.name}</h3><p>${exercise.primaryMuscles.join(" · ")}</p><footer><small>${exercise.tool}</small><small>${exercise.difficulty}</small></footer></button>`).join("")||"<div class='empty-mini'>没有匹配动作，请减少筛选条件。</div>";
   $("#exerciseLoadMore").hidden=exerciseLimit>=filtered.length;$("#exerciseLoadMore").textContent=`显示更多（当前 ${Math.min(exerciseLimit,filtered.length)} / ${filtered.length}）`;
   $$(".exercise-library-card").forEach(card=>card.onclick=()=>openExerciseGuide(exerciseById(card.dataset.exercise)));
 }
@@ -751,10 +987,52 @@ function renderRecipeEditor(){
   $("#addRecipeToPlan").onclick=()=>{syncDraft();const plan=currentPlan();if(!plan){toast("请先为当前成员生成方案");return}if(!recipeAllowed(recipe,state.profile||{})){toast("该菜谱与当前成员的忌口、饮食模式或过敏原冲突");return}const day=plan.meals.days[state.day]||plan.meals.days[0],meal=day.meals.find(item=>item.name==="午餐")||day.meals[1],scale=1/Math.max(1,recipe.servings||1);meal.items=recipe.ingredients.map(ingredient=>({foodId:ingredient.foodId,food:foods.find(food=>food.id===ingredient.foodId),grams:Math.round(ingredient.grams*scale)})).filter(item=>item.food);meal.recipeName=recipe.name;meal.method=recipe.method;meal.total=calculateMeal(meal.items);day.total=calculateMeal(day.meals.flatMap(item=>item.items));write(KEYS.plans,state.plans);renderMeals(plan);toast(`已加入第${day.day}天午餐，全天营养已重算`)};
 }
 function renderRecipeCalculator(){
-  $("#recipeCount").textContent=standardRecipes.length;const allCategories=[...new Set([...recipeCategories,...allRecipes().map(recipe=>recipe.category)])],current=$("#recipeCategory").value||"all";$("#recipeCategory").innerHTML=`<option value="all">全部类别</option>${allCategories.map(category=>`<option ${category===current?"selected":""}>${escapeHtml(category)}</option>`).join("")}`;
+  $("#recipeCount").textContent=standardRecipes.length+diningItemCount;const allCategories=[...new Set([...recipeCategories,...allRecipes().map(recipe=>recipe.category)])],current=$("#recipeCategory").value||"all";$("#recipeCategory").innerHTML=`<option value="all">全部类别</option>${allCategories.map(category=>`<option ${category===current?"selected":""}>${escapeHtml(category)}</option>`).join("")}`;
   if(!state.recipeDraft)state.recipeDraft=structuredClone(allRecipes().find(recipe=>recipe.id===state.recipeId)||standardRecipes[0]);renderRecipeList();renderRecipeEditor();
 }
 $("#recipeSearch").oninput=renderRecipeList;$("#recipeCategory").onchange=renderRecipeList;
+
+function activeDiningItem(){return diningItems.find(item=>item.id===state.diningId)||diningItems[0]}
+function diningFilters(){
+  const query=$("#diningSearch").value.trim().toLowerCase(),group=$("#diningGroup").value,brand=$("#diningBrand").value;
+  return diningItems.filter(item=>(!query||`${item.brand}${item.name}`.toLowerCase().includes(query))&&(group==="all"||item.group===group)&&(brand==="all"||item.brand===brand));
+}
+function renderDiningList(){
+  const available=diningFilters();if(!available.some(item=>item.id===state.diningId)&&available.length)state.diningId=available[0].id;
+  $("#diningList").innerHTML=available.slice(0,160).map(item=>`<button class="${item.id===state.diningId?"active":""}" data-dining="${item.id}"><span>${escapeHtml(item.brand)}</span><b>${escapeHtml(item.name)}</b><small>${item.kcal} kcal/份 · ${item.status}</small></button>`).join("")||"<div class='empty-mini'>没有匹配的外食条目</div>";
+  $$("#diningList [data-dining]").forEach(button=>button.onclick=()=>{state.diningId=button.dataset.dining;state.diningOptions={};renderDiningList();renderDiningDetail()});
+}
+function renderDiningDetail(){
+  const item=activeDiningItem(),calculated=calculateDiningItem(item,state.diningOptions),hasAllergens=(state.profile?.allergens||[]).length>0;
+  const options=item.options?`<div class="dining-option-grid"><label>杯型<select id="diningSize">${item.options.sizes.map(([label])=>`<option ${label===(state.diningOptions.size||"中杯")?"selected":""}>${label}</option>`).join("")}</select></label><label>糖度<select id="diningSugar">${item.options.sugars.map(([label])=>`<option ${label===(state.diningOptions.sugar||"不另外加糖")?"selected":""}>${label}</option>`).join("")}</select></label><label>加料<select id="diningTopping">${item.options.toppings.map(([label])=>`<option ${label===(state.diningOptions.topping||"不加料")?"selected":""}>${label}</option>`).join("")}</select></label></div>`:"";
+  $("#diningDetail").innerHTML=`<header><div><span class="badge">${escapeHtml(item.group)} · ${escapeHtml(item.brand)}</span><h2>${escapeHtml(item.name)}</h2><p>${escapeHtml(calculated.selectedServing)}</p></div><div class="dining-kcal"><strong>${calculated.calculatedKcal}</strong><span>kcal / 份</span></div></header>${options}<div class="dining-macros"><span><small>蛋白质</small><b>${calculated.calculatedProtein??item.protein} g</b></span><span><small>脂肪</small><b>${calculated.calculatedFat??item.fat} g</b></span><span><small>碳水</small><b>${calculated.calculatedCarbs??item.carbs} g</b></span><span><small>估算区间</small><b>${calculated.calculatedRange[0]}～${calculated.calculatedRange[1]} kcal</b></span></div><article class="data-confidence"><b>${item.status} · 置信度${item.confidence}</b><p>${escapeHtml(item.source)}</p><small>核验日期：${item.verifiedOn}。同品牌不同门店、份量、酱料和季节配方可能造成差异。</small>${item.sourceUrl?`<a href="${item.sourceUrl}" target="_blank" rel="noopener">打开品牌官方入口 ↗</a>`:""}</article>${hasAllergens?`<label class="allergen-ack"><input type="checkbox" id="diningAllergenAck"> 我理解当前外食条目没有完整交叉接触信息，将自行向门店确认过敏原</label>`:""}<div class="dining-actions"><button class="primary-button" id="addDiningToPlan">加入当前饮食日</button><button class="secondary-button" id="copyDiningValue">复制热量信息</button></div>`;
+  for(const [id,key] of [["diningSize","size"],["diningSugar","sugar"],["diningTopping","topping"]])if($(`#${id}`))$(`#${id}`).onchange=event=>{state.diningOptions[key]=event.target.value;renderDiningDetail()};
+  $("#copyDiningValue").onclick=async()=>{
+    const text=`${item.brand} ${item.name}：${calculated.calculatedKcal} kcal/份（${calculated.selectedServing}，${item.status}）`;
+    try{
+      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);
+      else{const area=document.createElement("textarea");area.value=text;area.style.position="fixed";area.style.opacity="0";document.body.append(area);area.select();document.execCommand("copy");area.remove()}
+      toast("热量信息已复制");
+    }catch{toast("浏览器禁止自动复制，请手动记录当前热量")}
+  };
+  $("#addDiningToPlan").onclick=()=>{
+    const plan=currentPlan();if(!plan){toast("请先为当前成员生成方案");return}
+    if(hasAllergens&&!$("#diningAllergenAck")?.checked){toast("请先确认外食过敏原提示");return}
+    const day=plan.meals.days[state.day]||plan.meals.days[0],meal=day.meals[item.type==="drinks"?3:1];
+    const food={id:`dining-${item.id}`,name:`${item.brand} · ${item.name}`,category:"外食主菜",state:"每份",kcal:calculated.calculatedKcal,protein:calculated.calculatedProtein??item.protein,fat:calculated.calculatedFat??item.fat,carbs:calculated.calculatedCarbs??item.carbs,fiber:0,allergens:[],tags:["external"],source:item.source,verifiedOn:item.verifiedOn,reviewStatus:item.status};
+    meal.items=[{foodId:food.id,food,grams:100}];meal.recipeName=`外食：${item.brand} ${item.name}`;meal.method=`按购买一份记录；${calculated.selectedServing}。估算区间 ${calculated.calculatedRange[0]}～${calculated.calculatedRange[1]} kcal。`;
+    meal.total=calculateMeal(meal.items);day.total=calculateMeal(day.meals.flatMap(entry=>entry.items));write(KEYS.plans,state.plans);renderMeals(plan);toast(`已加入第${day.day}天${meal.name}`);
+  };
+}
+function renderDiningCalculator(){
+  $("#diningBrandCount").textContent=diningBrandCount;$("#diningItemCount").textContent=diningItemCount;
+  const group=$("#diningGroup").value||"all",brand=$("#diningBrand").value||"all";
+  $("#diningGroup").innerHTML=`<option value="all">全部餐饮类别</option>${[...new Set(diningBrands.map(item=>item.group))].map(value=>`<option ${value===group?"selected":""}>${value}</option>`).join("")}`;
+  $("#diningBrand").innerHTML=`<option value="all">全部品牌</option>${diningBrands.map(item=>`<option ${item.name===brand?"selected":""}>${item.name}</option>`).join("")}`;
+  renderDiningList();renderDiningDetail();
+}
+for(const id of ["diningSearch","diningGroup","diningBrand"])$(`#${id}`).addEventListener(id==="diningSearch"?"input":"change",()=>{renderDiningList();renderDiningDetail()});
+$$("[data-calculator-tab]").forEach(button=>button.onclick=()=>{$$("[data-calculator-tab]").forEach(item=>item.classList.toggle("active",item===button));$("#recipeCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="recipe");$("#diningCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="dining")});
 
 function renderEvidence(){$("#referenceList").innerHTML=references.map((r,i)=>`<article class="reference"><div class="reference-index">${String(i+1).padStart(2,"0")}</div><div><h3>${r.title}</h3><p>${r.org} · ${r.note}</p></div><a href="${r.url}" target="_blank" rel="noopener">查看来源 ↗</a></article>`).join("");$("#foodCount").textContent=foods.length;$("#mealCount").textContent=`${mealTemplates.length}+${standardRecipes.length}`;$("#dataDate").textContent=dataMeta.verifiedOn}
 function renderVideos(filter="all"){
@@ -797,10 +1075,15 @@ async function restoreCloud(){try{const {syncId,code}=syncCredentials();if(!sync
 async function deleteCloud(){try{const {syncId,code}=syncCredentials();if(!syncId||!code)throw new Error("请填写同步ID和恢复码");if(!confirm("确定永久删除云端密文？本地数据不会同时删除。"))return;const token=await authToken(code);await syncRequest("delete",{syncId,authToken:token});localStorage.removeItem(syncKeys.id);localStorage.removeItem(syncKeys.revision);sessionStorage.removeItem(syncKeys.code);setSyncStatus("云端档案已删除") }catch(e){setSyncStatus(e.message,true)}}
 $("#createCloud").onclick=createCloud;$("#pushCloud").onclick=pushCloud;$("#restoreCloud").onclick=restoreCloud;$("#deleteCloud").onclick=deleteCloud;
 
-function renderAll(){renderMemberControls();renderOverview();renderPlan();renderRecords();renderTrend();renderRecipeCalculator();renderExerciseLibrary();refreshCompletion()}
-persistLibrary();fillForm(state.profile);setProfileDirty(false);$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);renderEvidence();renderVideos();$("#exerciseCount").textContent=exerciseLibraryCount;if(state.profile&&!currentPlan())ensurePlan();else if(upgradeLegacyPlan())toast("旧方案已保留，并自动升级为新的渐进方案");renderAll();
+function renderAll(){renderMemberControls();renderOverview();renderPlan();renderRecords();renderTrend();renderRecipeCalculator();renderDiningCalculator();renderExerciseLibrary();refreshCompletion()}
+persistLibrary();fillForm(state.profile);renderSpecificDates();setProfileDirty(false);$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);renderEvidence();renderVideos();$("#exerciseCount").textContent=exerciseLibraryCount;if(state.profile&&!currentPlan())ensurePlan();else if(upgradeLegacyPlan())toast("旧方案已保留，并自动升级为新的渐进方案");renderAll();
 $("#storageMode").textContent=syncConfigured()?"可用加密同步":"仅本地存储";$(".online-dot").classList.toggle("ready",syncConfigured());
 $("#syncUnavailable").hidden=syncConfigured();$("#syncOnline").hidden=!syncConfigured();$("#syncIdInput").value=localStorage.getItem(syncKeys.id)||"";
 const initial=location.hash.slice(1);if(initial&&document.getElementById(initial)?.classList.contains("page"))showPage(initial);
+const requestedExercise=new URLSearchParams(location.search).get("exercise");
+if(requestedExercise){
+  const exercise=exerciseById(requestedExercise);
+  if(exercise){showPage("exercises");openExerciseGuide(exercise)}
+}
 
 })();
