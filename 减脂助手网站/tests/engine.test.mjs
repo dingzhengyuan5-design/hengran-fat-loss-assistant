@@ -1,15 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {bmi,bmr,calculateTargets,filterFoods,generatePlan,replaceWholeMeal,replaceDayMenu,assessRisk,assessProgress,foods,mealTemplates,exerciseCount} from "../js/engine.js";
+import {exerciseLibrary,bodyweightExerciseCount} from "../js/exercise-catalog.js";
+import {standardRecipes,calculateRecipe,recipeAllowed} from "../js/recipe-catalog.js";
 
 const 男性={age:30,sex:"male",height:175,weight:85,goal:"steady",activity:1.375,experience:"some",days:4,minutes:60,equipment:"gym",diet:"normal",limits:[],dislikes:[],allergens:[],risks:[]};
 
 test("BMI与Mifflin-St Jeor计算",()=>{assert.equal(bmi(85,175),27.8);assert.equal(bmr(男性),1799)});
 test("宏量目标在合理范围",()=>{const t=calculateTargets(男性);assert.ok(t.calories>=1500&&t.calories<t.tdee);assert.ok(t.protein>=120);assert.ok(t.fat>=50);assert.ok(t.carbs>=80)});
 test("4天训练采用上下肢拆分且60分钟含6动作",()=>{const p=generatePlan(男性);assert.equal(p.training.structure,"上下肢拆分");assert.equal(p.training.weeks.length,4);assert.equal(p.training.weeks[0].sessions[0].exercises.length,6)});
-test("新方案带有可迁移的数据结构版本",()=>assert.equal(generatePlan(男性).schemaVersion,3));
+test("新方案带有可迁移的数据结构版本",()=>assert.equal(generatePlan(男性).schemaVersion,4));
 test("四周处方不是同一对象且组数次数RIR与有氧真实进阶",()=>{const p=generatePlan(男性),[w1,w2,w3,w4]=p.training.weeks,s1=w1.sessions[0],s2=w2.sessions[0],s3=w3.sessions[0],s4=w4.sessions[0];assert.notEqual(w1.sessions,w2.sessions);assert.notEqual(s1.exercises,s2.exercises);assert.notEqual(s1.exercises[0].reps,s2.exercises[0].reps);assert.notEqual(s2.exercises[0].rir,s3.exercises[0].rir);assert.ok(s2.cardio.minutes>s1.cardio.minutes);assert.ok(s4.exercises[0].sets<s3.exercises[0].sets);assert.ok(s4.cardio.minutes<s3.cardio.minutes)});
-test("动作库已扩充到50个以上候选动作",()=>assert.ok(exerciseCount>=50));
+test("动作库完整覆盖220项且徒手动作充足",()=>{assert.equal(exerciseCount,220);assert.equal(exerciseLibrary.length,220);assert.ok(bodyweightExerciseCount>=100)});
 test("膝部限制过滤已标记动作",()=>{const p=generatePlan({...男性,equipment:"home",limits:["knee"]});for(const w of p.training.weeks)for(const s of w.sessions)for(const e of s.exercises)assert.ok(!e.limits.includes("knee"))});
 test("纯素与过敏原属于硬过滤",()=>{const list=filterFoods({...男性,diet:"vegan",allergens:["soy","nuts"]});assert.ok(list.length>0);assert.ok(list.every(x=>x.tags.includes("vegan")));assert.ok(list.every(x=>!x.allergens.includes("soy")&&!x.allergens.includes("nuts")))});
 test("不吃猪肉不会返回猪肉标签或名称",()=>{const list=filterFoods({...男性,diet:"no-pork"});assert.ok(list.every(x=>!x.tags.includes("pork")&&!x.name.includes("猪")))});
@@ -17,6 +19,8 @@ test("风险用户不应进入普通处方流程",()=>{assert.ok(assessRisk({...
 test("进度不足时不提调整",()=>{assert.equal(assessProgress([{date:"2026-01-01",weight:85}],男性,generatePlan(男性)).ready,false)});
 test("连续下降过快触发恢复建议",()=>{const records=Array.from({length:14},(_,i)=>({date:`2026-01-${String(i+1).padStart(2,"0")}`,weight:85-i*.25,fatigue:"4",performance:i>9?"down":"same"}));const a=assessProgress(records,男性,generatePlan(男性));assert.equal(a.ready,true);assert.equal(a.proposal.type,"recover")});
 test("目录和套餐达到首版规模",()=>{assert.equal(foods.length,300);assert.equal(mealTemplates.length,80)});
+test("标准中餐菜谱达到120套并由原料克重计算",()=>{assert.equal(standardRecipes.length,120);const recipe=structuredClone(standardRecipes[0]),before=calculateRecipe(recipe).total.kcal;recipe.ingredients.find(item=>foods.find(food=>food.id===item.foodId)?.category==="油脂调味").grams+=5;assert.ok(calculateRecipe(recipe).total.kcal>before+40)});
+test("菜谱严格执行过敏原与饮食模式",()=>{const eggRecipe=standardRecipes.find(recipe=>recipe.ingredients.some(item=>foods.find(food=>food.id===item.foodId)?.allergens.includes("egg")));assert.equal(recipeAllowed(eggRecipe,{...男性,allergens:["egg"]}),false)});
 test("七天菜单能量与主要宏量控制在目标容差",()=>{const p=generatePlan(男性);for(const d of p.meals.days){assert.ok(Math.abs(d.total.kcal-p.targets.calories)/p.targets.calories<=.05,`第${d.day}天能量超差`);for(const k of ["protein","fat","carbs"])assert.ok(Math.abs(d.total[k]-p.targets[k])/p.targets[k]<=.10,`第${d.day}天${k}超差`)}});
 test("整餐替换可改变组合并重算全天营养",()=>{const p=generatePlan(男性),day=p.meals.days[0],before=day.meals[1].items.map(x=>x.food.id).join(","),result=replaceWholeMeal(男性,day,1,"all",p.targets,4);assert.equal(result.ok,true);assert.notEqual(day.meals[1].items.map(x=>x.food.id).join(","),before);assert.ok(Number.isFinite(day.total.kcal))});
 test("整天菜单替换产生另一套且保留七天目标结构",()=>{const p=generatePlan(男性),old=p.meals.days[0],result=replaceDayMenu(男性,old,p.targets,3);assert.equal(result.ok,true);assert.equal(result.day.day,old.day);assert.equal(result.day.meals.length,4);assert.notEqual(result.day.meals.flatMap(m=>m.items).map(x=>x.food.id).join(","),old.meals.flatMap(m=>m.items).map(x=>x.food.id).join(","))});
