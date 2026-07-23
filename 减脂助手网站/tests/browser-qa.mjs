@@ -113,13 +113,17 @@ const result=await evaluate(`(async()=>{
   const exerciseCards=document.querySelectorAll('.exercise-library-card').length;
   document.querySelector('.exercise-library-card').click();await pause(30);
   const guideOpen=document.querySelector('#exerciseDialog').open;
-  const guideFrames=document.querySelectorAll('#exerciseDialog .exercise-frames figure').length;
+  const guideFrames=document.querySelectorAll('#exerciseDialog .reviewed-step-grid article').length;
   const guideText=document.querySelector('#exerciseDialog').innerText;
+  const guideSources=document.querySelectorAll('#exerciseDialog .exercise-sources a').length;
   const motionPlayer=Boolean(document.querySelector('#exerciseDialog #motionPlayer'));
   const motionProgressBefore=Number(document.querySelector('#motionScrubber')?.value||0);
   await pause(120);
   const motionProgressAfter=Number(document.querySelector('#motionScrubber')?.value||0);
   document.querySelector('#motionToggle')?.click();
+  document.querySelector('#closeExerciseDialog').click();
+  document.querySelector('.exercise-library-card[data-exercise="ex009"]').click();await pause(30);
+  const unreviewedBlocked=Boolean(document.querySelector('#exerciseDialog .unreviewed-exercise'))&&!document.querySelector('#exerciseDialog .reviewed-step-grid');
   document.querySelector('#closeExerciseDialog').click();
 
   window.__printed=false;Object.defineProperty(window,'print',{configurable:true,value:()=>{window.__printed=true}});
@@ -148,8 +152,10 @@ const result=await evaluate(`(async()=>{
     exerciseCards,
     guideOpen,
     guideFrames,
+    guideSources,
     motionPlayer,
     motionMoved:motionProgressAfter!==motionProgressBefore,
+    unreviewedBlocked,
     guideComplete:guideText.includes('做到位的判断')&&guideText.includes('常见错误')&&guideText.includes('呼吸'),
     reportDefault,
     printed:window.__printed,
@@ -169,8 +175,8 @@ if(!direct){
   await call("Emulation.clearDeviceMetricsOverride");
   const reviewUrl=new URL("动作演示审核.html",url).href;
   await call("Page.navigate",{url:reviewUrl});
-  await waitFor("document.querySelector('#readyCount')?.textContent==='88'");
-  review=await evaluate(`({total:document.querySelector('#totalCount').textContent,ready:document.querySelector('#readyCount').textContent,pending:document.querySelector('#pendingCount').textContent,cards:document.querySelectorAll('.card').length,firstLink:document.querySelector('.card a:not(.disabled)')?.href})`);
+  await waitFor("document.querySelector('#readyCount')?.textContent==='6'");
+  review=await evaluate(`({total:document.querySelector('#totalCount').textContent,reviewed:document.querySelector('#reviewedCount').textContent,ready:document.querySelector('#readyCount').textContent,pending:document.querySelector('#pendingCount').textContent,cards:document.querySelectorAll('.card').length,firstLink:document.querySelector('.card a:not(.disabled)')?.href})`);
   await call("Page.navigate",{url:review.firstLink});
   review.deepLinkOpened=await waitFor("Boolean(document.querySelector('#exerciseDialog')?.open&&document.querySelector('#motionPlayer'))");
 }
@@ -187,7 +193,7 @@ const failed=
   result.scheduledSessions!==4||!result.scheduleVisible||!result.scheduleEntryComplete||
   result.members!==2||!result.secondIsEmpty||!result.firstRestored||
   !result.recipeChanged||result.diningMatches!==18||!result.diningChanged||!result.diningConfidence||
-  result.exerciseCards!==36||!result.guideOpen||result.guideFrames!==3||!result.motionPlayer||!result.motionMoved||!result.guideComplete||
+  result.exerciseCards!==36||!result.guideOpen||result.guideFrames!==3||result.guideSources<2||!result.motionPlayer||!result.motionMoved||!result.unreviewedBlocked||!result.guideComplete||
   result.reportDefault!=="45"||!result.printed||result.reportWeeks!==4||result.reportDays!==7||!result.reportComplete||
-  mobile.overflow||(!direct&&(review.total!=="220"||review.ready!=="88"||review.pending!=="132"||review.cards!==220||!review.deepLinkOpened))||errors.length;
+  mobile.overflow||(!direct&&(review.total!=="220"||review.reviewed!=="88"||review.ready!=="6"||review.pending!=="214"||review.cards!==220||!review.deepLinkOpened))||errors.length;
 if(failed)process.exitCode=1;

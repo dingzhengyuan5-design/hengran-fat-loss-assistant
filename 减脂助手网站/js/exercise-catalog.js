@@ -1,3 +1,5 @@
+import {curatedGuideByName,curatedGuideCount} from "./curated-exercise-guides.js";
+
 const 动作核验日期="2026-07-23";
 
 const 动作模式说明={
@@ -29,6 +31,19 @@ const 动作分组=[
 ];
 
 function 推断器械(name){
+  const 专项={
+    "高脚杯深蹲":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "毛巾等长划船":{equipment:["none","home"],tool:"毛巾与可靠固定点"},
+    "门框划船":{equipment:["none","home"],tool:"稳固门框"},
+    "农夫行走":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "单侧提重行走":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "前抱式负重行走":{equipment:["home","gym"],tool:"沙袋或药球"},
+    "过顶负重行走":{equipment:["home","gym"],tool:"轻哑铃或壶铃"},
+    "俯卧腿弯举":{equipment:["gym"],tool:"俯卧腿弯举机"},
+    "坐姿腿弯举":{equipment:["gym"],tool:"坐姿腿弯举机"},
+    "跑步机坡度走":{equipment:["gym"],tool:"跑步机"}
+  };
+  if(专项[name])return 专项[name];
   if(/器械|史密斯|哈克|腿举|绳索|高位下拉|坐姿划船|蝴蝶机|雪橇|登阶机|椭圆机|划船机|固定单车|卧式单车/.test(name))return {equipment:["gym"],tool:"固定器械"};
   if(/杠铃|T杠|潘德雷|安全杠/.test(name))return {equipment:["gym"],tool:"杠铃"};
   if(/哑铃/.test(name))return {equipment:["home","gym"],tool:"哑铃"};
@@ -53,10 +68,56 @@ function 推断限制(pattern,name){
   if(["push","vertical"].includes(pattern)||/侧平举|前平举|臂屈伸|战绳|悬垂|引体/.test(name))result.push("shoulder");
   return [...new Set(result)];
 }
+function 推断专项肌群(name,guide){
+  const rules=[
+    [/靠墙静蹲/,["股四头肌","臀大肌"],["比目鱼肌","核心"]],
+    [/相扑/,["臀大肌","内收肌"],["股四头肌","核心"]],
+    [/深蹲|前蹲/,["股四头肌","臀大肌"],["内收肌","核心"]],
+    [/髋铰链|早安|罗马尼亚硬拉/,["腘绳肌","臀大肌"],["竖脊肌","核心"]],
+    [/臀桥|青蛙泵/,["臀大肌"],["腘绳肌","核心"]],
+    [/双哑铃硬拉/,["臀大肌","股四头肌"],["腘绳肌","核心"]],
+    [/肩胛俯卧撑/,["前锯肌"],["胸大肌","核心"]],
+    [/俯卧撑/,["胸大肌","肱三头肌"],["三角肌前束","核心"]],
+    [/面拉/,["三角肌后束","斜方肌中下束"],["肩袖肌群","菱形肌"]],
+    [/划船/,["背阔肌","菱形肌"],["斜方肌中束","肱二头肌"]],
+    [/墙壁滑动/,["前锯肌","斜方肌下束"],["肩袖肌群"]],
+    [/直臂下压/,["背阔肌"],["大圆肌","核心"]],
+    [/下拉|引体/,["背阔肌","肱二头肌"],["菱形肌","斜方肌下束"]],
+    [/肩胛下沉/,["斜方肌下束","背阔肌"],["前锯肌","握力"]],
+    [/侧向箭步/,["臀大肌","内收肌"],["股四头肌","臀中肌"]],
+    [/分腿蹲|箭步蹲/,["臀大肌","股四头肌"],["内收肌","臀中肌"]],
+    [/腹式呼吸/,["膈肌","腹横肌"],["盆底肌","肋间肌"]],
+    [/骨盆后倾/,["腹直肌","腹横肌"],["臀大肌"]],
+    [/死虫/,["腹横肌","腹斜肌"],["髋屈肌","前锯肌"]],
+    [/鸟狗/,["多裂肌","臀大肌"],["腹横肌","三角肌"]],
+    [/平板支撑/,["腹横肌","腹直肌"],["前锯肌","臀大肌"]],
+    [/高抬腿/,["髋屈肌","臀中肌"],["小腿肌群","核心"]],
+    [/农夫行走/,["握力","斜方肌"],["核心","臀腿"]],
+    [/单侧提重/,["腹斜肌","腰方肌"],["握力","臀中肌"]],
+    [/前抱式/,["上背部","肱二头肌"],["核心","臀腿"]],
+    [/架式行走/,["三角肌前束","肱二头肌"],["核心","臀腿"]],
+    [/过顶负重/,["三角肌","前锯肌"],["核心","臀腿"]],
+    [/雪橇/,["股四头肌","臀大肌"],["小腿肌群","核心"]],
+    [/提踵/,["腓肠肌","比目鱼肌"],["足底稳定肌"]],
+    [/胫骨前肌/,["胫骨前肌"],["趾伸肌群"]],
+    [/腿屈伸/,["股四头肌"],["髋部稳定肌"]],
+    [/腿弯举/,["腘绳肌"],["腓肠肌"]],
+    [/划船机/,["股四头肌","臀大肌"],["背阔肌","心肺系统"]],
+    [/单车|椭圆机|登阶机|快走|变速走|坡度走/,["心肺系统","股四头肌"],["臀大肌","小腿肌群"]],
+    [/猫牛式/,["脊柱活动控制"],["腹部与背部肌群"]],
+    [/胸椎|开书式/,["胸椎旋转活动度"],["腹斜肌","肩胛稳定肌"]],
+    [/肩胛绕环/,["肩胛控制肌群"],["斜方肌","前锯肌"]],
+    [/拉伸肩|肩袖外旋/,["肩袖肌群"],["三角肌后束","肩胛稳定肌"]],
+    [/髋关节绕环/,["髋关节活动控制"],["臀中肌","髋屈肌"]]
+  ];
+  const match=rules.find(([pattern])=>pattern.test(name));
+  return match?{primary:match[1],secondary:match[2]}:{primary:guide.primary,secondary:guide.secondary};
+}
 
 export const exerciseLibrary=动作分组.flatMap(([pattern,category,names])=>names.split("|").map(name=>{
-  const guide=动作模式说明[pattern],gear=推断器械(name);
-  return {name,pattern,group:pattern,category,equipment:gear.equipment,tool:gear.tool,difficulty:推断难度(name),limits:推断限制(pattern,name),primaryMuscles:guide.primary,secondaryMuscles:guide.secondary,steps:guide.steps,cues:guide.cues,errors:guide.errors,breathing:guide.breathing,standard:guide.standard,visualKey:guide.visualKey,verifiedOn:动作核验日期,source:"ACSM 2026抗阻训练原则与ACE动作库分类框架；本站中文动作说明为教学性整理",reviewStatus:"结构化教学示意，非个体动作诊断"};
+  const guide=动作模式说明[pattern],gear=推断器械(name),curated=curatedGuideByName[name],muscles=curated?推断专项肌群(name,guide):{primary:guide.primary,secondary:guide.secondary};
+  const base={name,pattern,group:pattern,category,equipment:gear.equipment,tool:gear.tool,difficulty:推断难度(name),limits:推断限制(pattern,name),primaryMuscles:muscles.primary,secondaryMuscles:muscles.secondary,steps:guide.steps,cues:guide.cues,errors:guide.errors,breathing:guide.breathing,standard:guide.standard,visualKey:guide.visualKey,verifiedOn:动作核验日期,source:"NASM 与 ACE 动作库分类框架；仅提供动作模式级概览",sources:[],reviewStatus:"尚未逐项复核，请勿把通用示意当作本动作标准教程",motionApproved:false,motionKey:""};
+  return curated?{...base,...curated,visualKey:curated.motionKey||guide.visualKey}:base;
 })).map((exercise,index)=>({...exercise,id:`ex${String(index+1).padStart(3,"0")}`}));
 
 for(const exercise of exerciseLibrary){
@@ -68,5 +129,6 @@ for(const exercise of exerciseLibrary){
 
 export const exerciseLibraryCount=exerciseLibrary.length;
 export const bodyweightExerciseCount=exerciseLibrary.filter(item=>item.tool==="徒手").length;
+export const curatedExerciseCount=curatedGuideCount;
 export function getExerciseByName(name){return exerciseLibrary.find(item=>item.name===name)}
 export function exerciseById(id){return exerciseLibrary.find(item=>item.id===id)}

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {bmi,bmr,calculateTargets,filterFoods,generatePlan,replaceWholeMeal,replaceDayMenu,assessRisk,assessProgress,foods,mealTemplates,exerciseCount} from "../js/engine.js";
-import {exerciseLibrary,bodyweightExerciseCount} from "../js/exercise-catalog.js";
+import {exerciseLibrary,bodyweightExerciseCount,curatedExerciseCount} from "../js/exercise-catalog.js";
 import {standardRecipes,calculateRecipe,recipeAllowed} from "../js/recipe-catalog.js";
 import {diningBrands,diningItems,diningBrandCount,diningItemCount,calculateDiningItem} from "../js/external-food-catalog.js";
 import {motionExercises,motionExerciseCount,getMotion} from "../js/motion-catalog.js";
@@ -17,7 +17,8 @@ test("自动排期为每节训练生成日期、时间和分段流程",()=>{cons
 test("可按指定星期排期",()=>{const p=generatePlan({...男性,days:3,planStart:"2026-08-03",scheduleMode:"weekdays",weekdays:["2","4","6"]});assert.equal(p.training.schedule.entries.length,12);assert.ok(p.training.schedule.entries.every(entry=>["周二","周四","周六"].includes(entry.weekday)))});
 test("可优先采用多个具体日期",()=>{const p=generatePlan({...男性,days:2,scheduleMode:"dates",specificDates:"2026-08-05,2026-08-09,2026-08-12"}),entries=p.training.schedule.entries;assert.deepEqual(entries.slice(0,3).map(entry=>entry.date),["2026-08-05","2026-08-09","2026-08-12"])});
 test("动作库完整覆盖220项且徒手动作充足",()=>{assert.equal(exerciseCount,220);assert.equal(exerciseLibrary.length,220);assert.ok(bodyweightExerciseCount>=100)});
-test("首批动作演示覆盖多种动作模式并标注角度",()=>{assert.ok(motionExerciseCount>=80);assert.equal(motionExercises.length,motionExerciseCount);assert.ok(motionExercises.some(item=>item.mode==="single-angle"));assert.ok(motionExercises.some(item=>item.mode==="multi-angle"));assert.ok(getMotion(motionExercises[0].exerciseId))});
+test("首批88项已逐项复核且不再共享同一套文字",()=>{const reviewed=exerciseLibrary.filter(item=>item.reviewStatus==="首批逐项复核");assert.equal(curatedExerciseCount,88);assert.equal(reviewed.length,88);assert.equal(new Set(reviewed.map(item=>item.steps.join("|"))).size,88);assert.ok(new Set(reviewed.map(item=>item.breathing)).size>=5);assert.ok(reviewed.every(item=>item.sources.length&&item.cues.length===3&&item.errors.length===3));assert.equal(exerciseLibrary.find(item=>item.name==="高脚杯深蹲").tool,"哑铃或壶铃");assert.equal(exerciseLibrary.find(item=>item.name==="跑步机坡度走").tool,"跑步机")});
+test("只有轨迹匹配的动作保留拟真人动画",()=>{assert.equal(motionExerciseCount,6);assert.equal(motionExercises.length,motionExerciseCount);assert.ok(motionExercises.some(item=>item.mode==="single-angle"));assert.ok(motionExercises.some(item=>item.mode==="multi-angle"));assert.ok(motionExercises.every(item=>exerciseLibrary.find(exercise=>exercise.id===item.exerciseId)?.motionApproved));assert.ok(getMotion(motionExercises[0].exerciseId))});
 test("膝部限制过滤已标记动作",()=>{const p=generatePlan({...男性,equipment:"home",limits:["knee"]});for(const w of p.training.weeks)for(const s of w.sessions)for(const e of s.exercises)assert.ok(!e.limits.includes("knee"))});
 test("纯素与过敏原属于硬过滤",()=>{const list=filterFoods({...男性,diet:"vegan",allergens:["soy","nuts"]});assert.ok(list.length>0);assert.ok(list.every(x=>x.tags.includes("vegan")));assert.ok(list.every(x=>!x.allergens.includes("soy")&&!x.allergens.includes("nuts")))});
 test("不吃猪肉不会返回猪肉标签或名称",()=>{const list=filterFoods({...男性,diet:"no-pork"});assert.ok(list.every(x=>!x.tags.includes("pork")&&!x.name.includes("猪")))});

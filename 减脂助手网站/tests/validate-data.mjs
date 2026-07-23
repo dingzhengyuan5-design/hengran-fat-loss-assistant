@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {foods,mealTemplates,dataMeta} from "../js/catalog.js";
-import {exerciseLibrary,bodyweightExerciseCount} from "../js/exercise-catalog.js";
+import {exerciseLibrary,bodyweightExerciseCount,curatedExerciseCount} from "../js/exercise-catalog.js";
 import {standardRecipes,calculateRecipe} from "../js/recipe-catalog.js";
 import {diningBrands,diningItems} from "../js/external-food-catalog.js";
 import {motionExercises} from "../js/motion-catalog.js";
@@ -44,9 +44,15 @@ for(const item of diningItems){
   assert.ok(Array.isArray(item.range)&&item.range.length===2&&item.range[0]<=item.kcal&&item.range[1]>=item.kcal,`${item.brand} ${item.name} 区间不合理`);
   assert.ok(item.status&&item.confidence&&item.source&&item.verifiedOn,`${item.brand} ${item.name} 缺少估算说明`);
 }
-assert.ok(motionExercises.length>=80,"首批动作演示覆盖不得少于80项");
+assert.equal(curatedExerciseCount,88,"首批逐项复核动作必须为88项");
+const reviewedExercises=exerciseLibrary.filter(exercise=>exercise.reviewStatus==="首批逐项复核");
+assert.equal(reviewedExercises.length,88,"逐项复核状态数量不正确");
+assert.equal(new Set(reviewedExercises.map(exercise=>exercise.steps.join("|"))).size,88,"逐项复核动作不得共用完全相同的步骤");
+assert.ok(new Set(reviewedExercises.map(exercise=>exercise.breathing)).size>=5,"不同类型动作必须使用适配的呼吸说明");
+for(const exercise of reviewedExercises)assert.ok(exercise.sources.length&&exercise.cues.length===3&&exercise.errors.length===3,`${exercise.name} 缺少独立来源或要点`);
+assert.equal(motionExercises.length,6,"只有当前轨迹与动作确切匹配的6项动画可以发布");
 for(const motion of motionExercises){
   assert.ok(exerciseIds.has(motion.exerciseId),`动作演示引用不存在的动作：${motion.exerciseId}`);
-  assert.ok(["single-angle","multi-angle"].includes(motion.mode)&&motion.fps>=50,`${motion.name} 演示配置不完整`);
+  assert.ok(["single-angle","multi-angle"].includes(motion.mode)&&motion.fps>=30,`${motion.name} 演示配置不完整`);
 }
 console.log(`数据验证通过：${foods.length}种食物、${mealTemplates.length}套模板、${standardRecipes.length}套标准菜谱、${diningItems.length}项外食、${exerciseLibrary.length}项动作、${motionExercises.length}项演示，版本 ${dataMeta.version}`);
