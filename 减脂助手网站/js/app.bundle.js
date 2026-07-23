@@ -97,6 +97,142 @@ const videos = [
 
 const dataMeta = {verifiedOn:核验日期,foodCount:foods.length,mealCount:mealTemplates.length,version:"2026.07-b",reviewStatus:"待营养专业逐条审核",disclaimer:"营养值为离线规划参考快照，尤其外卖和混合菜误差较大。正式发布前应由营养专业人员逐条审核。"};
 
+/* 来源：js/curated-exercise-guides.js */
+const 来源={
+  nasm:{title:"NASM Exercise Library",url:"https://www.nasm.org/workout-exercise-guidance"},
+  ace:{title:"ACE Exercise Library",url:"https://www.acefitness.org/resources/everyone/exercise-library/"},
+  nhs:{title:"NHS Strength and Flex how-to videos",url:"https://www.nhs.uk/live-well/exercise/strength-and-flex-exercise-plan-how-to-videos/"},
+  wger:{title:"wger 开放动作库（CC BY-SA）",url:"https://wger.readthedocs.io/en/latest/"}
+};
+
+const 条目=[];
+const 呼吸=name=>{
+  if(/腹式呼吸/.test(name))return "经鼻平稳吸气约3～4秒，让下肋扩张；缓慢呼气约4～6秒。";
+  if(/静蹲|平板支撑|等长/.test(name))return "全程保持连续呼吸，不为延长时间而闭气。";
+  if(/快走|变速走|坡度走|椭圆机|单车|划船机|登阶机|行走|雪橇|高抬腿/.test(name))return "保持有节律的自然呼吸，以谈话测试校准强度。";
+  if(/猫牛式/.test(name))return "卷曲时呼气，展开时吸气，让动作跟随呼吸。";
+  if(/胸椎旋转|开书式|胸椎伸展|拉伸肩/.test(name))return "进入活动范围时吸气，受控回位时呼气，不憋气硬压。";
+  if(/肩胛绕环|肩袖外旋|髋关节绕环/.test(name))return "保持自然呼吸，动作速度不受呼吸催促。";
+  return "发力阶段呼气，受控返回时吸气；需要较高腹压时先吸气建立躯干张力。";
+};
+const 记=(name,setup,execute,finish,cue,error,standard,sourceKey="ace",motionKey="")=>{
+  const primary=来源[sourceKey],secondary=sourceKey==="nasm"?来源.ace:sourceKey==="ace"?来源.nasm:来源.ace;
+  条目.push([name,{steps:[setup,execute,finish],cues:[cue,"动作全程保持可控速度","出现锐痛、麻木或眩晕立即停止"],errors:[error,"借摆动或反弹完成动作","姿态失控后仍继续重复"],breathing:呼吸(name),standard,sources:[primary,secondary],source:`${primary.title}与${secondary.title}交叉核对；本站逐项中文复核`,verifiedOn:"2026-07-23",reviewStatus:"首批逐项复核",motionKey,motionApproved:Boolean(motionKey)}]);
+};
+
+// 下肢力量
+记("徒手深蹲","双脚约肩宽，脚尖自然外展，肋骨位于骨盆上方。","髋膝同步屈曲，膝盖沿第二脚趾方向下降。","脚掌三点压地，髋膝同步伸展站直。","脚跟和大脚趾根部持续着地","膝内扣或脚跟抬起","正面双膝轨迹稳定，侧面腰背不突然塌陷。","ace","squat");
+记("箱式徒手深蹲","背对固定箱椅站立，箱高应允许骨盆受控。","臀部向后下方移动，轻触箱面但不完全卸力。","不借反弹，以双脚发力站起。","触箱只作深度反馈","向后跌坐或在箱上放松","每次触点一致，箱体不移动。");
+记("靠墙静蹲","背部贴墙，双脚前移到下蹲后小腿近垂直。","沿墙下滑到无痛角度并保持。","计时结束后沿墙缓慢站起。","双膝始终对准脚尖","双脚离墙太近导致膝压过大","保持期间能自然呼吸，结束时仍可受控站起。","nhs");
+记("相扑徒手深蹲","宽于肩站立，脚尖按髋部舒适范围外展。","髋部向下，双膝沿外展脚尖方向打开。","脚跟和内侧前掌共同发力站起。","宽站距来自髋部而非扭膝","膝盖内塌或脚内侧离地","底部双膝与脚尖同向，内侧脚掌不抬。");
+记("深蹲触椅","椅子靠墙固定，站位保证臀部能轻触椅缘。","髋膝屈曲下降，触椅即停，不完全坐下。","保持胸髋同步站起。","椅子只作触点而非休息面","坐下休息后再用摆动起身","可连续触到相同位置且椅子不被撞动。","nhs");
+记("抱胸深蹲","双臂交叉抱胸，采用舒适深蹲站距。","不用摆臂，髋膝同步下降。","胸口与髋部同时上升。","手臂位置全程不变","含胸或先抬臀后抬胸","无摆臂条件下仍能维持相同深度和轨迹。");
+记("高脚杯深蹲","双手把哑铃或壶铃贴近胸前，肘部朝下。","负重贴近身体，髋膝屈曲下蹲。","脚掌压地站起，负重不离开胸口。","手腕中立且负重靠近重心","把重量举离身体或用肘强压膝盖","负重路径接近垂直，最后一次仍能控制底部。","nasm");
+记("双哑铃前蹲","两只哑铃置于肩前，两侧高度一致。","保持哑铃稳定，髋膝同步屈曲。","双脚均匀发力，躯干不过度后仰。","肘部略向前且手腕舒适","一侧哑铃下坠或左右躯干侧倾","左右轨迹对称，哑铃不碰撞头颈。","nasm");
+
+// 髋部力量
+记("徒手髋铰链","双脚髋宽，膝微屈，双手放在髋部。","臀部向后推，躯干作为整体前倾。","夹臀把髋向前送，回到直立但不后仰。","小腿位置变化很小","把动作做成深蹲或腰部弯曲","主要感到臀腿后侧牵拉，腰部无锐痛。","nasm","hinge");
+记("早安式徒手练习","双手置于后脑或胸前，膝保持轻微弯曲。","髋部向后，头胸骨盆作为整体前倾。","臀腿后侧发力回到直立。","膝角基本保持不变","抬头或分段塌腰","侧面观察脊柱形状稳定，动作轴心在髋。","nasm");
+记("臀桥","仰卧屈膝，脚跟距臀约一脚长。","轻收腹并夹臀抬髋至肩髋膝近一条线。","肋骨不过度上翻，缓慢降髋。","脚跟持续压地","用腰过伸追求高度","顶端主要感到臀部收缩而非腰部挤压。","nasm");
+记("单腿臀桥","仰卧，一脚踩地，另一侧髋膝屈曲离地。","支撑脚跟压地抬髋，骨盆保持水平。","缓慢下降至臀部轻触地面。","非支撑腿不摆动","骨盆旋转或支撑膝内扣","左右能在无旋转下达到相近高度。");
+记("臀桥行进","先建立稳定臀桥位，双脚髋宽。","维持髋高，交替把一只脚抬离地面数厘米。","每只脚轻放回原位，最后再降髋。","抬脚幅度小而稳定","每次抬脚时髋部明显下沉","从正面看骨盆不左右摇摆。");
+记("青蛙泵","仰卧，脚底相对，膝盖向两侧打开。","保持腰背自然，夹臀抬髋。","顶端停顿后缓慢降下。","脚底持续相对","用腰过伸或强压膝盖到地面","顶端臀部收缩明显，髋前侧无夹痛。");
+记("哑铃罗马尼亚硬拉","哑铃置于大腿前，双脚髋宽、膝微屈。","臀部后移，哑铃贴腿下降到腘绳肌张力明显。","夹臀伸髋，哑铃沿原路回到大腿前。","哑铃始终贴近身体","下蹲代替铰链或底部圆背","哑铃路径近垂直，腰背形状稳定。","nasm");
+记("双哑铃硬拉","哑铃置于脚外侧或身体两侧，先建立稳定起始位。","髋膝同步伸展把哑铃提起。","先髋后膝受控把哑铃放回原位。","起拉前先收紧腋下和腹部","臀部先抬或哑铃向前漂","肩髋同步上升，每次起点一致。","nasm");
+
+// 俯卧撑
+记("墙壁俯卧撑","面对墙站立，双手略宽于肩并与胸同高。","身体整体前移，胸口靠近墙，肘部斜向后。","手掌推墙，身体整体回到起点。","头髋脚保持一条直线","只把头伸向墙或腰部塌陷","胸口和骨盆同步靠墙，肩前侧无夹痛。","nhs");
+记("高位俯卧撑","双手撑稳固高台，身体从头到踝成直线。","胸口向双手之间下降，肘部约30至60度。","推开支撑面，身体整体上升。","先确认台面防滑","髋部先下沉或头部前伸","每次胸口到台面距离一致。","nasm");
+记("跪姿俯卧撑","双膝着垫，膝髋肩形成直线。","以膝为支点整体下降，髋部不后坐。","手掌推地，身体整体回位。","支点在膝而不是髋","做成跪姿鞠躬","侧面看膝髋肩关系稳定。","nasm");
+记("标准俯卧撑","双手略宽于肩，头胸骨盆脚跟成直线。","胸口向地面下降，肘部约与躯干成45度。","推地伸肘并让肩胛自然前伸。","腹部和臀部同时收紧","塌腰或肘部外展接近90度","最后一次仍能保持身体直线和下降深度。","nasm","push");
+记("窄距俯卧撑","双手肩宽或略窄，手腕保持舒适。","肘部贴近躯干后移，胸口受控下降。","主要用肱三头和胸部推起。","窄距不要求双手相碰","手距过窄引发腕痛","肘部轨迹稳定且躯干不旋转。","nasm");
+记("宽距俯卧撑","手距比标准略宽，但底部前臂仍接近垂直。","胸口居中下降，避免极端外展。","手掌向内下方施力推起。","宽度以肩部舒适为限","手距过宽或肩膀耸起","肩前侧无夹痛，左右肘角度对称。");
+记("肩胛俯卧撑","高位平板，双手在肩下，手肘保持伸直。","胸廓在肩胛间轻微下沉，再主动推地使肩胛前伸。","回到肩胛中立，腰髋不动。","幅度来自肩胛而非手肘","把动作做成普通俯卧撑","只有肩胛和胸廓小幅变化，骨盆高度不变。");
+记("暂停俯卧撑","采用标准俯卧撑起始位。","下降到底部并保持全身张力停顿1至2秒。","不借反弹，从静止位置整体推起。","停顿时不趴地卸力","胸腹先后离地","每次停顿深度一致，能从静止位整体推起。","nasm");
+
+// 背部拉力
+记("毛巾等长划船","确认毛巾和固定点可靠，建立稳定坐姿或站姿。","肘部向后拉，逐渐增加张力并保持。","缓慢降低张力，不能突然松手。","固定点安全优先","使用活动门把手等不可靠固定点","张力能平稳建立和释放，颈部放松。");
+记("桌边反向划船","先测试桌体稳定，仰卧于桌下握稳边缘。","保持身体直线，把胸口拉向桌边。","伸肘受控下降，身体不坠落。","脚跟压地且臀部不下沉","使用轻薄或不固定桌子","桌体无位移，身体整体移动。");
+记("低杠反向划船","确认低杠固定，双手握杠、脚跟着地。","肘部向后，把下胸拉向杠。","受控下降到肩胛可控前伸。","胸口对准杠而非下巴","髋部下沉或下巴前伸","身体从头到脚保持直线。","nasm");
+记("门框划船","只使用结构稳固的门框，双脚靠近门框。","身体整体后倾，再用肘带动拉回。","缓慢伸肘回到后倾位置。","先检查门框和地面防滑","抓活动门扇或用腰甩动","门框无位移，肩膀不耸起。");
+记("弹力带划船","弹力带固定在胸高，后退至起始即有张力。","肘部后拉到手接近躯干。","缓慢伸肘，不让弹力带弹回。","固定点必须可靠","身体后仰或回程失控","带子全程有张力，顶端能停顿。","nasm");
+记("弹力带面拉","弹力带固定在眼睛至额头高度。","把带拉向面部两侧，肘部外展并伴随肩外旋。","肩膀保持下沉，缓慢伸臂。","终点双手在眉眼两侧","拉向胸口变成划船","肩前侧无夹痛，躯干不后仰。","nasm");
+记("单臂哑铃划船","建立一手支撑，背部自然，哑铃垂于肩下。","肘部沿躯干向髋部拉。","缓慢下放到手臂伸直。","骨盆保持水平","躯干旋转提重","左右躯干角度一致，顶端不靠旋转增加高度。","nasm");
+记("双臂哑铃划船","髋铰链使躯干前倾，两哑铃垂于肩下。","两肘同时向后拉至下肋附近。","缓慢伸肘，髋铰链角度不变。","两侧哑铃同步","边划边起身","一组内躯干角度稳定。","nasm");
+
+// 垂直推拉
+记("墙壁滑动","后脑上背骨盆自然贴墙，前臂呈W形。","肋骨不外翻，前臂沿墙向上滑。","肩胛自然下回W形。","只到肩部无痛范围","用腰后仰换取幅度","上滑时腰部不明显离墙。");
+记("跪姿弹力带下拉","弹力带固定在头顶上方，跪姿躯干稳定。","肘部向下后方拉，手到上胸两侧。","受控伸肘回到起点。","固定点可靠且身体不后仰","用体重猛拉弹力带","终点肩膀不耸起，腰部不后仰。","nasm");
+记("弹力带直臂下压","弹力带固定在头顶，双臂伸直握带。","肘角基本不变，手臂画弧压向大腿。","缓慢抬臂回到可控上方位置。","肋骨不外翻","变成肱三头屈伸","手臂呈弧形移动，躯干角度不变。","nasm");
+记("悬垂肩胛下沉","握杠悬垂，先确认握力和肩部耐受。","手肘伸直，把肩膀从耳旁向下拉。","缓慢回到可控悬垂。","动作幅度很小","屈肘变成引体或甩腿","只有肩胛小幅移动，身体不摆荡。");
+记("辅助引体向上","使用辅助机或弹力带减重，建立稳定悬垂。","肘部向下，把胸口拉向杠。","受控伸肘下降。","辅助量应保证完整动作","踢腿借力或快速坠落","每次从同一起点开始，下降至少可控2秒。","nasm");
+记("反手引体向上","手掌朝向自己，肩宽握杠。","肘部向肋骨下拉，上胸靠近杠。","缓慢伸肘下降。","腕部舒适且肘部朝下","只伸头过杠","下巴越杠来自身体上升而非颈部伸展。","nasm");
+记("正手引体向上","手背朝向自己，握距略宽于肩。","稳定肩胛后，肘部向下后方拉。","受控下降到手臂接近伸直。","胸口朝杠且核心收紧","宽握过度或踢腿摆荡","全程无摆荡，底部仍能主动控制。","nasm");
+记("高位下拉","大腿固定，躯干轻微后倾且保持不变。","肘部向下，把杠拉向上胸。","缓慢伸肘让杠上升。","杠始终在身体前方","拉到颈后或大幅后仰","终点无肩部夹痛，配重不撞击。","nasm");
+
+// 单腿与稳定
+记("扶墙分腿蹲","采用前后分腿站姿，一手轻扶墙。","身体垂直下降，前后膝同时屈曲。","前脚发力站起，扶墙手只作平衡。","双脚像铁轨而非一条线","用手臂拉起身体","前脚脚跟不抬，骨盆朝前。");
+记("扶墙反向箭步蹲","站立轻扶墙，一脚向后迈。","后膝下降，前脚全掌稳定。","前脚发力把后脚带回。","扶墙只作平衡","用墙推拉身体","回收后脚时身体不晃动。");
+记("静态分腿蹲","双脚前后固定并保留左右宽度。","垂直下降，后膝朝地面。","前脚下压沿原路站起。","重心主要在前脚","前后摇摆或后脚过度蹬地","一组内双脚位置不变。","nasm","lunge");
+记("反向箭步蹲","从站立位一脚向后迈足够距离。","后膝向地面下降，前膝沿脚尖方向。","前脚发力站起并收回后脚。","后步不跨过身体中线","前膝内扣","回到站姿时无需额外小碎步。","nasm");
+记("前向箭步蹲","从站立位向前迈足够步幅。","前脚全掌落地并受控吸收惯性。","前脚推地回到起始位。","先落稳再下降","步幅过短或落地过重","能在底部短暂停顿并稳定回位。","nasm");
+记("侧向箭步蹲","一脚向侧方迈出，脚尖大致朝前。","迈出侧髋向后坐，另一腿保持较直。","屈曲侧脚掌发力推回中央。","髋部向后而非膝盖单独前冲","躯干塌向一侧","屈曲侧脚跟不抬，骨盆可控后移。");
+记("行走箭步蹲","向前迈出稳定步幅，双脚左右有宽度。","下降后让后脚向前进入下一步。","每一步先恢复平衡再继续。","步间必须先站稳","为赶速度连续跌落","连续步伐仍能维持相同深度。","nasm");
+记("保加利亚分腿蹲","后脚置于稳固低凳，前脚调到脚跟稳定的位置。","以前腿为主下降，后膝朝地面。","前脚发力站起，后腿只平衡。","前脚承担主要负荷","凳子过高或从后腿蹬起","前脚脚跟着地且骨盆不旋转。","nasm");
+
+// 核心
+记("仰卧腹式呼吸","仰卧屈膝，一手放胸、一手放下肋缘。","经鼻吸气，让下肋向前侧后方扩张。","缓慢呼气，肩颈保持放松。","感受360度肋骨扩张","只抬胸口或吸气耸肩","能连续完成5次平稳呼吸。","nhs");
+记("骨盆后倾练习","仰卧屈膝，找到腰部自然空隙。","轻收下腹，让骨盆向后滚动。","放松回到中立，不抬臀。","幅度小且来自骨盆","做成臀桥或用脚蹬地","不抬臀、不憋气也能控制腰部空隙。","nhs");
+记("死虫","仰卧，髋膝90度，双臂指向天花板。","缓慢伸出对侧手腿，腰背保持稳定。","沿原路回位后换侧。","幅度服从腰背稳定","腿伸太低导致腰部拱起","左右幅度接近且呼吸不中断。","nasm","core");
+记("死虫脚跟点地","仰卧髋膝90度，双臂保持稳定。","一侧髋部伸展，让脚跟轻触地面。","把腿带回90度后换侧。","膝角保持约90度","脚掌重砸地面","每次触地点一致，骨盆不摇摆。");
+记("死虫弹力带版","双手把头顶方向弹力带拉至稳定位置。","保持上肢等长张力，交替伸腿。","腿回位后再换侧，手臂不动。","先确认固定点可靠","双臂被弹力带拉动","弹力带张力和腰背位置全程一致。");
+记("鸟狗","四点跪姿，手在肩下、膝在髋下。","同时伸出对侧手腿，骨盆朝地。","手膝受控回位后换侧。","伸长而不是抬高","髋部向外翻开","从背后看骨盆不旋转。","nasm");
+记("鸟狗划船","四点跪姿，一手持轻哑铃，另一手稳定支撑。","骨盆保持水平，持铃侧肘向后划。","缓慢下放，躯干不旋转。","从极轻负重开始","用腰扭转提铃","划船前后背部与骨盆方向不变。");
+记("前臂平板支撑","前臂着地，肘在肩下，脚尖支撑。","收紧腹臀并维持身体直线。","姿势开始失稳前主动跪地结束。","前臂主动推地","塌腰或臀部过高","保持期间头胸骨盆脚跟位置稳定。","nasm");
+
+// 负重与全身
+记("原地高抬腿慢走","站直，必要时轻扶稳定物。","交替抬膝到可控高度并自然摆臂。","每只脚轻柔落回原位。","落地安静且骨盆水平","身体后仰抬膝","连续行进时躯干不后仰。","nhs","cardio");
+记("农夫行走","两侧持等重负荷，站直后开始。","用短而稳定的步幅向前走。","在握力下降前停下并安全放下。","两侧负荷相等","耸肩或负重撞腿","行走路线平直，身体不左右摆动。");
+记("单侧提重行走","一侧手持负重，身体保持直立。","抵抗侧拉并稳定行走。","完成距离后换侧。","头胸骨盆垂直叠放","身体向任一侧弯曲","左右侧完成质量和距离接近。");
+记("前抱式负重行走","把沙袋或药球贴近胸前，视线不被遮挡。","保持负重贴近重心行走。","胸廓塌陷前停下并用下肢放下。","负重持续贴身","含胸低头或腰部后仰","负重不下滑，躯干不后仰。");
+记("双壶铃架式行走","两壶铃置于前架位，前臂近垂直。","保持两侧壶铃稳定行走。","先停稳，再安全放下。","手腕中立且肘在壶铃下方","壶铃压腕或左右高度不同","壶铃不碰撞，肋骨不外翻。","nasm");
+记("过顶负重行走","把轻负荷举至头顶，确认肩部无痛。","负重位于肩上方，缓慢行走。","先停稳再受控降至肩部。","手肩髋尽量叠放","负重漂到身体前方","肩部无痛且腰部不后仰。");
+记("雪橇推行","握住雪橇立杆，身体前倾、脚掌稳定。","用连续短步推动雪橇。","逐渐减速，不在移动中松手。","躯干保持刚性","步幅过大打滑","雪橇平稳移动且腰背位置稳定。");
+记("雪橇后拖","面对雪橇，握把后让拉带绷紧。","保持躯干较直，以小步后退。","减速停稳后再放松拉带。","先确认身后路线","只用脚尖拖行","后退平稳且能随时停下。");
+
+// 局部强化
+记("徒手提踵","双脚平行，必要时轻扶稳定物。","前脚掌压地，脚跟垂直抬高。","缓慢下降至脚跟轻触地面。","大脚趾根部持续压地","脚踝向外翻或借弹跳","左右脚跟高度接近，下降至少2秒。");
+记("单腿提踵","单脚站立，轻扶稳定物。","支撑脚前掌压地抬高脚跟。","缓慢下降并保持骨盆水平。","扶手只用于平衡","用手臂拉起身体","脚踝轨迹近垂直，左右差异可记录。");
+记("坐姿提踵","坐稳，双脚前掌着地，膝约90度。","前掌不动，抬起脚跟。","缓慢降低，膝盖不晃动。","负荷放大腿远端而非髌骨","脚掌内外翻","脚跟垂直移动，膝盖稳定。");
+记("器械站姿提踵","调整肩垫，前脚掌稳固踩踏板。","膝自然伸展，抬高脚跟。","缓慢下降到小腿有拉伸的位置。","先锁定安全装置","前掌踩台过少或底部弹震","配重不撞击，脚踝不翻转。","nasm");
+记("胫骨前肌抬脚","脚跟着地，前脚掌自然放松。","保持脚跟不动，把脚尖抬向小腿。","缓慢放下，不让脚掌拍地。","脚尖始终朝前","身体后仰代偿","左右前脚掌高度接近，落地安静。");
+记("器械腿屈伸","调节器械轴线对准膝关节，滚垫在小腿下端。","伸膝抬起滚垫至无痛范围。","缓慢屈膝，不让配重撞击。","臀部贴靠背","顶端暴力锁膝","膝盖无痛且左右同步。","nasm");
+记("俯卧腿弯举","俯卧器械，膝轴对准转轴。","保持髋贴垫，屈膝拉向臀部。","缓慢伸膝回到起点。","滚垫位于脚踝上方","臀部抬起或腰部过伸","动作主要发生在膝关节。","nasm");
+记("坐姿腿弯举","调座椅使膝轴对准转轴，固定大腿。","屈膝把滚垫拉向座椅下方。","缓慢伸膝回到起点。","大腿固定垫贴合","臀部抬离座位","一组内座姿和终点角度一致。","nasm");
+
+// 有氧器械
+记("平地快走","穿合脚鞋，在平整路线轻松热身。","逐步加快到能说短句的速度。","用3至5分钟逐渐减速。","步幅自然且视线前方","一开始冲太快","关节无持续疼痛，呼吸能逐步恢复。","nhs");
+记("户外变速走","选择安全路线并热身5分钟。","交替快走和轻松走，快段仍保持步态。","最后以轻松走冷身。","快慢段提前计时","忽略路况只追求配速","慢段能明显恢复，所有快段姿态稳定。","nhs");
+记("跑步机坡度走","启动低速后踏上并熟悉急停装置。","不扶扶手，逐步增加坡度或速度。","先降坡度和速度再离开。","一次只调整一个变量","长期抓扶手或身体向后吊住","无需扶手也能稳定行走。","nasm");
+记("椭圆机","握稳扶手，低阻力启动。","脚掌贴踏板，髋膝沿脚尖方向运动。","降阻力和速度，停稳后下机。","左右腿均匀发力","只用手臂拉动","动作平滑且膝盖不内扣。","nasm");
+记("固定单车","调座高到踏板最低点时膝仍微屈。","骨盆稳定踩踏并逐步调阻力。","降阻力慢踩后停止。","膝盖朝脚尖方向","座位过低导致膝过屈","踩踏圆顺，骨盆不左右摇。","nasm");
+记("卧式单车","调座椅使最远踏板位时膝仍微屈。","背贴靠背，双脚持续踩踏。","降阻力并停稳后起身。","腰背贴靠垫","膝盖锁死或骨盆移动","背部稳定，踩踏连续。","nasm");
+记("划船机","脚带固定，起始位小腿近垂直、手臂伸直。","按腿蹬、躯干轻后倾、手拉的顺序驱动。","按手伸、躯干前倾、屈膝的顺序回程。","驱动顺序必须清晰","一开始就用手拉","链条平稳，座椅不撞前端。","nasm");
+记("登阶机","握稳后低速启动，脚掌充分踩踏板。","身体较直，连续受控踏步。","逐步降速，停稳后下机。","扶手只作平衡","用手臂撑住体重","无需重压扶手也能维持节奏。","nasm");
+
+// 活动度
+记("猫牛式","四点跪姿，先找到自然脊柱。","呼气时从骨盆开始卷曲，吸气时反向展开。","在两端之间缓慢往返。","动作从骨盆逐节传递","快速甩动头颈","动作与呼吸同步，颈部不单独甩动。","nhs");
+记("胸椎旋转","四点跪姿，一手置于后脑。","肘部向支撑臂靠近后，再向外上旋转。","缓慢回到起点，骨盆不翻转。","旋转来自上背","用腰椎或骨盆代偿","左右旋转时骨盆位置稳定。");
+记("开书式旋转","侧卧，髋膝屈曲叠放，双臂前伸。","上侧手臂沿弧线向另一侧打开。","保持双膝接触并缓慢合回。","眼睛跟随上侧手","双膝分开代偿","双膝不动时胸廓能平稳旋转。","nhs");
+记("墙壁胸椎伸展","面对墙或凳跪立，双肘支撑。","胸口向地面下沉，髋位于膝上。","收腹并回到起点。","重点伸展上背","用腰椎塌陷换幅度","感到上背伸展而非腰部挤压。");
+记("肩胛绕环","站立或坐直，手臂放松。","肩胛缓慢向上后下前画圈。","完成数圈后反向。","颈部保持放松","只甩动手臂","圆周平滑，左右节奏接近。","nhs");
+记("弹力带拉伸肩","双手宽握轻弹力带，手臂伸直。","在无痛范围把手臂抬过头顶。","沿原路回到身前。","握距要足够宽","用腰后仰换幅度","整个轨迹无肩部夹痛。");
+记("肩袖外旋热身","肘屈90度贴近身体，使用轻阻力。","肘部不离体，前臂向外旋。","缓慢回到腹前。","可在肘旁夹毛巾","躯干旋转或手腕甩动","动作来自肩关节，肘部位置不变。","nasm");
+记("髋关节绕环","站立轻扶稳定物，支撑腿微屈。","抬起另一侧膝，以髋关节缓慢画圈。","反向重复后换侧。","圆周小而可控","甩腿或支撑膝内扣","躯干基本不动，髋部无痛画圈。");
+
+const curatedGuideByName=Object.fromEntries(条目);
+const curatedGuideCount=条目.length;
+
 /* 来源：js/exercise-catalog.js */
 const 动作核验日期="2026-07-23";
 
@@ -129,6 +265,19 @@ const 动作分组=[
 ];
 
 function 推断器械(name){
+  const 专项={
+    "高脚杯深蹲":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "毛巾等长划船":{equipment:["none","home"],tool:"毛巾与可靠固定点"},
+    "门框划船":{equipment:["none","home"],tool:"稳固门框"},
+    "农夫行走":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "单侧提重行走":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "前抱式负重行走":{equipment:["home","gym"],tool:"沙袋或药球"},
+    "过顶负重行走":{equipment:["home","gym"],tool:"轻哑铃或壶铃"},
+    "俯卧腿弯举":{equipment:["gym"],tool:"俯卧腿弯举机"},
+    "坐姿腿弯举":{equipment:["gym"],tool:"坐姿腿弯举机"},
+    "跑步机坡度走":{equipment:["gym"],tool:"跑步机"}
+  };
+  if(专项[name])return 专项[name];
   if(/器械|史密斯|哈克|腿举|绳索|高位下拉|坐姿划船|蝴蝶机|雪橇|登阶机|椭圆机|划船机|固定单车|卧式单车/.test(name))return {equipment:["gym"],tool:"固定器械"};
   if(/杠铃|T杠|潘德雷|安全杠/.test(name))return {equipment:["gym"],tool:"杠铃"};
   if(/哑铃/.test(name))return {equipment:["home","gym"],tool:"哑铃"};
@@ -153,10 +302,56 @@ function 推断限制(pattern,name){
   if(["push","vertical"].includes(pattern)||/侧平举|前平举|臂屈伸|战绳|悬垂|引体/.test(name))result.push("shoulder");
   return [...new Set(result)];
 }
+function 推断专项肌群(name,guide){
+  const rules=[
+    [/靠墙静蹲/,["股四头肌","臀大肌"],["比目鱼肌","核心"]],
+    [/相扑/,["臀大肌","内收肌"],["股四头肌","核心"]],
+    [/深蹲|前蹲/,["股四头肌","臀大肌"],["内收肌","核心"]],
+    [/髋铰链|早安|罗马尼亚硬拉/,["腘绳肌","臀大肌"],["竖脊肌","核心"]],
+    [/臀桥|青蛙泵/,["臀大肌"],["腘绳肌","核心"]],
+    [/双哑铃硬拉/,["臀大肌","股四头肌"],["腘绳肌","核心"]],
+    [/肩胛俯卧撑/,["前锯肌"],["胸大肌","核心"]],
+    [/俯卧撑/,["胸大肌","肱三头肌"],["三角肌前束","核心"]],
+    [/面拉/,["三角肌后束","斜方肌中下束"],["肩袖肌群","菱形肌"]],
+    [/划船/,["背阔肌","菱形肌"],["斜方肌中束","肱二头肌"]],
+    [/墙壁滑动/,["前锯肌","斜方肌下束"],["肩袖肌群"]],
+    [/直臂下压/,["背阔肌"],["大圆肌","核心"]],
+    [/下拉|引体/,["背阔肌","肱二头肌"],["菱形肌","斜方肌下束"]],
+    [/肩胛下沉/,["斜方肌下束","背阔肌"],["前锯肌","握力"]],
+    [/侧向箭步/,["臀大肌","内收肌"],["股四头肌","臀中肌"]],
+    [/分腿蹲|箭步蹲/,["臀大肌","股四头肌"],["内收肌","臀中肌"]],
+    [/腹式呼吸/,["膈肌","腹横肌"],["盆底肌","肋间肌"]],
+    [/骨盆后倾/,["腹直肌","腹横肌"],["臀大肌"]],
+    [/死虫/,["腹横肌","腹斜肌"],["髋屈肌","前锯肌"]],
+    [/鸟狗/,["多裂肌","臀大肌"],["腹横肌","三角肌"]],
+    [/平板支撑/,["腹横肌","腹直肌"],["前锯肌","臀大肌"]],
+    [/高抬腿/,["髋屈肌","臀中肌"],["小腿肌群","核心"]],
+    [/农夫行走/,["握力","斜方肌"],["核心","臀腿"]],
+    [/单侧提重/,["腹斜肌","腰方肌"],["握力","臀中肌"]],
+    [/前抱式/,["上背部","肱二头肌"],["核心","臀腿"]],
+    [/架式行走/,["三角肌前束","肱二头肌"],["核心","臀腿"]],
+    [/过顶负重/,["三角肌","前锯肌"],["核心","臀腿"]],
+    [/雪橇/,["股四头肌","臀大肌"],["小腿肌群","核心"]],
+    [/提踵/,["腓肠肌","比目鱼肌"],["足底稳定肌"]],
+    [/胫骨前肌/,["胫骨前肌"],["趾伸肌群"]],
+    [/腿屈伸/,["股四头肌"],["髋部稳定肌"]],
+    [/腿弯举/,["腘绳肌"],["腓肠肌"]],
+    [/划船机/,["股四头肌","臀大肌"],["背阔肌","心肺系统"]],
+    [/单车|椭圆机|登阶机|快走|变速走|坡度走/,["心肺系统","股四头肌"],["臀大肌","小腿肌群"]],
+    [/猫牛式/,["脊柱活动控制"],["腹部与背部肌群"]],
+    [/胸椎|开书式/,["胸椎旋转活动度"],["腹斜肌","肩胛稳定肌"]],
+    [/肩胛绕环/,["肩胛控制肌群"],["斜方肌","前锯肌"]],
+    [/拉伸肩|肩袖外旋/,["肩袖肌群"],["三角肌后束","肩胛稳定肌"]],
+    [/髋关节绕环/,["髋关节活动控制"],["臀中肌","髋屈肌"]]
+  ];
+  const match=rules.find(([pattern])=>pattern.test(name));
+  return match?{primary:match[1],secondary:match[2]}:{primary:guide.primary,secondary:guide.secondary};
+}
 
 const exerciseLibrary=动作分组.flatMap(([pattern,category,names])=>names.split("|").map(name=>{
-  const guide=动作模式说明[pattern],gear=推断器械(name);
-  return {name,pattern,group:pattern,category,equipment:gear.equipment,tool:gear.tool,difficulty:推断难度(name),limits:推断限制(pattern,name),primaryMuscles:guide.primary,secondaryMuscles:guide.secondary,steps:guide.steps,cues:guide.cues,errors:guide.errors,breathing:guide.breathing,standard:guide.standard,visualKey:guide.visualKey,verifiedOn:动作核验日期,source:"ACSM 2026抗阻训练原则与ACE动作库分类框架；本站中文动作说明为教学性整理",reviewStatus:"结构化教学示意，非个体动作诊断"};
+  const guide=动作模式说明[pattern],gear=推断器械(name),curated=curatedGuideByName[name],muscles=curated?推断专项肌群(name,guide):{primary:guide.primary,secondary:guide.secondary};
+  const base={name,pattern,group:pattern,category,equipment:gear.equipment,tool:gear.tool,difficulty:推断难度(name),limits:推断限制(pattern,name),primaryMuscles:muscles.primary,secondaryMuscles:muscles.secondary,steps:guide.steps,cues:guide.cues,errors:guide.errors,breathing:guide.breathing,standard:guide.standard,visualKey:guide.visualKey,verifiedOn:动作核验日期,source:"NASM 与 ACE 动作库分类框架；仅提供动作模式级概览",sources:[],reviewStatus:"尚未逐项复核，请勿把通用示意当作本动作标准教程",motionApproved:false,motionKey:""};
+  return curated?{...base,...curated,visualKey:curated.motionKey||guide.visualKey}:base;
 })).map((exercise,index)=>({...exercise,id:`ex${String(index+1).padStart(3,"0")}`}));
 
 for(const exercise of exerciseLibrary){
@@ -168,23 +363,18 @@ for(const exercise of exerciseLibrary){
 
 const exerciseLibraryCount=exerciseLibrary.length;
 const bodyweightExerciseCount=exerciseLibrary.filter(item=>item.tool==="徒手").length;
+const curatedExerciseCount=curatedGuideCount;
 function getExerciseByName(name){return exerciseLibrary.find(item=>item.name===name)}
 function exerciseById(id){return exerciseLibrary.find(item=>item.id===id)}
 
 /* 来源：js/motion-catalog.js */
-const 每组动画数=8;
-const 复杂模式=new Set(["squat","hinge","push","pull","vertical","single"]);
-const 组内序号=new Map();
+const 复杂模式=new Set(["squat","hinge","push","lunge"]);
 
-const motionExercises=exerciseLibrary.filter(exercise=>{
-  const index=组内序号.get(exercise.group)||0;
-  组内序号.set(exercise.group,index+1);
-  return index<每组动画数;
-}).map(exercise=>({
-  exerciseId:exercise.id,name:exercise.name,visualKey:exercise.visualKey,
-  mode:复杂模式.has(exercise.group)?"multi-angle":"single-angle",
-  fps:60,duration:复杂模式.has(exercise.group)?9:4.5,
-  status:"首批程序化高帧率教学动画",reviewStatus:"动作模式已结构化；发布前仍需逐项人工复核"
+const motionExercises=exerciseLibrary.filter(exercise=>exercise.motionApproved&&exercise.motionKey).map(exercise=>({
+  exerciseId:exercise.id,name:exercise.name,visualKey:exercise.motionKey,
+  mode:复杂模式.has(exercise.motionKey)?"multi-angle":"single-angle",
+  fps:36,duration:复杂模式.has(exercise.motionKey)?9:4.5,
+  status:"拟真人动画已通过轨迹初审",reviewStatus:"动作步骤已逐项复核，动画仍不替代现场教练判断"
 }));
 
 const motionExerciseIds=new Set(motionExercises.map(item=>item.exerciseId));
@@ -732,7 +922,7 @@ function write(key,value){
 function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2400)}
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const currentPlan=()=>state.plans.length?state.plans[state.plans.length-1]:null;
-function upgradeLegacyPlan(){const old=currentPlan();if(!old||old.schemaVersion>=5||!state.profile)return false;const upgraded=generatePlan(state.profile,state.plans);upgraded.reason=`从旧版 v${old.version} 自动升级：训练日历、高帧率动作演示与中国大陆外食数据库`;state.plans.push(upgraded);write(KEYS.plans,state.plans);return true}
+function upgradeLegacyPlan(){const old=currentPlan();if(!old||old.schemaVersion>=5||!state.profile)return false;const upgraded=generatePlan(state.profile,state.plans);upgraded.reason=`从旧版 v${old.version} 自动升级：训练日历、逐项动作复核与中国大陆外食数据库`;state.plans.push(upgraded);write(KEYS.plans,state.plans);return true}
 let profileDirty=false,progressDirty=false,pendingNavigation=null,pendingMemberId=null;
 
 function renderMemberControls(){
@@ -812,7 +1002,7 @@ function renderSummary(plan){const t=plan.targets,profile=state.profile||plan.in
 function renderTraining(plan){
   const week=plan.training.weeks[state.week]||plan.training.weeks[0],strengthSessions=week.sessions.filter(s=>s.exercises?.length),sets=strengthSessions.reduce((sum,s)=>sum+s.exercises.reduce((n,e)=>n+Number(e.sets),0),0),cardio=week.sessions.reduce((sum,s)=>sum+(s.cardio?.minutes||0),0);
   const calendar=week.sessions.map((session,index)=>`<article><span>${session.schedule?.dateLabel||`第${index+1}天`}</span><b>${session.schedule?.weekday||""} ${session.schedule?.startTime||""}</b><small>${session.label} · ${session.estimatedMinutes}分钟</small></article>`).join("");
-  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>高帧率动画</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看高帧率动画":"查看三阶段指导"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
+  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>项动画轨迹初审</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看拟真人动画":e.reviewStatus==="首批逐项复核"?"查看逐项教程":"查看复核状态"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
   $$('[data-week]').forEach(b=>b.onclick=()=>{state.week=Number(b.dataset.week);renderTraining(plan)});
   $$(".movement-guide-link").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));
   $("#exportTrainingCalendar").onclick=()=>downloadTrainingCalendar(plan);
@@ -905,11 +1095,27 @@ function exerciseSvg(exercise,stage=0,label=""){
 }
 let motionAnimationFrame=0;
 function motionAvatarMarkup(view){
-  return `<g class="motion-avatar" data-view="${view}"><ellipse class="motion-shadow" cx="55" cy="133" rx="30" ry="5"/><line data-part="torso"/><line data-part="arm1"/><line data-part="arm2"/><line data-part="thigh1"/><line data-part="shin1"/><line data-part="thigh2"/><line data-part="shin2"/><circle data-part="head" r="9"/><circle class="motion-joint" data-joint="shoulder" r="3"/><circle class="motion-joint" data-joint="hip" r="3"/><circle class="motion-joint" data-joint="knee1" r="3"/><circle class="motion-joint" data-joint="knee2" r="3"/></g>`;
+  return `<g class="motion-avatar" data-view="${view}">
+    <ellipse class="motion-shadow" cx="55" cy="133" rx="30" ry="5"/>
+    <g class="motion-rear-limbs">
+      <path class="motion-skin motion-thigh" data-part="thigh2"/><path class="motion-skin motion-shin" data-part="shin2"/><path class="motion-shoe" data-part="foot2"/>
+      <path class="motion-skin motion-upper-arm" data-part="upperArm2"/><path class="motion-skin motion-forearm" data-part="forearm2"/><ellipse class="motion-hand" data-part="hand2" rx="4.6" ry="3.2"/>
+    </g>
+    <path class="motion-neck" data-part="neck"/>
+    <path class="motion-shirt" data-part="torso"/>
+    <path class="motion-shorts" data-part="pelvis"/>
+    <path class="motion-skin motion-thigh" data-part="thigh1"/><path class="motion-skin motion-shin" data-part="shin1"/><path class="motion-shoe" data-part="foot1"/>
+    <path class="motion-skin motion-upper-arm" data-part="upperArm1"/><path class="motion-skin motion-forearm" data-part="forearm1"/><ellipse class="motion-hand" data-part="hand1" rx="4.6" ry="3.2"/>
+    <ellipse class="motion-head" data-part="head" rx="8.4" ry="10.3"/>
+    <path class="motion-hair" data-part="hair"/>
+    <circle class="motion-ear" data-part="ear" r="1.8"/>
+    <path class="motion-face" data-part="face"/>
+    <path class="motion-shirt-highlight" data-part="shirtHighlight"/>
+  </g>`;
 }
 function motionPlayerMarkup(exercise,motion){
   const multi=motion.mode==="multi-angle";
-  return `<section class="motion-player" id="motionPlayer" data-exercise="${exercise.id}"><div class="motion-stage"><svg viewBox="0 0 360 190" role="img" aria-label="${escapeHtml(exercise.name)}高帧率循环动作演示"><defs><linearGradient id="motionBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1b27d"/><stop offset=".48" stop-color="#d98958"/><stop offset="1" stop-color="#9b4f35"/></linearGradient></defs>${motionAvatarMarkup("a")}${motionAvatarMarkup("b")}<text class="motion-angle-label" x="180" y="178" text-anchor="middle">${multi?"侧面视角":"单角度循环"}</text></svg><div class="motion-status"><span>${motion.fps} FPS 浏览器插值</span><span>${multi?"角度A → 角度B → 分屏":"固定机位"}</span></div></div><div class="motion-controls"><button class="secondary-button" id="motionToggle">暂停</button><button class="secondary-button" id="motionSpeed">速度 1×</button><label>动作进度<input id="motionScrubber" type="range" min="0" max="1000" value="0"></label></div><p class="motion-note">这是统一拟真人教学动画，不是摄像头姿态识别。高帧率由浏览器实时插值生成，避免数百个GIF造成的加载延迟。</p></section>`;
+  return `<section class="motion-player" id="motionPlayer" data-exercise="${exercise.id}"><div class="motion-stage"><svg viewBox="0 0 360 190" role="img" aria-label="${escapeHtml(exercise.name)}拟真人循环动作演示"><defs><linearGradient id="motionSkin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd0aa"/><stop offset=".42" stop-color="#d98b5a"/><stop offset="1" stop-color="#8b432f"/></linearGradient><linearGradient id="motionShirt" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#52616a"/><stop offset=".5" stop-color="#252e33"/><stop offset="1" stop-color="#0f1518"/></linearGradient><linearGradient id="motionShorts" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#303b41"/><stop offset="1" stop-color="#0d1113"/></linearGradient><linearGradient id="motionShoe" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#67747b"/><stop offset=".55" stop-color="#232b2f"/><stop offset="1" stop-color="#0d1113"/></linearGradient><filter id="motionDepth" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="1.2" dy="1.8" stdDeviation="1.2" flood-color="#000" flood-opacity=".35"/></filter></defs>${motionAvatarMarkup("a")}${motionAvatarMarkup("b")}<text class="motion-angle-label" x="180" y="178" text-anchor="middle">${multi?"侧面视角":"单角度循环"}</text></svg><div class="motion-status"><span>${motion.fps} FPS 拟真人插值</span><span>${multi?"角度A → 角度B → 分屏":"固定机位"}</span></div></div><div class="motion-controls"><button class="secondary-button" id="motionToggle">暂停</button><button class="secondary-button" id="motionSpeed">速度 1×</button><label>动作进度<input id="motionScrubber" type="range" min="0" max="1000" value="0"></label></div><p class="motion-note">画面采用有身体体积、服装和明暗层次的统一拟真人模型，并由浏览器连续插值；不是火柴人，也不是摄像头姿态识别或真人实拍。</p></section>`;
 }
 function interpolatePose(key,progress){
   const start=poseFor(key,0),end=poseFor(key,1),depth=(1-Math.cos(progress*Math.PI*2))/2,result={};
@@ -917,11 +1123,33 @@ function interpolatePose(key,progress){
   return result;
 }
 function setMotionPose(group,pose){
-  if(!group)return;const [hx,hy]=pose.head,[sx,sy]=pose.shoulder,[px,py]=pose.hip,[kx,ky]=pose.knee,[ax,ay]=pose.ankle,[wx,wy]=pose.hand,mirror=110-wx,knee2=110-kx,ankle2=110-ax;
-  const line=(part,x1,y1,x2,y2)=>{const node=$(`[data-part="${part}"]`,group);for(const [key,value] of Object.entries({x1,y1,x2,y2}))node.setAttribute(key,value)};
-  line("torso",sx,sy,px,py);line("arm1",sx,sy,wx,wy);line("arm2",sx,sy,mirror,wy);line("thigh1",px,py,kx,ky);line("shin1",kx,ky,ax,ay);line("thigh2",px,py,knee2,ky);line("shin2",knee2,ky,ankle2,ay);
-  const point=(selector,x,y)=>{const node=$(selector,group);node.setAttribute("cx",x);node.setAttribute("cy",y)};
-  point('[data-part="head"]',hx,hy);point('[data-joint="shoulder"]',sx,sy);point('[data-joint="hip"]',px,py);point('[data-joint="knee1"]',kx,ky);point('[data-joint="knee2"]',knee2,ky);
+  if(!group)return;
+  const [hx,hy]=pose.head,[sx,sy]=pose.shoulder,[px,py]=pose.hip,[kx,ky]=pose.knee,[ax,ay]=pose.ankle,[wx,wy]=pose.hand;
+  const mirrorX=value=>110-value,knee2=mirrorX(kx),ankle2=mirrorX(ax),hand2=mirrorX(wx);
+  const vector=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy)||1;return {dx,dy,length,nx:-dy/length,ny:dx/length}};
+  const segmentPath=(a,b,startWidth,endWidth)=>{
+    const {nx,ny}=vector(a,b),s=startWidth/2,e=endWidth/2;
+    return `M ${a[0]+nx*s} ${a[1]+ny*s} L ${b[0]+nx*e} ${b[1]+ny*e} Q ${b[0]} ${b[1]+e*.35} ${b[0]-nx*e} ${b[1]-ny*e} L ${a[0]-nx*s} ${a[1]-ny*s} Q ${a[0]} ${a[1]-s*.25} ${a[0]+nx*s} ${a[1]+ny*s} Z`;
+  };
+  const torsoVector=vector([sx,sy],[px,py]),shoulderLeft=[sx+torsoVector.nx*10,sy+torsoVector.ny*10],shoulderRight=[sx-torsoVector.nx*10,sy-torsoVector.ny*10],hipLeft=[px+torsoVector.nx*7,py+torsoVector.ny*7],hipRight=[px-torsoVector.nx*7,py-torsoVector.ny*7];
+  const torso=`M ${shoulderLeft[0]} ${shoulderLeft[1]} Q ${sx+torsoVector.nx*12} ${sy+8} ${hipLeft[0]} ${hipLeft[1]} Q ${px} ${py+4} ${hipRight[0]} ${hipRight[1]} Q ${sx-torsoVector.nx*12} ${sy+8} ${shoulderRight[0]} ${shoulderRight[1]} Q ${sx} ${sy-4} ${shoulderLeft[0]} ${shoulderLeft[1]} Z`;
+  const pelvis=`M ${hipLeft[0]+1} ${hipLeft[1]-2} L ${hipRight[0]-1} ${hipRight[1]-2} L ${hipRight[0]-2} ${hipRight[1]+10} Q ${px} ${py+14} ${hipLeft[0]+2} ${hipLeft[1]+10} Z`;
+  const elbow=(start,end,side)=>{const mid=[(start[0]+end[0])*.5,(start[1]+end[1])*.5],v=vector(start,end);return [mid[0]+v.nx*side*3.2,mid[1]+v.ny*side*3.2]};
+  const arm1Start=shoulderLeft,arm2Start=shoulderRight,elbow1=elbow(arm1Start,[wx,wy],1),elbow2=elbow(arm2Start,[hand2,wy],-1);
+  const setPath=(part,d)=>$(`[data-part="${part}"]`,group)?.setAttribute("d",d);
+  setPath("torso",torso);setPath("pelvis",pelvis);
+  setPath("neck",segmentPath([sx,sy-1],[hx,hy+8],6,5));
+  setPath("upperArm1",segmentPath(arm1Start,elbow1,8.5,7));setPath("forearm1",segmentPath(elbow1,[wx,wy],7,5.2));
+  setPath("upperArm2",segmentPath(arm2Start,elbow2,8.2,6.8));setPath("forearm2",segmentPath(elbow2,[hand2,wy],6.8,5));
+  setPath("thigh1",segmentPath(hipLeft,[kx,ky],12,9));setPath("shin1",segmentPath([kx,ky],[ax,ay],9,6.5));
+  setPath("thigh2",segmentPath(hipRight,[knee2,ky],11.5,8.5));setPath("shin2",segmentPath([knee2,ky],[ankle2,ay],8.5,6));
+  setPath("foot1",segmentPath([ax,ay],[ax+10,ay+1.5],7,5));setPath("foot2",segmentPath([ankle2,ay],[ankle2+10,ay+1.5],7,5));
+  setPath("hair",`M ${hx-7.5} ${hy-2} Q ${hx-6.5} ${hy-11} ${hx+1} ${hy-10.5} Q ${hx+8} ${hy-9} ${hx+7.5} ${hy-3} Q ${hx+1} ${hy-6} ${hx-7.5} ${hy-2} Z`);
+  setPath("face",`M ${hx+2.5} ${hy-1} L ${hx+7.8} ${hy+1.5} L ${hx+3.2} ${hy+3}`);
+  setPath("shirtHighlight",`M ${shoulderLeft[0]-1} ${shoulderLeft[1]+2} Q ${sx} ${sy+4} ${hipLeft[0]-1} ${hipLeft[1]-2}`);
+  const setEllipse=(part,x,y,rotation=0)=>{const node=$(`[data-part="${part}"]`,group);if(!node)return;node.setAttribute("cx",x);node.setAttribute("cy",y);node.setAttribute("transform",`rotate(${rotation} ${x} ${y})`)};
+  const torsoAngle=Math.atan2(py-sy,px-sx)*180/Math.PI-90;
+  setEllipse("head",hx,hy,torsoAngle);setEllipse("ear",hx-7.5,hy+.5,torsoAngle);setEllipse("hand1",wx,wy,Math.atan2(wy-elbow1[1],wx-elbow1[0])*180/Math.PI);setEllipse("hand2",hand2,wy,Math.atan2(wy-elbow2[1],hand2-elbow2[0])*180/Math.PI);
 }
 function startMotionPlayer(exercise,motion){
   cancelAnimationFrame(motionAnimationFrame);const player=$("#motionPlayer");if(!player)return;
@@ -943,8 +1171,10 @@ function startMotionPlayer(exercise,motion){
 }
 function openExerciseGuide(exercise){
   if(!exercise)return;state.exerciseId=exercise.id;$("#exerciseDialogTitle").textContent=exercise.name;
-  const motion=getMotion(exercise.id);
-  $("#exerciseDialogBody").innerHTML=`<div class="exercise-guide-meta"><span>${exercise.category}</span><span>${exercise.difficulty}</span><span>${exercise.tool}</span><span>${exercise.primaryMuscles.join("、")}</span>${motion?`<span class="motion-ready">高帧率动画已覆盖</span>`:"<span>三阶段示意</span>"}</div>${motion?motionPlayerMarkup(exercise,motion):""}<div class="exercise-frames">${exercise.steps.map((step,index)=>`<figure>${exerciseSvg(exercise,index,index===0?"起始":index===1?"发力":"回位")}<figcaption><b>${index+1}</b>${escapeHtml(step)}</figcaption></figure>`).join("")}</div><div class="guide-columns"><section><h3>做到位的判断</h3><p>${escapeHtml(exercise.standard)}</p><h3>动作提示</h3><ul>${exercise.cues.map(cue=>`<li>${escapeHtml(cue)}</li>`).join("")}</ul></section><section class="guide-warning"><h3>常见错误</h3><ul>${exercise.errors.map(error=>`<li>${escapeHtml(error)}</li>`).join("")}</ul><h3>呼吸</h3><p>${escapeHtml(exercise.breathing)}</p></section></div><div class="alternative-row"><b>同模式替代</b>${exercise.alternatives.map(name=>`<button class="secondary-button alternative-exercise" data-exercise-name="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join("")}</div><p class="notice"><b>安全边界</b><span>教学画面用于理解动作阶段，不会判断你的实际姿态。出现锐痛、麻木、眩晕或异常气促时立即停止。</span></p>`;
+  const motion=getMotion(exercise.id),reviewed=exercise.reviewStatus==="首批逐项复核";
+  const sourceMarkup=(exercise.sources||[]).length?`<div class="exercise-sources"><b>复核依据</b>${exercise.sources.map(source=>`<a href="${source.url}" target="_blank" rel="noopener">${escapeHtml(source.title)} ↗</a>`).join("")}<small>本站说明为中文整理，不是来源原文的逐字翻译。</small></div>`:"";
+  const guideMarkup=reviewed?`<div class="reviewed-step-grid">${exercise.steps.map((step,index)=>`<article><b>${String(index+1).padStart(2,"0")}</b><div><small>${index===0?"起始位":index===1?"执行轨迹":"受控回位"}</small><p>${escapeHtml(step)}</p></div></article>`).join("")}</div><div class="guide-columns"><section><h3>做到位的判断</h3><p>${escapeHtml(exercise.standard)}</p><h3>动作提示</h3><ul>${exercise.cues.map(cue=>`<li>${escapeHtml(cue)}</li>`).join("")}</ul></section><section class="guide-warning"><h3>本动作常见错误</h3><ul>${exercise.errors.map(error=>`<li>${escapeHtml(error)}</li>`).join("")}</ul><h3>呼吸</h3><p>${escapeHtml(exercise.breathing)}</p></section></div>${sourceMarkup}`:`<article class="unreviewed-exercise"><b>该动作尚未完成逐项复核</b><p>此前版本错误地套用了“${escapeHtml(exercise.category)}”通用说明。为避免继续误导，当前不展示通用三帧图和注意事项；完成动作轨迹与来源核对后再开放。</p></article>`;
+  $("#exerciseDialogBody").innerHTML=`<div class="exercise-guide-meta"><span>${exercise.category}</span><span>${exercise.difficulty}</span><span>${exercise.tool}</span><span>${exercise.primaryMuscles.join("、")}</span>${motion?`<span class="motion-ready">拟真人动画已初审</span>`:reviewed?"<span class='guide-reviewed'>文字已逐项复核 · 动画待制作</span>":"<span class='guide-pending'>待逐项复核</span>"}</div>${motion?motionPlayerMarkup(exercise,motion):""}${guideMarkup}<div class="alternative-row"><b>同模式替代</b>${exercise.alternatives.map(name=>`<button class="secondary-button alternative-exercise" data-exercise-name="${escapeHtml(name)}">${escapeHtml(name)}</button>`).join("")}</div><p class="notice"><b>安全边界</b><span>教学画面用于理解动作阶段，不会判断你的实际姿态。出现锐痛、麻木、眩晕或异常气促时立即停止。</span></p>`;
   $$(".alternative-exercise").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));$("#exerciseDialog").showModal();if(motion)startMotionPlayer(exercise,motion);
 }
 $("#closeExerciseDialog").onclick=()=>{cancelAnimationFrame(motionAnimationFrame);$("#exerciseDialog").close()};
@@ -952,7 +1182,7 @@ let exerciseLimit=36;
 function renderExerciseLibrary(){
   const query=$("#exerciseSearch").value.trim().toLowerCase(),pattern=$("#exercisePattern").value,equipment=$("#exerciseEquipment").value,difficulty=$("#exerciseDifficulty").value;
   const filtered=exerciseLibrary.filter(exercise=>(!query||`${exercise.name}${exercise.category}${exercise.primaryMuscles.join("")}${exercise.tool}`.toLowerCase().includes(query))&&(pattern==="all"||exercise.group===pattern)&&(equipment==="all"||exercise.tool===equipment)&&(difficulty==="all"||exercise.difficulty===difficulty));
-  $("#exerciseLibraryGrid").innerHTML=filtered.slice(0,exerciseLimit).map(exercise=>`<button class="exercise-library-card" data-exercise="${exercise.id}"><div>${exerciseSvg(exercise,1,"动作中")}${motionExerciseIds.has(exercise.id)?"<em class='motion-card-badge'>▶ 高帧率</em>":""}</div><span>${exercise.category}</span><h3>${exercise.name}</h3><p>${exercise.primaryMuscles.join(" · ")}</p><footer><small>${exercise.tool}</small><small>${exercise.difficulty}</small></footer></button>`).join("")||"<div class='empty-mini'>没有匹配动作，请减少筛选条件。</div>";
+  $("#exerciseLibraryGrid").innerHTML=filtered.slice(0,exerciseLimit).map(exercise=>{const reviewed=exercise.reviewStatus==="首批逐项复核",motion=motionExerciseIds.has(exercise.id);return `<button class="exercise-library-card" data-exercise="${exercise.id}"><div class="exercise-review-cover ${motion?"has-motion":reviewed?"reviewed":"pending"}"><b>${motion?"拟真人演示":reviewed?"逐项复核":"待复核"}</b><small>${motion?"动作轨迹已初审":reviewed?"独立文字教程":"不再套用通用教程"}</small>${motion?"<em class='motion-card-badge'>▶ 36 FPS</em>":""}</div><span>${exercise.category}</span><h3>${exercise.name}</h3><p>${exercise.primaryMuscles.join(" · ")}</p><footer><small>${exercise.tool}</small><small>${exercise.difficulty}</small></footer></button>`}).join("")||"<div class='empty-mini'>没有匹配动作，请减少筛选条件。</div>";
   $("#exerciseLoadMore").hidden=exerciseLimit>=filtered.length;$("#exerciseLoadMore").textContent=`显示更多（当前 ${Math.min(exerciseLimit,filtered.length)} / ${filtered.length}）`;
   $$(".exercise-library-card").forEach(card=>card.onclick=()=>openExerciseGuide(exerciseById(card.dataset.exercise)));
 }
