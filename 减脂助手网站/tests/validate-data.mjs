@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import {foods,mealTemplates,dataMeta} from "../js/catalog.js";
 import {exerciseLibrary,bodyweightExerciseCount} from "../js/exercise-catalog.js";
 import {standardRecipes,calculateRecipe} from "../js/recipe-catalog.js";
+import {diningBrands,diningItems} from "../js/external-food-catalog.js";
+import {motionExercises} from "../js/motion-catalog.js";
 
 assert.equal(foods.length,300,"食物条目必须为300");
 assert.equal(mealTemplates.length,80,"套餐模板必须为80");
@@ -32,4 +34,19 @@ for(const exercise of exerciseLibrary){
   assert.ok(exercise.cues.length>=3&&exercise.errors.length>=3&&exercise.standard&&exercise.breathing,`${exercise.name} 指导信息不完整`);
   assert.ok(exercise.source&&exercise.verifiedOn&&exercise.reviewStatus,`${exercise.name} 缺少来源说明`);
 }
-console.log(`数据验证通过：${foods.length}种食物、${mealTemplates.length}套模板、${standardRecipes.length}套标准菜谱、${exerciseLibrary.length}项动作，版本 ${dataMeta.version}`);
+assert.ok(diningBrands.length>=25,"外食品牌不得少于25个");
+assert.ok(diningItems.length>=400,"外食项目不得少于400项");
+const diningIds=new Set();
+for(const item of diningItems){
+  assert.ok(item.id&&item.brand&&item.name&&item.serving,`外食项目字段缺失：${item.brand} ${item.name}`);
+  assert.ok(!diningIds.has(item.id),`重复外食ID：${item.id}`);diningIds.add(item.id);
+  assert.ok(Number.isFinite(item.kcal)&&item.kcal>=0&&item.kcal<3000,`${item.brand} ${item.name} 热量不合理`);
+  assert.ok(Array.isArray(item.range)&&item.range.length===2&&item.range[0]<=item.kcal&&item.range[1]>=item.kcal,`${item.brand} ${item.name} 区间不合理`);
+  assert.ok(item.status&&item.confidence&&item.source&&item.verifiedOn,`${item.brand} ${item.name} 缺少估算说明`);
+}
+assert.ok(motionExercises.length>=80,"首批动作演示覆盖不得少于80项");
+for(const motion of motionExercises){
+  assert.ok(exerciseIds.has(motion.exerciseId),`动作演示引用不存在的动作：${motion.exerciseId}`);
+  assert.ok(["single-angle","multi-angle"].includes(motion.mode)&&motion.fps>=50,`${motion.name} 演示配置不完整`);
+}
+console.log(`数据验证通过：${foods.length}种食物、${mealTemplates.length}套模板、${standardRecipes.length}套标准菜谱、${diningItems.length}项外食、${exerciseLibrary.length}项动作、${motionExercises.length}项演示，版本 ${dataMeta.version}`);

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>衡燃 · 动作演示审核</title>
+  <link rel="icon" href="assets/衡燃图标.svg" type="image/svg+xml">
+  <style>
+    :root{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#17221f;background:#f4f7f5}
+    *{box-sizing:border-box}body{margin:0}a{color:inherit}
+    header{padding:38px max(24px,calc((100vw - 1180px)/2));background:#153e35;color:#fff}
+    header div{display:flex;align-items:center;gap:14px}header img{width:46px;height:46px}
+    header h1{margin:0;font-size:clamp(26px,4vw,42px)}header p{max-width:850px;line-height:1.8;color:#dcebe5}
+    main{max-width:1180px;margin:auto;padding:28px 24px 60px}
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:-50px}
+    .summary article{padding:20px;border-radius:18px;background:#fff;box-shadow:0 10px 35px #163f3620}
+    .summary b{display:block;font-size:32px;color:#c85b36}.summary span{color:#61706a}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0 18px}.toolbar input,.toolbar select{min-height:44px;border:1px solid #ccd8d3;border-radius:12px;padding:0 14px;background:#fff}.toolbar input{flex:1;min-width:230px}
+    .notice{padding:16px 18px;border-left:4px solid #c85b36;background:#fff7ee;border-radius:10px;line-height:1.7}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .card{display:flex;flex-direction:column;gap:10px;padding:17px;background:#fff;border:1px solid #dce5e1;border-radius:16px}
+    .card small{color:#77827e}.card h2{font-size:18px;margin:0}.card p{margin:0;line-height:1.6;color:#58655f}
+    .status{align-self:flex-start;padding:5px 9px;border-radius:99px;background:#e8f6ef;color:#176b50;font-size:12px}.status.pending{background:#f2f2f2;color:#777}
+    .card a{margin-top:auto;text-align:center;text-decoration:none;padding:10px;border-radius:10px;background:#153e35;color:#fff}.card a.disabled{pointer-events:none;background:#e3e7e5;color:#89918e}
+    footer{max-width:1180px;margin:auto;padding:0 24px 35px;color:#69756f;line-height:1.7}
+    @media(max-width:800px){.summary,.grid{grid-template-columns:1fr}.summary{margin-top:-22px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div><img src="assets/衡燃图标.svg" alt=""><h1>动作演示审核台</h1></div>
+    <p>这里用于逐项观看动作演示并核对角度、流畅度和指导文字。首批采用浏览器实时插值的统一拟真人模型，不是从第三方平台复制的真人视频，也不具备姿态识别能力。</p>
+  </header>
+  <main>
+    <section class="summary">
+      <article><b id="totalCount">0</b><span>动作总数</span></article>
+      <article><b id="readyCount">0</b><span>首批可观看</span></article>
+      <article><b id="pendingCount">0</b><span>后续批次</span></article>
+    </section>
+    <p class="notice"><b>在 GitHub 上确认：</b>打开对应的草稿 Pull Request，在 “Checks” 下载“动作演示审核包”，观看后在 PR 留言“通过”或列出需要修改的动作。未确认的批次不会自动合并到正式站点。</p>
+    <div class="toolbar">
+      <input id="search" placeholder="搜索动作名称">
+      <select id="group"><option value="all">全部动作模式</option></select>
+      <select id="status"><option value="all">全部状态</option><option value="ready">可观看</option><option value="pending">待制作</option></select>
+    </div>
+    <section class="grid" id="grid"></section>
+  </main>
+  <footer>审核入口只用于动作素材质量控制。出现疼痛、眩晕或异常气短时，不应仅依据动画继续练习。</footer>
+  <script type="module">
+    import {exerciseLibrary} from "./js/exercise-catalog.js";
+    import {motionExerciseIds,getMotion} from "./js/motion-catalog.js";
+    const $=selector=>document.querySelector(selector);
+    const groups=[...new Map(exerciseLibrary.map(item=>[item.group,item.category]))];
+    $("#group").innerHTML+=groups.map(([value,label])=>`<option value="${value}">${label}</option>`).join("");
+    $("#totalCount").textContent=exerciseLibrary.length;
+    $("#readyCount").textContent=motionExerciseIds.size;
+    $("#pendingCount").textContent=exerciseLibrary.length-motionExerciseIds.size;
+    function render(){
+      const query=$("#search").value.trim(),group=$("#group").value,status=$("#status").value;
+      const items=exerciseLibrary.filter(item=>{
+        const ready=motionExerciseIds.has(item.id);
+        return (!query||item.name.includes(query))&&(group==="all"||item.group===group)&&(status==="all"||(status==="ready"&&ready)||(status==="pending"&&!ready));
+      });
+      $("#grid").innerHTML=items.map(item=>{
+        const motion=getMotion(item.id),ready=Boolean(motion);
+        return `<article class="card"><span class="status ${ready?"":"pending"}">${ready?"首批可观看":"待后续批次"}</span><small>${item.category} · ${item.equipment.join(" / ")}</small><h2>${item.name}</h2><p>${ready?(motion.mode==="multi-angle"?"角度A → 角度B → 分屏同步":"简单动作 · 单角度循环"):"已保留三阶段文字指导，动画尚未进入审核批次。"}</p><a class="${ready?"":"disabled"}" href="index.html?exercise=${item.id}" target="_blank">${ready?"打开完整演示":"等待制作"}</a></article>`;
+      }).join("");
+    }
+    for(const id of ["search","group","status"])$("#"+id).addEventListener(id==="search"?"input":"change",render);
+    render();
+  </script>
+</body>
+</html>

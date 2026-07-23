@@ -65,6 +65,64 @@ function strengthSession(profile,label,offset=0){
   return {type:"力量",label,exercises:patterns.slice(0,count).map((p,i)=>({ ...pickExercise(p,profile,i+offset),sets:profile.experience==="new"?2:3,reps:i===4?"8～12/侧":"8～12",rir:profile.experience==="trained"?"2":"2～3",rest:i<4?"75～120秒":"45～75秒"})),cardio:{mode:getCardio(profile),minutes:Number(profile.minutes)>=60?15:10,intensity:"能说完整短句；参考心率仅作辅助"}};
 }
 function getCardio(profile){if((profile.limits||[]).includes("knee"))return profile.equipment==="gym"?"椭圆机或单车":"平地快走";if((profile.dislikes||[]).includes("run"))return"快走或单车";return profile.equipment==="gym"?"坡度走、单车或椭圆机":"户外快走"}
+const 星期标签=["周日","周一","周二","周三","周四","周五","周六"];
+function 本地日期(text){
+  const match=String(text||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!match)return null;
+  const date=new Date(Number(match[1]),Number(match[2])-1,Number(match[3]));
+  return Number.isNaN(date.getTime())||date.getFullYear()!==Number(match[1])||date.getMonth()!==Number(match[2])-1||date.getDate()!==Number(match[3])?null:date;
+}
+function 日期文本(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
+function 加天(date,days){const next=new Date(date);next.setDate(next.getDate()+days);return next}
+function 加分钟(time,minutes){
+  const [hour,minute]=String(time||"19:00").split(":").map(Number),total=hour*60+minute+minutes;
+  return `${String(Math.floor(total/60)%24).padStart(2,"0")}:${String(total%60).padStart(2,"0")}`;
+}
+function 推荐时间(profile){
+  const preferred=profile.preferredTime||(profile.trainingTime==="早晨"?"07:00":profile.trainingTime==="午间"?"12:30":"19:00");
+  const toMinutes=value=>{const [hour,minute]=String(value||"").split(":").map(Number);return Number.isFinite(hour)&&Number.isFinite(minute)?hour*60+minute:null};
+  const preferredMinutes=toMinutes(preferred),earliest=toMinutes(profile.earliestTime),latest=toMinutes(profile.latestTime);
+  let result=preferredMinutes??19*60;
+  if(earliest!==null)result=Math.max(result,earliest);
+  if(latest!==null)result=Math.min(result,latest);
+  return `${String(Math.floor(result/60)%24).padStart(2,"0")}:${String(result%60).padStart(2,"0")}`;
+}
+function 默认星期(days){
+  return ({2:[2,6],3:[1,3,6],4:[1,2,4,6],5:[1,2,4,5,7],6:[1,2,3,5,6,7]})[days]||[1,3,5];
+}
+export function generateTrainingSchedule(profile,weeks){
+  const days=Number(profile.days),total=weeks.length*days,start=本地日期(profile.planStart)||加天(new Date(),1);
+  const exact=String(profile.specificDates||"").split(/[，,\s]+/).map(本地日期).filter(Boolean).sort((a,b)=>a-b);
+  const selectedWeekdays=(profile.weekdays||[]).map(Number).filter(day=>day>=1&&day<=7);
+  const weekdayList=selectedWeekdays.length?selectedWeekdays:默认星期(days);
+  const dates=[];
+  if(profile.scheduleMode==="dates"&&exact.length)dates.push(...exact.slice(0,total));
+  let cursor=dates.length?加天(dates.at(-1),1):start,guard=0;
+  while(dates.length<total&&guard<120){
+    const isoWeekday=cursor.getDay()===0?7:cursor.getDay();
+    if(weekdayList.includes(isoWeekday)&&!dates.some(item=>日期文本(item)===日期文本(cursor)))dates.push(new Date(cursor));
+    cursor=加天(cursor,1);guard++;
+  }
+  const startTime=推荐时间(profile),entries=[];
+  weeks.forEach((week,weekIndex)=>week.sessions.forEach((session,sessionIndex)=>{
+    const date=dates[weekIndex*days+sessionIndex]||加天(start,weekIndex*7+sessionIndex*2);
+    const cardioMinutes=session.cardio?.minutes||0,warmupMinutes=session.exercises?.length?8:6,cooldownMinutes=5;
+    const totalMinutes=Math.max(20,session.estimatedMinutes||Number(profile.minutes)||45);
+    const mainMinutes=Math.max(10,totalMinutes-warmupMinutes-cardioMinutes-cooldownMinutes);
+    const timeline=[
+      {label:"动态热身",minutes:warmupMinutes,detail:"关节活动、动作模式预演与2组递增热身"},
+      {label:session.exercises?.length?"力量主训练":session.label,minutes:mainMinutes,detail:session.exercises?.length?`${session.exercises.length}项动作，按页面组数、次数与休息执行`:"维持谈话测试对应强度"},
+      ...(cardioMinutes?[{label:"计划有氧",minutes:cardioMinutes,detail:session.cardio.intensity}]:[]),
+      {label:"放松与记录",minutes:cooldownMinutes,detail:"逐步降低强度，记录负荷、实际次数和完成感受"}
+    ];
+    let clock=startTime;
+    for(const item of timeline){item.start=clock;clock=加分钟(clock,item.minutes);item.end=clock}
+    const schedule={date:日期文本(date),dateLabel:`${date.getMonth()+1}月${date.getDate()}日`,weekday:星期标签[date.getDay()],startTime,endTime:clock,totalMinutes,timeline,source:profile.scheduleMode==="dates"&&exact.length?"用户指定日期":selectedWeekdays.length?"用户指定星期":"系统错峰推荐"};
+    Object.assign(session,{schedule,estimatedMinutes:totalMinutes});
+    entries.push({week:week.week,sessionIndex,label:session.label,...schedule});
+  }));
+  return {mode:profile.scheduleMode||"auto",entries,timeZone:"Asia/Shanghai",recommendation:"建议时间依据用户可用时段和训练间隔安排，不宣称存在统一的最佳燃脂时刻。"};
+}
 export function generateTraining(profile){
   const days=Number(profile.days);let base=[];
   if(days<=3) base=Array.from({length:days},(_,i)=>strengthSession(profile,`全身训练 ${String.fromCharCode(65+i)}`,i));
@@ -90,7 +148,8 @@ export function generateTraining(profile){
     return next;
   };
   const weeks=weekRules.map(rule=>({...rule,sessions:base.map(s=>progressSession(s,rule))}));
-  return {structure:days<=3?"全身训练":days===4?"上下肢拆分":"3次力量＋有氧/恢复",weeks,exerciseDatabaseSize:exerciseCount};
+  const schedule=generateTrainingSchedule(profile,weeks);
+  return {structure:days<=3?"全身训练":days===4?"上下肢拆分":"3次力量＋有氧/恢复",weeks,schedule,exerciseDatabaseSize:exerciseCount};
 }
 
 function allowedFood(food,profile){
@@ -198,7 +257,7 @@ export function replaceDayMenu(profile,day,targets,variant=1){
   return {ok:true,day:replacement};
 }
 export function generatePlan(profile,previousVersions=[]){
-  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:4,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案、220项动作库与标准中餐菜谱重新计算",adjustments:[]};
+  const previous=previousVersions.length?previousVersions[previousVersions.length-1]:null,targets=calculateTargets(profile);return {schemaVersion:5,version:(previous?.version||0)+1,createdAt:new Date().toISOString(),input:{...profile},targets,training:generateTraining(profile),meals:generateMeals(profile,targets),reason:"依据当前档案、4周日期日历、首批高帧率动作与中外食数据库重新计算",adjustments:[]};
 }
 export function assessRisk(profile){
   const flags=[...(profile.risks||[])];const value=bmi(profile.weight,profile.height);
