@@ -30,13 +30,13 @@
 <body>
   <header>
     <div><img src="assets/衡燃图标.svg" alt=""><h1>动作演示审核台</h1></div>
-    <p>这里用于逐项观看动作演示并核对角度、流畅度和指导文字。首批采用浏览器实时插值的统一拟真人模型，不是从第三方平台复制的真人视频，也不具备姿态识别能力。</p>
+    <p>这里用于逐项核对动作来源、文字教程与动画审核状态。旧版程序化关节模型已全部撤下；后续仅展示通过来源核对、人体结构与动作轨迹逐帧检查，并经用户确认的真人比例动画。</p>
   </header>
   <main>
     <section class="summary">
       <article><b id="totalCount">0</b><span>动作总数</span></article>
       <article><b id="reviewedCount">0</b><span>文字逐项复核</span></article>
-      <article><b id="readyCount">0</b><span>动画轨迹初审</span></article>
+      <article><b id="readyCount">0</b><span>用户确认可上线动画</span></article>
       <article><b id="pendingCount">0</b><span>动画待制作</span></article>
     </section>
     <p class="notice"><b>在 GitHub 上确认：</b>打开对应的草稿 Pull Request，在 “Checks” 下载“动作演示审核包”，观看后在 PR 留言“通过”或列出需要修改的动作。未确认的批次不会自动合并到正式站点。</p>
@@ -66,7 +66,7 @@
       });
       $("#grid").innerHTML=items.map(item=>{
         const motion=getMotion(item.id),ready=Boolean(motion),reviewed=item.reviewStatus==="首批逐项复核";
-        return `<article class="card"><span class="status ${ready?"":reviewed?"":"pending"}">${ready?"拟真人轨迹初审":reviewed?"文字已逐项复核":"尚未逐项复核"}</span><small>${item.category} · ${item.equipment.join(" / ")}</small><h2>${item.name}</h2><p>${ready?(motion.mode==="multi-angle"?"角度A → 角度B → 分屏同步":"简单动作 · 单角度循环"):reviewed?"起始位、轨迹、回位、错误和标准均已独立复核；动画不达标前不上线。":"旧版通用教程已撤下，等待独立复核。"}</p><a class="${reviewed?"":"disabled"}" href="index.html?exercise=${item.id}" target="_blank">${ready?"打开拟真人演示":reviewed?"查看独立文字教程":"等待复核"}</a></article>`;
+        return `<article class="card"><span class="status ${ready?"":reviewed?"":"pending"}">${ready?"真人比例动画已确认":reviewed?"文字已逐项复核 · 动画待审":"尚未逐项复核"}</span><small>${item.category} · ${item.equipment.join(" / ")}</small><h2>${item.name}</h2><p>${ready?(motion.mode==="multi-angle"?"角度A → 角度B → 分屏同步":"简单动作 · 单角度循环"):reviewed?"起始位、轨迹、回位、错误和标准均已独立复核；真人比例动画不达标前不上线。":"旧版通用教程已撤下，等待独立复核。"}</p><a class="${reviewed?"":"disabled"}" href="index.html?exercise=${item.id}" target="_blank">${ready?"打开真人比例演示":reviewed?"查看独立文字教程":"等待复核"}</a></article>`;
       }).join("");
     }
     for(const id of ["search","group","status"])$("#"+id).addEventListener(id==="search"?"input":"change",render);

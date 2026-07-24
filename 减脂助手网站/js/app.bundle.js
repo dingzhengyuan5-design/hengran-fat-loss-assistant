@@ -50,6 +50,30 @@ for(const food of foods.slice(285,290))Object.assign(food,{kcal:899,protein:0,fa
 const 调味参考={"黄豆酱":[138,12,6,10,3],"豆瓣酱":[178,14,7,17,2],"生抽":[55,8,.1,5,0],"蚝油":[115,3,.5,25,0],"番茄酱":[100,1.5,.2,24,1],"芝麻酱":[620,20,55,17,8],"花生酱":[600,25,50,20,6],"沙拉酱低脂":[260,1,20,20,0],"辣椒酱":[80,3,3,10,3],"蜂蜜":[321,.4,0,80,0]};
 for(const food of foods.slice(290)){const p=调味参考[food.name];if(p)Object.assign(food,{kcal:p[0],protein:p[1],fat:p[2],carbs:p[3],fiber:p[4],confidence:"中"})}
 
+// 高频蛋类不能共用同一模板。基础蛋按每100克可食部；蒸蛋和炒蛋按明确的
+// 标准配方成品重核算，水和用油会显著改变每100克数值。
+const 蛋类参考={
+  "水煮鸡蛋":[155,12.6,10.6,1.1,0,"每100克去壳可食部；一枚常见可食部约50克。"],
+  "蒸鸡蛋羹":[65,5.3,4.4,.5,0,"标准配方估算：鸡蛋可食部50克加水约70克，不额外放油，成品约120克。"],
+  "荷包蛋少油":[198,11.9,16.8,1,0,"标准配方估算：鸡蛋可食部50克加食用油约3克，成品约53至55克。"],
+  "鹌鹑蛋":[158,13.1,11.1,.4,0,"每100克去壳可食部；实际个数需按去壳重量换算。"],
+  "鸭蛋":[185,12.8,13.8,1,0,"每100克去壳可食部；盐腌鸭蛋不适用此值。"],
+  "鸡蛋白":[52,10.9,.2,.7,0,"每100克蛋白可食部。"],
+  "鸡蛋黄":[322,15.9,26.5,3.6,0,"每100克蛋黄可食部。"],
+  "茶叶蛋":[151,12.4,10.2,1.4,0,"按去壳成品估算；卤汁含糖与浸泡程度会造成差异。"],
+  "卤鸡蛋":[156,12.5,10.5,1.8,0,"按少糖卤汁的去壳成品估算。"],
+  "番茄炒蛋少油":[118,7.2,7.9,5,1,"标准配方估算：番茄约120克、鸡蛋50克、油5克。"],
+  "韭菜炒蛋少油":[154,9.1,11.5,4,1.2,"标准配方估算：韭菜约100克、鸡蛋50克、油5克。"],
+  "虾仁蒸蛋":[83,9.2,4.4,1.2,0,"标准配方估算：鸡蛋50克、虾仁40克、水70克，不额外放油。"],
+  "菠菜蛋羹":[60,5.1,3.8,1.4,.8,"标准配方估算：鸡蛋50克、菠菜30克、水70克，不额外放油。"],
+  "香菇蒸蛋":[62,5.2,3.9,1.7,.5,"标准配方估算：鸡蛋50克、香菇30克、水70克，不额外放油。"],
+  "青椒炒蛋少油":[137,8.1,10.2,4.5,1,"标准配方估算：青椒100克、鸡蛋50克、油5克。"]
+};
+for(const food of foods.filter(item=>item.category==="蛋类")){
+  const p=蛋类参考[food.name];
+  if(p)Object.assign(food,{kcal:p[0],protein:p[1],fat:p[2],carbs:p[3],fiber:p[4],confidence:"中",source:"中国食物成分资料与 USDA FoodData Central 蛋类参考值；简单菜按所列标准配方核算",reviewStatus:"基础值或标准配方已拆分核算",note:`${p[5]} 家庭鸡蛋大小、加水量、用油和成品失水会改变实际结果。`});
+}
+
 const breakfast = ["f046","f181","f183","f166","f226","f229","f151","f236","f238","f233"];
 const staples = ["f001","f002","f003","f016","f017","f031","f032","f036"];
 const proteins = ["f061","f063","f076","f079","f091","f094","f106","f109","f121","f124","f256","f259"];
@@ -100,8 +124,19 @@ const dataMeta = {verifiedOn:核验日期,foodCount:foods.length,mealCount:mealT
 /* 来源：js/curated-exercise-guides.js */
 const 来源={
   nasm:{title:"NASM Exercise Library",url:"https://www.nasm.org/workout-exercise-guidance"},
+  nasmDumbbellFront:{title:"NASM Dumbbell Front Squat",url:"https://www.nasm.org/resource-center/exercise-library/dumbbell-front-squat"},
+  nasmLegPress:{title:"NASM Leg Press",url:"https://www.nasm.org/resource-center/exercise-library/leg-press"},
+  nasmSquatGuide:{title:"NASM Guide to Squats and Deadlifts",url:"https://trainer.nasm.org/hubfs/NASM_Free%20Guide_Squats%20and%20Deadlifts.pdf"},
   ace:{title:"ACE Exercise Library",url:"https://www.acefitness.org/resources/everyone/exercise-library/"},
+  aceBackSquat:{title:"ACE Back Squat",url:"https://www.acefitness.org/resources/everyone/exercise-library/11/back-squat/"},
+  aceGoblet:{title:"ACE Goblet Squat",url:"https://www.acefitness.org/resources/everyone/exercise-library/362/goblet-squat/"},
+  aceSquatAssessment:{title:"ACE Body-weight Squat Assessment Protocol",url:"https://www.acefitness.org/images/webcontent/assets/certification/ace-answers/forms/pt/37_Bodyweight_Squat_Assessment_Protocol.pdf"},
   nhs:{title:"NHS Strength and Flex how-to videos",url:"https://www.nhs.uk/live-well/exercise/strength-and-flex-exercise-plan-how-to-videos/"},
+  nhsLower:{title:"NHS Inside Guide Lower Body Exercises",url:"https://insideguide.nhs.uk/hospitals/helping-yourself/healthy-body/exercise/lower-body-exercises/"},
+  strongerSquat:{title:"Stronger by Science - How to Squat",url:"https://www.strongerbyscience.com/how-to-squat/"},
+  squatUniversity:{title:"Squat University - How to Teach a Perfect Squat",url:"https://squatuniversity.com/2016/02/05/how-to-teach-a-perfect-squat/"},
+  barbendFront:{title:"BarBend - Front Squat",url:"https://barbend.com/front-squat/"},
+  barbendHack:{title:"BarBend - Hack Squat and Landmine Squat",url:"https://barbend.com/hack-squat/"},
   wger:{title:"wger 开放动作库（CC BY-SA）",url:"https://wger.readthedocs.io/en/latest/"}
 };
 
@@ -119,6 +154,10 @@ const 记=(name,setup,execute,finish,cue,error,standard,sourceKey="ace",motionKe
   const primary=来源[sourceKey],secondary=sourceKey==="nasm"?来源.ace:sourceKey==="ace"?来源.nasm:来源.ace;
   条目.push([name,{steps:[setup,execute,finish],cues:[cue,"动作全程保持可控速度","出现锐痛、麻木或眩晕立即停止"],errors:[error,"借摆动或反弹完成动作","姿态失控后仍继续重复"],breathing:呼吸(name),standard,sources:[primary,secondary],source:`${primary.title}与${secondary.title}交叉核对；本站逐项中文复核`,verifiedOn:"2026-07-23",reviewStatus:"首批逐项复核",motionKey,motionApproved:Boolean(motionKey)}]);
 };
+const 记严=(name,steps,cues,errors,standard,sourceKeys)=>{
+  const sources=sourceKeys.map(key=>来源[key]);
+  条目.push([name,{steps,cues,errors,breathing:呼吸(name),standard,sources,source:`${sources.map(item=>item.title).join("、")}交叉核对；本站按器械和轨迹逐项中文复核`,verifiedOn:"2026-07-24",reviewStatus:"首批逐项复核",motionKey:"",motionApproved:false}]);
+};
 
 // 下肢力量
 记("徒手深蹲","双脚约肩宽，脚尖自然外展，肋骨位于骨盆上方。","髋膝同步屈曲，膝盖沿第二脚趾方向下降。","脚掌三点压地，髋膝同步伸展站直。","脚跟和大脚趾根部持续着地","膝内扣或脚跟抬起","正面双膝轨迹稳定，侧面腰背不突然塌陷。","ace","squat");
@@ -127,8 +166,58 @@ const 记=(name,setup,execute,finish,cue,error,standard,sourceKey="ace",motionKe
 记("相扑徒手深蹲","宽于肩站立，脚尖按髋部舒适范围外展。","髋部向下，双膝沿外展脚尖方向打开。","脚跟和内侧前掌共同发力站起。","宽站距来自髋部而非扭膝","膝盖内塌或脚内侧离地","底部双膝与脚尖同向，内侧脚掌不抬。");
 记("深蹲触椅","椅子靠墙固定，站位保证臀部能轻触椅缘。","髋膝屈曲下降，触椅即停，不完全坐下。","保持胸髋同步站起。","椅子只作触点而非休息面","坐下休息后再用摆动起身","可连续触到相同位置且椅子不被撞动。","nhs");
 记("抱胸深蹲","双臂交叉抱胸，采用舒适深蹲站距。","不用摆臂，髋膝同步下降。","胸口与髋部同时上升。","手臂位置全程不变","含胸或先抬臀后抬胸","无摆臂条件下仍能维持相同深度和轨迹。");
-记("高脚杯深蹲","双手把哑铃或壶铃贴近胸前，肘部朝下。","负重贴近身体，髋膝屈曲下蹲。","脚掌压地站起，负重不离开胸口。","手腕中立且负重靠近重心","把重量举离身体或用肘强压膝盖","负重路径接近垂直，最后一次仍能控制底部。","nasm");
+记("哑铃高脚杯深蹲","双手托住一只哑铃上端，哑铃竖直贴近胸前。","保持负重靠近重心，髋膝同步屈曲下蹲。","全脚掌压地站起，哑铃与胸口距离基本不变。","手腕中立且哑铃竖直稳定","把哑铃举离身体或让一侧手先松开","负重路径接近垂直，最后一次仍能控制底部。","ace");
 记("双哑铃前蹲","两只哑铃置于肩前，两侧高度一致。","保持哑铃稳定，髋膝同步屈曲。","双脚均匀发力，躯干不过度后仰。","肘部略向前且手腕舒适","一侧哑铃下坠或左右躯干侧倾","左右轨迹对称，哑铃不碰撞头颈。","nasm");
+记严("哑铃相扑深蹲",
+  ["双脚明显宽于肩，脚尖在髋部舒适范围外展；双手让一只哑铃竖直悬于骨盆下方。","髋部向双脚之间下降，哑铃垂直下行，双膝沿脚尖方向打开。","脚掌三点压地站起，顶端自然伸直但不向后挺腰。"],
+  ["先用空手确认宽站距不会夹髋","哑铃始终位于两脚之间","深度以脚掌稳定和无痛为限"],
+  ["把动作做成窄站距硬拉","膝盖向内折而脚尖继续外转","哑铃前后摆动或触地反弹"],
+  "正面看双膝与脚尖同向，侧面看哑铃路径近垂直且腰背形状稳定。",["aceGoblet","strongerSquat"]);
+记严("壶铃高脚杯深蹲",
+  ["双手握住壶铃两侧角部，铃体贴近胸骨，前臂稳定。","先建立腹压，再让髋膝同步屈曲；壶铃不离开胸前。","全脚掌发力站起，髋膝同步伸展。"],
+  ["握住铃角而非只捏指尖","肘部自然向下，不用肘强压膝","壶铃全程贴近身体重心"],
+  ["壶铃远离胸口造成前坠","用手臂上下举铃代替下蹲","底部脚跟抬起或膝明显内扣"],
+  "壶铃与胸口距离稳定，负重路径平滑，底部仍能维持脚掌三点受力。",["nasmSquatGuide","aceGoblet"]);
+记严("杠铃后蹲",
+  ["在深蹲架内设置安全销，杠铃放在上背承重位置；握紧杠、建立腹压后直立出架。","以最少步数后退站稳，让杠铃保持在足中部上方，髋膝同步屈曲下降。","胸髋同步上升，站稳后向前回架，确认两端入钩再松手。"],
+  ["先用空杠确认高杠或低杠位置","每次重复前重新建立躯干张力","训练架安全销略低于计划最低点"],
+  ["把杠压在颈椎骨突上","出架后连续碎步寻找站位","臀部先冲起导致杠铃明显前移"],
+  "侧面杠铃大致停留在足中部上方；正面左右杠端高度一致，回架过程可控。",["aceBackSquat","strongerSquat","squatUniversity"]);
+记严("杠铃前蹲",
+  ["杠铃落在前三角肌形成的肩架上，采用交叉或举重式握法；肘部抬高、腹部收紧。","保持肘朝前上方，髋膝同步下降，杠铃位于足中部上方。","脚掌压地站起，避免肘部先下坠；站稳后回架。"],
+  ["杠铃由肩部承重而不是手腕硬托","肘尖持续朝前并保持上背张力","先用轻重量确认腕肩活动度"],
+  ["杠铃压在喉部或仅靠手掌承重","下降时肘部塌落导致上背圆曲","为保持直立而脚跟离地"],
+  "从侧面看杠铃路径接近垂直，底部杠铃仍稳定在肩架上，双肘未明显下坠。",["barbendFront","strongerSquat"]);
+记严("安全杠深蹲",
+  ["把安全深蹲杠的肩垫居中放在上背，设置安全销；双手轻握前方把手并直立出架。","保持把手位置稳定而不向下猛拉，建立腹压后髋膝同步下降。","胸髋同步上升，站稳后回架并确认两侧挂稳。"],
+  ["确认肩垫、把手和配重锁扣安装正确","手只稳定把手，不用手臂把躯干折弯","先以轻重量适应负重前移感"],
+  ["把手向下猛拉造成胸椎过度弯曲","垫块偏向一侧或杠铃未居中","省略安全销或疲劳后独自冲重量"],
+  "两侧杠端高度一致，把手不剧烈摆动；上升时胸与髋没有明显分离。",["nasmSquatGuide","strongerSquat"]);
+记严("史密斯深蹲",
+  ["确认史密斯机导轨方向、挂钩和安全挡块；把杠置于上背，双脚调整到能让全脚掌稳定的位置。","旋开挂钩后沿固定导轨下降，双膝随脚尖方向移动，骨盆和上背保持受控。","沿导轨推起，在接近站直处重新挂钩，并目视确认两侧锁定。"],
+  ["不同史密斯机导轨可能垂直或倾斜，站位需按设备调整","先空杠测试底部位置和挂钩方向","安全挡块设在失力时可接住杠的位置"],
+  ["照搬自由杠站位导致脚掌受力失衡","下降到底部时骨盆卷离稳定位置","未完全挂钩就松手离开"],
+  "整个重复中脚掌不抬、膝髋无痛，固定导轨与身体关节轨迹不相互顶撞。",["aceBackSquat","nasmSquatGuide"]);
+记严("史密斯箱式深蹲",
+  ["把稳固箱凳固定在导轨下方，设置安全挡块；空杠确认触箱位置不会让骨盆被迫前后滑动。","旋开挂钩后受控下降，臀部轻触箱面并保持躯干张力，不向后跌坐。","双脚发力沿导轨站起；完成后重新挂钩并确认锁定。"],
+  ["箱面只提供深度反馈，不用于卸力休息","箱高和脚位需与该台史密斯机的导轨匹配","先空杠排除箱凳与导轨冲突"],
+  ["臀部砸向箱面或在箱上完全放松","触箱后用摇摆和反弹启动","箱凳未固定或安全挡块过低"],
+  "每次轻触同一位置，箱体不移动，离箱时胸髋同步且无明显摇摆。",["nhsLower","nasmSquatGuide"]);
+记严("哈克深蹲",
+  ["调整肩垫和平台站位，让背部与骨盆贴稳靠垫；伸腿解锁安全机构。","屈髋屈膝让滑架受控下降，仅到骨盆仍能贴住靠垫且脚跟稳定的深度。","全脚掌推平台使滑架上升，膝盖保留柔和伸展；完成后重新锁住安全机构。"],
+  ["先用空载或轻载确认安全把手方向","膝盖始终沿脚尖方向移动","平台站位需服从无痛和脚掌稳定"],
+  ["下降过深导致骨盆卷起离开靠垫","顶端暴力锁膝或让配重撞击","脚放太低仍强行追求深度"],
+  "靠垫接触稳定、滑架不撞击，双膝轨迹对称且顶端能安全重置锁扣。",["barbendHack","nasmLegPress"]);
+记严("腿举",
+  ["调节座椅和靠背，头、上背与骨盆贴垫；双脚在平台上约髋至肩宽，先确认安全把手。","解锁后受控屈髋屈膝，让平台靠近，仅到骨盆不卷起、脚跟不抬的深度。","全脚掌推开平台，膝盖接近伸直但不猛烈锁死；结束时重新锁定安全机构。"],
+  ["座椅距离应允许起点有可控膝角","双手握把稳定骨盆而非拉动身体","负重以回程可控为前提"],
+  ["膝盖内扣或双脚在平台滑动","下降过深使腰骨盆离开靠垫","用手推膝或顶端锁膝休息"],
+  "全程头背骨盆贴垫，平台回程平稳，双膝沿脚尖方向且安全机构能可靠复位。",["nasmLegPress","aceSquatAssessment"]);
+记严("地雷管深蹲",
+  ["把杠铃固定在地雷管底座并锁紧配重片；双手托住杠铃末端贴近胸前，身体面对锚点并略后站。","顺应杠铃弧形轨迹屈髋屈膝下蹲，让脚掌保持稳定，杠端不压向喉部。","脚掌发力站起，胸口与杠端距离稳定，顶端不过度后仰。"],
+  ["必须使用可靠地雷管底座，不能让未固定杠端自由滑动","站位需让身体顺应杠铃弧线","杠端贴近胸前并用双手对称承托"],
+  ["误当徒手深蹲或把杠铃竖直举离身体","站得太靠近锚点导致重心后倒","底座松动、配重片未锁紧仍继续"],
+  "杠铃沿固定弧线平稳移动，底座无位移；人物脚掌不抬且躯干不被杠端推得后仰。",["barbendHack","strongerSquat"]);
 
 // 髋部力量
 记("徒手髋铰链","双脚髋宽，膝微屈，双手放在髋部。","臀部向后推，躯干作为整体前倾。","夹臀把髋向前送，回到直立但不后仰。","小腿位置变化很小","把动作做成深蹲或腰部弯曲","主要感到臀腿后侧牵拉，腰部无锐痛。","nasm","hinge");
@@ -251,7 +340,7 @@ const 动作模式说明={
 };
 
 const 动作分组=[
-  ["squat","下肢力量","徒手深蹲|箱式徒手深蹲|靠墙静蹲|相扑徒手深蹲|深蹲触椅|抱胸深蹲|高脚杯深蹲|双哑铃前蹲|哑铃相扑深蹲|壶铃高脚杯深蹲|杠铃后蹲|杠铃前蹲|安全杠深蹲|史密斯深蹲|史密斯箱式深蹲|哈克深蹲|腿举|地雷管深蹲"],
+  ["squat","下肢力量","徒手深蹲|箱式徒手深蹲|靠墙静蹲|相扑徒手深蹲|深蹲触椅|抱胸深蹲|哑铃高脚杯深蹲|双哑铃前蹲|哑铃相扑深蹲|壶铃高脚杯深蹲|杠铃后蹲|杠铃前蹲|安全杠深蹲|史密斯深蹲|史密斯箱式深蹲|哈克深蹲|腿举|地雷管深蹲"],
   ["hinge","髋部力量","徒手髋铰链|早安式徒手练习|臀桥|单腿臀桥|臀桥行进|青蛙泵|哑铃罗马尼亚硬拉|双哑铃硬拉|哑铃臀推|壶铃硬拉|壶铃摆动|杠铃罗马尼亚硬拉|传统硬拉|相扑硬拉|杠铃臀推|绳索拉臀|器械腿弯举|健身球腿弯举"],
   ["push","胸部与推力","墙壁俯卧撑|高位俯卧撑|跪姿俯卧撑|标准俯卧撑|窄距俯卧撑|宽距俯卧撑|肩胛俯卧撑|暂停俯卧撑|下斜俯卧撑|地板哑铃卧推|哑铃卧推|上斜哑铃卧推|哑铃飞鸟|弹力带胸推|弹力带夹胸|杠铃卧推|上斜杠铃卧推|窄握杠铃卧推|史密斯卧推|器械推胸|蝴蝶机夹胸|绳索夹胸"],
   ["pull","背部与拉力","毛巾等长划船|桌边反向划船|低杠反向划船|门框划船|弹力带划船|弹力带面拉|单臂哑铃划船|双臂哑铃划船|胸托哑铃划船|俯卧哑铃划船|杠铃俯身划船|潘德雷划船|T杠划船|地雷管单臂划船|坐姿绳索划船|宽握坐姿划船|器械高位划船|器械低位划船|反向飞鸟|绳索面拉|TRX划船|胸托器械划船"],
@@ -266,7 +355,9 @@ const 动作分组=[
 
 function 推断器械(name){
   const 专项={
-    "高脚杯深蹲":{equipment:["home","gym"],tool:"哑铃或壶铃"},
+    "哑铃高脚杯深蹲":{equipment:["home","gym"],tool:"哑铃"},
+    "安全杠深蹲":{equipment:["gym"],tool:"安全深蹲杠"},
+    "地雷管深蹲":{equipment:["gym"],tool:"杠铃与地雷管底座"},
     "毛巾等长划船":{equipment:["none","home"],tool:"毛巾与可靠固定点"},
     "门框划船":{equipment:["none","home"],tool:"稳固门框"},
     "农夫行走":{equipment:["home","gym"],tool:"哑铃或壶铃"},
@@ -368,14 +459,9 @@ function getExerciseByName(name){return exerciseLibrary.find(item=>item.name===n
 function exerciseById(id){return exerciseLibrary.find(item=>item.id===id)}
 
 /* 来源：js/motion-catalog.js */
-const 复杂模式=new Set(["squat","hinge","push","lunge"]);
-
-const motionExercises=exerciseLibrary.filter(exercise=>exercise.motionApproved&&exercise.motionKey).map(exercise=>({
-  exerciseId:exercise.id,name:exercise.name,visualKey:exercise.motionKey,
-  mode:复杂模式.has(exercise.motionKey)?"multi-angle":"single-angle",
-  fps:36,duration:复杂模式.has(exercise.motionKey)?9:4.5,
-  status:"拟真人动画已通过轨迹初审",reviewStatus:"动作步骤已逐项复核，动画仍不替代现场教练判断"
-}));
+// 用户已否决旧版程序化关节模型。只有通过来源核对、逐帧审核并由用户确认的
+// 真人比例动画才能进入此集合；当前正式站点不展示任何未确认动画。
+const motionExercises=[];
 
 const motionExerciseIds=new Set(motionExercises.map(item=>item.exerciseId));
 const motionExerciseCount=motionExercises.length;
@@ -582,6 +668,93 @@ function calculateDiningItem(item,{size="中杯",sugar="不另外加糖",topping
   };
 }
 
+/* 来源：js/single-food-catalog.js */
+const 常用份量 = {
+  "水煮鸡蛋":50,
+  "蒸鸡蛋羹":120,
+  "荷包蛋少油":55,
+  "鹌鹑蛋":50,
+  "鸭蛋":65,
+  "鸡蛋白":35,
+  "鸡蛋黄":18,
+  "茶叶蛋":50,
+  "卤鸡蛋":50,
+  "番茄炒蛋少油":180,
+  "韭菜炒蛋少油":160,
+  "虾仁蒸蛋":160,
+  "菠菜蛋羹":160,
+  "香菇蒸蛋":160,
+  "青椒炒蛋少油":180,
+  "玉米棒":180,
+  "蒸红薯":200,
+  "蒸土豆":200,
+  "南瓜":200,
+  "贝贝南瓜":200,
+  "白米饭":150,
+  "糙米饭":150,
+  "全脂牛奶":250,
+  "低脂牛奶":250,
+  "脱脂牛奶":250,
+  "豆浆无糖":250,
+  "纯酸奶无糖":200,
+  "希腊酸奶无糖":180
+};
+
+const 简单菜关键词 = [
+  "水煮","蒸","烤","清炖","清蒸","盐水","卤","手撕","蛋羹","炒蛋",
+  "黑椒牛柳","瘦肉丸","清炖牛腩"
+];
+
+const 即食类别 = new Set(["奶类","水果","坚果种子","便捷蛋白","常见早餐"]);
+const 默认份量 = {
+  "米饭杂粮":150,"面食":200,"薯类":200,"全谷早餐":250,
+  "禽肉":100,"畜肉":100,"鱼类":150,"虾贝":150,"蛋类":60,
+  "豆制品":150,"豆类":150,"奶类":250,"叶菜":200,"瓜茄菌菇":200,
+  "水果":150,"坚果种子":25,"外卖主菜":200,"便捷蛋白":100,
+  "常见早餐":100,"油脂调味":10
+};
+
+function 单品类型(food){
+  if(简单菜关键词.some(keyword=>food.name.includes(keyword))||["蛋类","外卖主菜"].includes(food.category))return "简单烹调菜";
+  if(即食类别.has(food.category))return "即食单品";
+  return "基础食物";
+}
+
+function 误差比例(food){
+  if(food.confidence==="高")return .05;
+  if(food.confidence==="中")return .1;
+  return .2;
+}
+
+const singleFoodItems = foods.map(food=>({
+  ...food,
+  itemType:单品类型(food),
+  servingGrams:常用份量[food.name]||默认份量[food.category]||100,
+  basis:"每100克可食部",
+  calculationStatus:food.reviewStatus,
+  rangeRatio:误差比例(food)
+}));
+
+const singleFoodTypes=["基础食物","简单烹调菜","即食单品"];
+const singleFoodCategories=[...new Set(singleFoodItems.map(item=>item.category))];
+
+function calculateSingleFood(item,grams){
+  const safeGrams=Math.max(1,Math.min(3000,Number(grams)||item.servingGrams||100));
+  const ratio=safeGrams/100;
+  const nutrient=key=>Number((item[key]*ratio).toFixed(1));
+  const kcal=Math.round(item.kcal*ratio);
+  const margin=Math.max(2,Math.round(kcal*item.rangeRatio));
+  return {
+    grams:safeGrams,
+    kcal,
+    protein:nutrient("protein"),
+    fat:nutrient("fat"),
+    carbs:nutrient("carbs"),
+    fiber:nutrient("fiber"),
+    range:[Math.max(0,kcal-margin),kcal+margin]
+  };
+}
+
 /* 来源：js/engine.js */
 const round=(n,d=0)=>Number(Number(n).toFixed(d));
 function bmi(weight,height){return round(weight/((height/100)**2),1)}
@@ -611,7 +784,7 @@ function calculateTargets(profile){
 
 const exercises={
   squat:[
-    {name:"高脚杯深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"箱式徒手深蹲",equipment:["none","home","gym"],limits:[],pattern:"蹲"},{name:"腿举",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"史密斯箱式深蹲",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"哈克深蹲",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"哑铃相扑深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"坐站训练",equipment:["none","home","gym"],limits:[],pattern:"蹲"}],
+    {name:"哑铃高脚杯深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"箱式徒手深蹲",equipment:["none","home","gym"],limits:[],pattern:"蹲"},{name:"腿举",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"史密斯箱式深蹲",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"哈克深蹲",equipment:["gym"],limits:["knee"],pattern:"蹲"},{name:"哑铃相扑深蹲",equipment:["home","gym"],limits:["knee"],pattern:"蹲"},{name:"坐站训练",equipment:["none","home","gym"],limits:[],pattern:"蹲"}],
   hinge:[
     {name:"哑铃罗马尼亚硬拉",equipment:["home","gym"],limits:["back"],pattern:"髋铰链"},{name:"臀桥",equipment:["none","home","gym"],limits:[],pattern:"髋铰链"},{name:"器械腿弯举",equipment:["gym"],limits:[],pattern:"髋铰链"},{name:"杠铃罗马尼亚硬拉",equipment:["gym"],limits:["back"],pattern:"髋铰链"},{name:"绳索拉臀",equipment:["gym"],limits:["back"],pattern:"髋铰链"},{name:"哑铃臀推",equipment:["home","gym"],limits:[],pattern:"髋铰链"},{name:"健身球腿弯举",equipment:["home","gym"],limits:[],pattern:"髋铰链"}],
   push:[
@@ -903,7 +1076,7 @@ function loadMemberLibrary(){
   const member=createMember(legacyProfile?.nickname||legacyProfile?.name||"成员 1",{profile:legacyProfile,plans:legacyPlans,records:legacyRecords});
   return {schemaVersion:4,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),activeMemberId:member.id,members:[member],sharedRecipes:[],migration:{from:legacyProfile||legacyPlans.length||legacyRecords.length?"单人版 v2":"全新资料库",at:new Date().toISOString()}};
 }
-const state={library:loadMemberLibrary(),week:0,day:0,foodId:foods[0].id,mealVariant:1,recipeId:standardRecipes[0].id,recipeDraft:null,exerciseId:exerciseLibrary[0].id,diningId:diningItems[0].id,diningOptions:{}};
+const state={library:loadMemberLibrary(),week:0,day:0,foodId:foods[0].id,singleFoodId:singleFoodItems[0].id,singleFoodGrams:singleFoodItems[0].servingGrams,mealVariant:1,recipeId:standardRecipes[0].id,recipeDraft:null,exerciseId:exerciseLibrary[0].id,diningId:diningItems[0].id,diningOptions:{}};
 const activeMember=()=>state.library.members.find(member=>member.id===state.library.activeMemberId)||state.library.members[0];
 Object.defineProperties(state,{
   profile:{get:()=>activeMember().profile,set:value=>{activeMember().profile=value;activeMember().updatedAt=new Date().toISOString()}},
@@ -1002,7 +1175,7 @@ function renderSummary(plan){const t=plan.targets,profile=state.profile||plan.in
 function renderTraining(plan){
   const week=plan.training.weeks[state.week]||plan.training.weeks[0],strengthSessions=week.sessions.filter(s=>s.exercises?.length),sets=strengthSessions.reduce((sum,s)=>sum+s.exercises.reduce((n,e)=>n+Number(e.sets),0),0),cardio=week.sessions.reduce((sum,s)=>sum+(s.cardio?.minutes||0),0);
   const calendar=week.sessions.map((session,index)=>`<article><span>${session.schedule?.dateLabel||`第${index+1}天`}</span><b>${session.schedule?.weekday||""} ${session.schedule?.startTime||""}</b><small>${session.label} · ${session.estimatedMinutes}分钟</small></article>`).join("");
-  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>项动画轨迹初审</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看拟真人动画":e.reviewStatus==="首批逐项复核"?"查看逐项教程":"查看复核状态"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
+  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>项用户确认动画</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看真人比例动画":e.reviewStatus==="首批逐项复核"?"查看逐项教程":"查看复核状态"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
   $$('[data-week]').forEach(b=>b.onclick=()=>{state.week=Number(b.dataset.week);renderTraining(plan)});
   $$(".movement-guide-link").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));
   $("#exportTrainingCalendar").onclick=()=>downloadTrainingCalendar(plan);
@@ -1190,6 +1363,55 @@ for(const [group,label] of [...new Map(exerciseLibrary.map(exercise=>[exercise.g
 for(const id of ["exerciseSearch","exercisePattern","exerciseEquipment","exerciseDifficulty"])$(`#${id}`).addEventListener(id==="exerciseSearch"?"input":"change",()=>{exerciseLimit=36;renderExerciseLibrary()});
 $("#exerciseLoadMore").onclick=()=>{exerciseLimit+=36;renderExerciseLibrary()};
 
+function activeSingleFood(){return singleFoodItems.find(item=>item.id===state.singleFoodId)||singleFoodItems[0]}
+function singleFoodFilters(){
+  const query=$("#singleFoodSearch").value.trim().toLowerCase(),type=$("#singleFoodType").value,category=$("#singleFoodCategory").value;
+  return singleFoodItems.filter(item=>(!query||`${item.name}${item.category}${item.itemType}`.toLowerCase().includes(query))&&(type==="all"||item.itemType===type)&&(category==="all"||item.category===category));
+}
+function renderSingleFoodList(){
+  const available=singleFoodFilters();
+  if(!available.some(item=>item.id===state.singleFoodId)&&available.length){
+    state.singleFoodId=available[0].id;
+    state.singleFoodGrams=available[0].servingGrams;
+  }
+  $("#singleFoodList").innerHTML=available.map(item=>{
+    const serving=calculateSingleFood(item,item.servingGrams);
+    return `<button class="${item.id===state.singleFoodId?"active":""}" data-single-food="${item.id}"><span>${escapeHtml(item.itemType)} · ${escapeHtml(item.category)}</span><b>${escapeHtml(item.name)}</b><small>${serving.kcal} kcal / 常用一份 ${item.servingGrams}g</small></button>`;
+  }).join("")||"<div class='empty-mini'>没有匹配的单品，请尝试其他关键词。</div>";
+  $$("#singleFoodList [data-single-food]").forEach(button=>button.onclick=()=>{
+    const item=singleFoodItems.find(entry=>entry.id===button.dataset.singleFood);
+    state.singleFoodId=item.id;state.singleFoodGrams=item.servingGrams;renderSingleFoodList();renderSingleFoodDetail();
+  });
+}
+function renderSingleFoodDetail(){
+  const item=activeSingleFood(),result=calculateSingleFood(item,state.singleFoodGrams);
+  $("#singleFoodDetail").innerHTML=`<header><div><span class="badge">${escapeHtml(item.itemType)} · ${escapeHtml(item.category)}</span><h2>${escapeHtml(item.name)}</h2><p>${escapeHtml(item.state)}；数据库基准为${escapeHtml(item.basis)}</p></div><div class="single-food-kcal"><strong>${result.kcal}</strong><span>kcal / ${result.grams}g</span></div></header><div class="single-food-serving"><div><b>常用一份</b><button class="secondary-button" id="useSingleServing">${item.servingGrams} g</button></div><label>自定义重量 <input id="singleFoodGrams" type="number" min="1" max="3000" step="1" value="${result.grams}"><span>克</span></label><input id="singleFoodRange" type="range" min="1" max="${Math.max(500,item.servingGrams*3)}" step="1" value="${Math.min(result.grams,Math.max(500,item.servingGrams*3))}" aria-label="${escapeHtml(item.name)}重量"></div><div class="single-food-macros"><span><small>蛋白质</small><b>${result.protein} g</b></span><span><small>脂肪</small><b>${result.fat} g</b></span><span><small>碳水</small><b>${result.carbs} g</b></span><span><small>纤维</small><b>${result.fiber} g</b></span><span><small>估算区间</small><b>${result.range[0]}～${result.range[1]} kcal</b></span></div><article class="data-confidence"><b>${escapeHtml(item.calculationStatus)} · 置信度${escapeHtml(item.confidence)}</b><p>${escapeHtml(item.source)}</p><small>核验日期：${item.verifiedOn}。${escapeHtml(item.note)}</small></article><div class="single-food-actions"><button class="primary-button" id="addSingleFoodToPlan">加入当前饮食日</button><button class="secondary-button" id="copySingleFoodValue">复制热量信息</button></div>`;
+  const updateGrams=value=>{state.singleFoodGrams=Math.max(1,Math.min(3000,Number(value)||item.servingGrams));renderSingleFoodDetail()};
+  $("#singleFoodGrams").onchange=event=>updateGrams(event.target.value);
+  $("#singleFoodRange").oninput=event=>{state.singleFoodGrams=Number(event.target.value);renderSingleFoodDetail()};
+  $("#useSingleServing").onclick=()=>updateGrams(item.servingGrams);
+  $("#copySingleFoodValue").onclick=async()=>{
+    const text=`${item.name} ${result.grams}克：约${result.kcal}千卡（估算区间${result.range[0]}～${result.range[1]}千卡；${item.calculationStatus}）`;
+    try{await navigator.clipboard.writeText(text);toast("单品热量信息已复制")}catch{toast("浏览器禁止自动复制，请手动记录当前数值")}
+  };
+  $("#addSingleFoodToPlan").onclick=()=>{
+    const plan=currentPlan();if(!plan){toast("请先为当前成员生成方案");return}
+    const profile=state.profile||{},excluded=(profile.excludedFoods||"").split(/[，,、]/).map(value=>value.trim()).filter(Boolean);
+    if((item.allergens||[]).some(allergen=>(profile.allergens||[]).includes(allergen))||excluded.some(name=>item.name.includes(name))){toast("该单品与当前成员的过敏原或绝对不吃项冲突");return}
+    if(profile.diet==="vegan"&&!item.tags.includes("vegan")||profile.diet==="vegetarian"&&!item.tags.includes("vegetarian")||profile.diet==="no-pork"&&(item.tags.includes("pork")||item.name.includes("猪"))){toast("该单品与当前成员的饮食模式冲突");return}
+    const day=plan.meals.days[state.day]||plan.meals.days[0],meal=day.meals.find(entry=>entry.name==="加餐")||day.meals[0];
+    meal.items.push({foodId:item.id,food:item,grams:result.grams});meal.total=calculateMeal(meal.items);day.total=calculateMeal(day.meals.flatMap(entry=>entry.items));write(KEYS.plans,state.plans);renderMeals(plan);toast(`已把${item.name}加入第${day.day}天${meal.name}`);
+  };
+}
+function renderSingleFoodCalculator(){
+  $("#singleFoodCount").textContent=singleFoodItems.length;
+  const currentType=$("#singleFoodType").value||"all",currentCategory=$("#singleFoodCategory").value||"all";
+  $("#singleFoodType").innerHTML=`<option value="all">全部单品类型</option>${singleFoodTypes.map(type=>`<option ${type===currentType?"selected":""}>${type}</option>`).join("")}`;
+  $("#singleFoodCategory").innerHTML=`<option value="all">全部食物类别</option>${singleFoodCategories.map(category=>`<option ${category===currentCategory?"selected":""}>${category}</option>`).join("")}`;
+  renderSingleFoodList();renderSingleFoodDetail();
+}
+for(const id of ["singleFoodSearch","singleFoodType","singleFoodCategory"])$(`#${id}`).addEventListener(id==="singleFoodSearch"?"input":"change",()=>{renderSingleFoodList();renderSingleFoodDetail()});
+
 function allRecipes(){return [...standardRecipes,...state.library.sharedRecipes,...state.customRecipes]}
 function selectRecipe(recipe){state.recipeId=recipe.id;state.recipeDraft=structuredClone(recipe);renderRecipeCalculator()}
 function recipeOwnerLabel(recipe){if(/^r\d{3}$/.test(recipe.id))return "标准菜谱";if(state.library.sharedRecipes.some(item=>item.id===recipe.id))return "成员共享";return "当前成员"}
@@ -1217,7 +1439,7 @@ function renderRecipeEditor(){
   $("#addRecipeToPlan").onclick=()=>{syncDraft();const plan=currentPlan();if(!plan){toast("请先为当前成员生成方案");return}if(!recipeAllowed(recipe,state.profile||{})){toast("该菜谱与当前成员的忌口、饮食模式或过敏原冲突");return}const day=plan.meals.days[state.day]||plan.meals.days[0],meal=day.meals.find(item=>item.name==="午餐")||day.meals[1],scale=1/Math.max(1,recipe.servings||1);meal.items=recipe.ingredients.map(ingredient=>({foodId:ingredient.foodId,food:foods.find(food=>food.id===ingredient.foodId),grams:Math.round(ingredient.grams*scale)})).filter(item=>item.food);meal.recipeName=recipe.name;meal.method=recipe.method;meal.total=calculateMeal(meal.items);day.total=calculateMeal(day.meals.flatMap(item=>item.items));write(KEYS.plans,state.plans);renderMeals(plan);toast(`已加入第${day.day}天午餐，全天营养已重算`)};
 }
 function renderRecipeCalculator(){
-  $("#recipeCount").textContent=standardRecipes.length+diningItemCount;const allCategories=[...new Set([...recipeCategories,...allRecipes().map(recipe=>recipe.category)])],current=$("#recipeCategory").value||"all";$("#recipeCategory").innerHTML=`<option value="all">全部类别</option>${allCategories.map(category=>`<option ${category===current?"selected":""}>${escapeHtml(category)}</option>`).join("")}`;
+  $("#recipeCount").textContent=singleFoodItems.length+standardRecipes.length+diningItemCount;const allCategories=[...new Set([...recipeCategories,...allRecipes().map(recipe=>recipe.category)])],current=$("#recipeCategory").value||"all";$("#recipeCategory").innerHTML=`<option value="all">全部类别</option>${allCategories.map(category=>`<option ${category===current?"selected":""}>${escapeHtml(category)}</option>`).join("")}`;
   if(!state.recipeDraft)state.recipeDraft=structuredClone(allRecipes().find(recipe=>recipe.id===state.recipeId)||standardRecipes[0]);renderRecipeList();renderRecipeEditor();
 }
 $("#recipeSearch").oninput=renderRecipeList;$("#recipeCategory").onchange=renderRecipeList;
@@ -1262,7 +1484,7 @@ function renderDiningCalculator(){
   renderDiningList();renderDiningDetail();
 }
 for(const id of ["diningSearch","diningGroup","diningBrand"])$(`#${id}`).addEventListener(id==="diningSearch"?"input":"change",()=>{renderDiningList();renderDiningDetail()});
-$$("[data-calculator-tab]").forEach(button=>button.onclick=()=>{$$("[data-calculator-tab]").forEach(item=>item.classList.toggle("active",item===button));$("#recipeCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="recipe");$("#diningCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="dining")});
+$$("[data-calculator-tab]").forEach(button=>button.onclick=()=>{$$("[data-calculator-tab]").forEach(item=>{const active=item===button;item.classList.toggle("active",active);item.setAttribute("aria-selected",String(active))});$("#singleFoodCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="single");$("#recipeCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="recipe");$("#diningCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="dining")});
 
 function renderEvidence(){$("#referenceList").innerHTML=references.map((r,i)=>`<article class="reference"><div class="reference-index">${String(i+1).padStart(2,"0")}</div><div><h3>${r.title}</h3><p>${r.org} · ${r.note}</p></div><a href="${r.url}" target="_blank" rel="noopener">查看来源 ↗</a></article>`).join("");$("#foodCount").textContent=foods.length;$("#mealCount").textContent=`${mealTemplates.length}+${standardRecipes.length}`;$("#dataDate").textContent=dataMeta.verifiedOn}
 function renderVideos(filter="all"){
@@ -1305,7 +1527,7 @@ async function restoreCloud(){try{const {syncId,code}=syncCredentials();if(!sync
 async function deleteCloud(){try{const {syncId,code}=syncCredentials();if(!syncId||!code)throw new Error("请填写同步ID和恢复码");if(!confirm("确定永久删除云端密文？本地数据不会同时删除。"))return;const token=await authToken(code);await syncRequest("delete",{syncId,authToken:token});localStorage.removeItem(syncKeys.id);localStorage.removeItem(syncKeys.revision);sessionStorage.removeItem(syncKeys.code);setSyncStatus("云端档案已删除") }catch(e){setSyncStatus(e.message,true)}}
 $("#createCloud").onclick=createCloud;$("#pushCloud").onclick=pushCloud;$("#restoreCloud").onclick=restoreCloud;$("#deleteCloud").onclick=deleteCloud;
 
-function renderAll(){renderMemberControls();renderOverview();renderPlan();renderRecords();renderTrend();renderRecipeCalculator();renderDiningCalculator();renderExerciseLibrary();refreshCompletion()}
+function renderAll(){renderMemberControls();renderOverview();renderPlan();renderRecords();renderTrend();renderSingleFoodCalculator();renderRecipeCalculator();renderDiningCalculator();renderExerciseLibrary();refreshCompletion()}
 persistLibrary();fillForm(state.profile);renderSpecificDates();setProfileDirty(false);$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);renderEvidence();renderVideos();$("#exerciseCount").textContent=exerciseLibraryCount;if(state.profile&&!currentPlan())ensurePlan();else if(upgradeLegacyPlan())toast("旧方案已保留，并自动升级为新的渐进方案");renderAll();
 $("#storageMode").textContent=syncConfigured()?"可用加密同步":"仅本地存储";$(".online-dot").classList.toggle("ready",syncConfigured());
 $("#syncUnavailable").hidden=syncConfigured();$("#syncOnline").hidden=!syncConfigured();$("#syncIdInput").value=localStorage.getItem(syncKeys.id)||"";

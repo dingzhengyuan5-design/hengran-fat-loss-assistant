@@ -1,7 +1,7 @@
 import {readFile,writeFile} from "node:fs/promises";
 
 const 根目录=new URL("../",import.meta.url);
-const 文件=["js/catalog.js","js/curated-exercise-guides.js","js/exercise-catalog.js","js/motion-catalog.js","js/recipe-catalog.js","js/external-food-catalog.js","js/engine.js","js/crypto-sync.js","js/app.js"];
+const 文件=["js/catalog.js","js/curated-exercise-guides.js","js/exercise-catalog.js","js/motion-catalog.js","js/recipe-catalog.js","js/external-food-catalog.js","js/single-food-catalog.js","js/engine.js","js/crypto-sync.js","js/app.js"];
 const 内容=[];
 
 for(const 路径 of 文件){

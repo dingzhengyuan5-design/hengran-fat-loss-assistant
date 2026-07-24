@@ -4,6 +4,7 @@ import {exerciseLibrary,exerciseLibraryCount,bodyweightExerciseCount,getExercise
 import {motionExerciseCount,motionExerciseIds,getMotion} from "./motion-catalog.js";
 import {standardRecipes,recipeCategories,calculateRecipe,recipeAllowed} from "./recipe-catalog.js";
 import {diningItems,diningBrands,diningItemCount,diningBrandCount,calculateDiningItem} from "./external-food-catalog.js";
+import {singleFoodItems,singleFoodTypes,singleFoodCategories,calculateSingleFood} from "./single-food-catalog.js";
 import {syncConfigured,createRecoveryCode,authToken,encryptPayload,decryptPayload,syncRequest} from "./crypto-sync.js";
 
 const $=(s,root=document)=>root.querySelector(s), $$=(s,root=document)=>[...root.querySelectorAll(s)];
@@ -24,7 +25,7 @@ function loadMemberLibrary(){
   const member=createMember(legacyProfile?.nickname||legacyProfile?.name||"成员 1",{profile:legacyProfile,plans:legacyPlans,records:legacyRecords});
   return {schemaVersion:4,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),activeMemberId:member.id,members:[member],sharedRecipes:[],migration:{from:legacyProfile||legacyPlans.length||legacyRecords.length?"单人版 v2":"全新资料库",at:new Date().toISOString()}};
 }
-const state={library:loadMemberLibrary(),week:0,day:0,foodId:foods[0].id,mealVariant:1,recipeId:standardRecipes[0].id,recipeDraft:null,exerciseId:exerciseLibrary[0].id,diningId:diningItems[0].id,diningOptions:{}};
+const state={library:loadMemberLibrary(),week:0,day:0,foodId:foods[0].id,singleFoodId:singleFoodItems[0].id,singleFoodGrams:singleFoodItems[0].servingGrams,mealVariant:1,recipeId:standardRecipes[0].id,recipeDraft:null,exerciseId:exerciseLibrary[0].id,diningId:diningItems[0].id,diningOptions:{}};
 const activeMember=()=>state.library.members.find(member=>member.id===state.library.activeMemberId)||state.library.members[0];
 Object.defineProperties(state,{
   profile:{get:()=>activeMember().profile,set:value=>{activeMember().profile=value;activeMember().updatedAt=new Date().toISOString()}},
@@ -123,7 +124,7 @@ function renderSummary(plan){const t=plan.targets,profile=state.profile||plan.in
 function renderTraining(plan){
   const week=plan.training.weeks[state.week]||plan.training.weeks[0],strengthSessions=week.sessions.filter(s=>s.exercises?.length),sets=strengthSessions.reduce((sum,s)=>sum+s.exercises.reduce((n,e)=>n+Number(e.sets),0),0),cardio=week.sessions.reduce((sum,s)=>sum+(s.cardio?.minutes||0),0);
   const calendar=week.sessions.map((session,index)=>`<article><span>${session.schedule?.dateLabel||`第${index+1}天`}</span><b>${session.schedule?.weekday||""} ${session.schedule?.startTime||""}</b><small>${session.label} · ${session.estimatedMinutes}分钟</small></article>`).join("");
-  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>项动画轨迹初审</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看拟真人动画":e.reviewStatus==="首批逐项复核"?"查看逐项教程":"查看复核状态"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
+  $("#trainingPanel").innerHTML=`<section class="training-dashboard"><div class="training-progress">${plan.training.weeks.map((w,i)=>`<button class="week-step ${i===state.week?"active":""}" data-week="${i}"><span>${w.week}</span><b>${w.focus}</b><small>${w.sessions[0]?.schedule?.dateLabel||""}起 · ${w.change||"查看处方"}</small></button>`).join("")}</div><article class="week-brief"><div><span class="badge">第 ${week.week} 周 · 当前执行</span><h2>${week.focus}</h2><p>${week.instruction}</p><button class="secondary-button" id="exportTrainingCalendar">导出日历文件 .ics</button></div><div class="week-stats"><span><b>${sets}</b>力量组</span><span><b>${cardio}</b>有氧分钟</span><span><b>${motionExerciseCount}</b>项用户确认动画</span></div></article><div class="training-calendar-strip">${calendar}</div><div class="change-ribbon">↗ 本周变化：<b>${week.change||week.instruction}</b></div><div class="training-stack">${week.sessions.map((s,i)=>`<article class="session-card"><header><div class="session-index">${String(i+1).padStart(2,"0")}</div><div><small>${s.schedule?`${s.schedule.dateLabel} ${s.schedule.weekday} · ${s.schedule.startTime}～${s.schedule.endTime}`:`${s.type}`} · 预计 ${s.estimatedMinutes||state.profile.minutes} 分钟</small><h3>${s.label}</h3><p class="session-source">${s.schedule?.source||"系统安排"}</p></div><span class="session-status">待完成</span></header><details class="session-timeline" open><summary>当天时间表</summary>${(s.schedule?.timeline||[]).map(item=>`<div><time>${item.start}–${item.end}</time><b>${item.label}</b><span>${item.minutes}分钟 · ${escapeHtml(item.detail)}</span></div>`).join("")}</details>${s.exercises?.length?`<div class="movement-list">${s.exercises.map((e,ei)=>`<div class="movement-card"><div class="movement-name"><span>${ei+1}</span><div><button class="movement-guide-link" data-exercise-name="${e.name}">${e.name}<i>${motionExerciseIds.has(e.id)?"观看真人比例动画":e.reviewStatus==="首批逐项复核"?"查看逐项教程":"查看复核状态"}</i></button><small>${e.pattern} · ${e.loadCue||"动作稳定优先"}</small></div></div><div class="dose"><span><small>组数</small><b>${e.sets}</b></span><span><small>次数</small><b>${e.reps}</b></span><span><small>余力</small><b>RIR ${e.rir}</b></span><span><small>休息</small><b>${e.rest}</b></span></div></div>`).join("")}</div>`:"<div class='recovery-card'>今天不堆力量训练量，完成低冲击有氧与活动度即可。</div>"}<footer class="cardio-strip"><span>♥</span><div><small>训练后有氧</small><b>${s.cardio.mode} · ${s.cardio.minutes} 分钟</b><p>${s.cardio.intensity}</p></div></footer></article>`).join("")}</div><p class="evidence-footnote">具体日期优先采用用户选择；只指定星期时按星期排布；均未指定时自动错开高疲劳训练。错过一次训练时不要在同一天补做两次，重新生成方案或选择下一个可恢复日期。</p></section>`;
   $$('[data-week]').forEach(b=>b.onclick=()=>{state.week=Number(b.dataset.week);renderTraining(plan)});
   $$(".movement-guide-link").forEach(button=>button.onclick=()=>openExerciseGuide(getExerciseByName(button.dataset.exerciseName)));
   $("#exportTrainingCalendar").onclick=()=>downloadTrainingCalendar(plan);
@@ -311,6 +312,55 @@ for(const [group,label] of [...new Map(exerciseLibrary.map(exercise=>[exercise.g
 for(const id of ["exerciseSearch","exercisePattern","exerciseEquipment","exerciseDifficulty"])$(`#${id}`).addEventListener(id==="exerciseSearch"?"input":"change",()=>{exerciseLimit=36;renderExerciseLibrary()});
 $("#exerciseLoadMore").onclick=()=>{exerciseLimit+=36;renderExerciseLibrary()};
 
+function activeSingleFood(){return singleFoodItems.find(item=>item.id===state.singleFoodId)||singleFoodItems[0]}
+function singleFoodFilters(){
+  const query=$("#singleFoodSearch").value.trim().toLowerCase(),type=$("#singleFoodType").value,category=$("#singleFoodCategory").value;
+  return singleFoodItems.filter(item=>(!query||`${item.name}${item.category}${item.itemType}`.toLowerCase().includes(query))&&(type==="all"||item.itemType===type)&&(category==="all"||item.category===category));
+}
+function renderSingleFoodList(){
+  const available=singleFoodFilters();
+  if(!available.some(item=>item.id===state.singleFoodId)&&available.length){
+    state.singleFoodId=available[0].id;
+    state.singleFoodGrams=available[0].servingGrams;
+  }
+  $("#singleFoodList").innerHTML=available.map(item=>{
+    const serving=calculateSingleFood(item,item.servingGrams);
+    return `<button class="${item.id===state.singleFoodId?"active":""}" data-single-food="${item.id}"><span>${escapeHtml(item.itemType)} · ${escapeHtml(item.category)}</span><b>${escapeHtml(item.name)}</b><small>${serving.kcal} kcal / 常用一份 ${item.servingGrams}g</small></button>`;
+  }).join("")||"<div class='empty-mini'>没有匹配的单品，请尝试其他关键词。</div>";
+  $$("#singleFoodList [data-single-food]").forEach(button=>button.onclick=()=>{
+    const item=singleFoodItems.find(entry=>entry.id===button.dataset.singleFood);
+    state.singleFoodId=item.id;state.singleFoodGrams=item.servingGrams;renderSingleFoodList();renderSingleFoodDetail();
+  });
+}
+function renderSingleFoodDetail(){
+  const item=activeSingleFood(),result=calculateSingleFood(item,state.singleFoodGrams);
+  $("#singleFoodDetail").innerHTML=`<header><div><span class="badge">${escapeHtml(item.itemType)} · ${escapeHtml(item.category)}</span><h2>${escapeHtml(item.name)}</h2><p>${escapeHtml(item.state)}；数据库基准为${escapeHtml(item.basis)}</p></div><div class="single-food-kcal"><strong>${result.kcal}</strong><span>kcal / ${result.grams}g</span></div></header><div class="single-food-serving"><div><b>常用一份</b><button class="secondary-button" id="useSingleServing">${item.servingGrams} g</button></div><label>自定义重量 <input id="singleFoodGrams" type="number" min="1" max="3000" step="1" value="${result.grams}"><span>克</span></label><input id="singleFoodRange" type="range" min="1" max="${Math.max(500,item.servingGrams*3)}" step="1" value="${Math.min(result.grams,Math.max(500,item.servingGrams*3))}" aria-label="${escapeHtml(item.name)}重量"></div><div class="single-food-macros"><span><small>蛋白质</small><b>${result.protein} g</b></span><span><small>脂肪</small><b>${result.fat} g</b></span><span><small>碳水</small><b>${result.carbs} g</b></span><span><small>纤维</small><b>${result.fiber} g</b></span><span><small>估算区间</small><b>${result.range[0]}～${result.range[1]} kcal</b></span></div><article class="data-confidence"><b>${escapeHtml(item.calculationStatus)} · 置信度${escapeHtml(item.confidence)}</b><p>${escapeHtml(item.source)}</p><small>核验日期：${item.verifiedOn}。${escapeHtml(item.note)}</small></article><div class="single-food-actions"><button class="primary-button" id="addSingleFoodToPlan">加入当前饮食日</button><button class="secondary-button" id="copySingleFoodValue">复制热量信息</button></div>`;
+  const updateGrams=value=>{state.singleFoodGrams=Math.max(1,Math.min(3000,Number(value)||item.servingGrams));renderSingleFoodDetail()};
+  $("#singleFoodGrams").onchange=event=>updateGrams(event.target.value);
+  $("#singleFoodRange").oninput=event=>{state.singleFoodGrams=Number(event.target.value);renderSingleFoodDetail()};
+  $("#useSingleServing").onclick=()=>updateGrams(item.servingGrams);
+  $("#copySingleFoodValue").onclick=async()=>{
+    const text=`${item.name} ${result.grams}克：约${result.kcal}千卡（估算区间${result.range[0]}～${result.range[1]}千卡；${item.calculationStatus}）`;
+    try{await navigator.clipboard.writeText(text);toast("单品热量信息已复制")}catch{toast("浏览器禁止自动复制，请手动记录当前数值")}
+  };
+  $("#addSingleFoodToPlan").onclick=()=>{
+    const plan=currentPlan();if(!plan){toast("请先为当前成员生成方案");return}
+    const profile=state.profile||{},excluded=(profile.excludedFoods||"").split(/[，,、]/).map(value=>value.trim()).filter(Boolean);
+    if((item.allergens||[]).some(allergen=>(profile.allergens||[]).includes(allergen))||excluded.some(name=>item.name.includes(name))){toast("该单品与当前成员的过敏原或绝对不吃项冲突");return}
+    if(profile.diet==="vegan"&&!item.tags.includes("vegan")||profile.diet==="vegetarian"&&!item.tags.includes("vegetarian")||profile.diet==="no-pork"&&(item.tags.includes("pork")||item.name.includes("猪"))){toast("该单品与当前成员的饮食模式冲突");return}
+    const day=plan.meals.days[state.day]||plan.meals.days[0],meal=day.meals.find(entry=>entry.name==="加餐")||day.meals[0];
+    meal.items.push({foodId:item.id,food:item,grams:result.grams});meal.total=calculateMeal(meal.items);day.total=calculateMeal(day.meals.flatMap(entry=>entry.items));write(KEYS.plans,state.plans);renderMeals(plan);toast(`已把${item.name}加入第${day.day}天${meal.name}`);
+  };
+}
+function renderSingleFoodCalculator(){
+  $("#singleFoodCount").textContent=singleFoodItems.length;
+  const currentType=$("#singleFoodType").value||"all",currentCategory=$("#singleFoodCategory").value||"all";
+  $("#singleFoodType").innerHTML=`<option value="all">全部单品类型</option>${singleFoodTypes.map(type=>`<option ${type===currentType?"selected":""}>${type}</option>`).join("")}`;
+  $("#singleFoodCategory").innerHTML=`<option value="all">全部食物类别</option>${singleFoodCategories.map(category=>`<option ${category===currentCategory?"selected":""}>${category}</option>`).join("")}`;
+  renderSingleFoodList();renderSingleFoodDetail();
+}
+for(const id of ["singleFoodSearch","singleFoodType","singleFoodCategory"])$(`#${id}`).addEventListener(id==="singleFoodSearch"?"input":"change",()=>{renderSingleFoodList();renderSingleFoodDetail()});
+
 function allRecipes(){return [...standardRecipes,...state.library.sharedRecipes,...state.customRecipes]}
 function selectRecipe(recipe){state.recipeId=recipe.id;state.recipeDraft=structuredClone(recipe);renderRecipeCalculator()}
 function recipeOwnerLabel(recipe){if(/^r\d{3}$/.test(recipe.id))return "标准菜谱";if(state.library.sharedRecipes.some(item=>item.id===recipe.id))return "成员共享";return "当前成员"}
@@ -338,7 +388,7 @@ function renderRecipeEditor(){
   $("#addRecipeToPlan").onclick=()=>{syncDraft();const plan=currentPlan();if(!plan){toast("请先为当前成员生成方案");return}if(!recipeAllowed(recipe,state.profile||{})){toast("该菜谱与当前成员的忌口、饮食模式或过敏原冲突");return}const day=plan.meals.days[state.day]||plan.meals.days[0],meal=day.meals.find(item=>item.name==="午餐")||day.meals[1],scale=1/Math.max(1,recipe.servings||1);meal.items=recipe.ingredients.map(ingredient=>({foodId:ingredient.foodId,food:foods.find(food=>food.id===ingredient.foodId),grams:Math.round(ingredient.grams*scale)})).filter(item=>item.food);meal.recipeName=recipe.name;meal.method=recipe.method;meal.total=calculateMeal(meal.items);day.total=calculateMeal(day.meals.flatMap(item=>item.items));write(KEYS.plans,state.plans);renderMeals(plan);toast(`已加入第${day.day}天午餐，全天营养已重算`)};
 }
 function renderRecipeCalculator(){
-  $("#recipeCount").textContent=standardRecipes.length+diningItemCount;const allCategories=[...new Set([...recipeCategories,...allRecipes().map(recipe=>recipe.category)])],current=$("#recipeCategory").value||"all";$("#recipeCategory").innerHTML=`<option value="all">全部类别</option>${allCategories.map(category=>`<option ${category===current?"selected":""}>${escapeHtml(category)}</option>`).join("")}`;
+  $("#recipeCount").textContent=singleFoodItems.length+standardRecipes.length+diningItemCount;const allCategories=[...new Set([...recipeCategories,...allRecipes().map(recipe=>recipe.category)])],current=$("#recipeCategory").value||"all";$("#recipeCategory").innerHTML=`<option value="all">全部类别</option>${allCategories.map(category=>`<option ${category===current?"selected":""}>${escapeHtml(category)}</option>`).join("")}`;
   if(!state.recipeDraft)state.recipeDraft=structuredClone(allRecipes().find(recipe=>recipe.id===state.recipeId)||standardRecipes[0]);renderRecipeList();renderRecipeEditor();
 }
 $("#recipeSearch").oninput=renderRecipeList;$("#recipeCategory").onchange=renderRecipeList;
@@ -383,7 +433,7 @@ function renderDiningCalculator(){
   renderDiningList();renderDiningDetail();
 }
 for(const id of ["diningSearch","diningGroup","diningBrand"])$(`#${id}`).addEventListener(id==="diningSearch"?"input":"change",()=>{renderDiningList();renderDiningDetail()});
-$$("[data-calculator-tab]").forEach(button=>button.onclick=()=>{$$("[data-calculator-tab]").forEach(item=>item.classList.toggle("active",item===button));$("#recipeCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="recipe");$("#diningCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="dining")});
+$$("[data-calculator-tab]").forEach(button=>button.onclick=()=>{$$("[data-calculator-tab]").forEach(item=>{const active=item===button;item.classList.toggle("active",active);item.setAttribute("aria-selected",String(active))});$("#singleFoodCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="single");$("#recipeCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="recipe");$("#diningCalculatorPanel").classList.toggle("active",button.dataset.calculatorTab==="dining")});
 
 function renderEvidence(){$("#referenceList").innerHTML=references.map((r,i)=>`<article class="reference"><div class="reference-index">${String(i+1).padStart(2,"0")}</div><div><h3>${r.title}</h3><p>${r.org} · ${r.note}</p></div><a href="${r.url}" target="_blank" rel="noopener">查看来源 ↗</a></article>`).join("");$("#foodCount").textContent=foods.length;$("#mealCount").textContent=`${mealTemplates.length}+${standardRecipes.length}`;$("#dataDate").textContent=dataMeta.verifiedOn}
 function renderVideos(filter="all"){
@@ -426,7 +476,7 @@ async function restoreCloud(){try{const {syncId,code}=syncCredentials();if(!sync
 async function deleteCloud(){try{const {syncId,code}=syncCredentials();if(!syncId||!code)throw new Error("请填写同步ID和恢复码");if(!confirm("确定永久删除云端密文？本地数据不会同时删除。"))return;const token=await authToken(code);await syncRequest("delete",{syncId,authToken:token});localStorage.removeItem(syncKeys.id);localStorage.removeItem(syncKeys.revision);sessionStorage.removeItem(syncKeys.code);setSyncStatus("云端档案已删除") }catch(e){setSyncStatus(e.message,true)}}
 $("#createCloud").onclick=createCloud;$("#pushCloud").onclick=pushCloud;$("#restoreCloud").onclick=restoreCloud;$("#deleteCloud").onclick=deleteCloud;
 
-function renderAll(){renderMemberControls();renderOverview();renderPlan();renderRecords();renderTrend();renderRecipeCalculator();renderDiningCalculator();renderExerciseLibrary();refreshCompletion()}
+function renderAll(){renderMemberControls();renderOverview();renderPlan();renderRecords();renderTrend();renderSingleFoodCalculator();renderRecipeCalculator();renderDiningCalculator();renderExerciseLibrary();refreshCompletion()}
 persistLibrary();fillForm(state.profile);renderSpecificDates();setProfileDirty(false);$("#progressForm").elements.date.value=new Date().toISOString().slice(0,10);setProgressDirty(false);renderEvidence();renderVideos();$("#exerciseCount").textContent=exerciseLibraryCount;if(state.profile&&!currentPlan())ensurePlan();else if(upgradeLegacyPlan())toast("旧方案已保留，并自动升级为新的渐进方案");renderAll();
 $("#storageMode").textContent=syncConfigured()?"可用加密同步":"仅本地存储";$(".online-dot").classList.toggle("ready",syncConfigured());
 $("#syncUnavailable").hidden=syncConfigured();$("#syncOnline").hidden=!syncConfigured();$("#syncIdInput").value=localStorage.getItem(syncKeys.id)||"";

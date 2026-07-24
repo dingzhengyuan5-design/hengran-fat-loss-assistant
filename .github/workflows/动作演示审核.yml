@@ -9,6 +9,10 @@ on:
       - "减脂助手网站/js/app.js"
       - "减脂助手网站/styles.css"
       - "减脂助手网站/动作演示审核.html"
+      - "减脂助手网站/data/动作动画审核清单.json"
+      - "减脂助手网站/docs/动作动画逐项审核规范.md"
+      - "减脂助手网站/scripts/生成动作动画审核清单.mjs"
+      - "减脂助手网站/tests/动作动画审核清单.test.mjs"
       - "减脂助手网站/assets/motions/**"
 
 permissions:

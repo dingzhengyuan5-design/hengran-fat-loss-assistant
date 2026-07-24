@@ -44,13 +44,13 @@ for(const item of diningItems){
   assert.ok(Array.isArray(item.range)&&item.range.length===2&&item.range[0]<=item.kcal&&item.range[1]>=item.kcal,`${item.brand} ${item.name} 区间不合理`);
   assert.ok(item.status&&item.confidence&&item.source&&item.verifiedOn,`${item.brand} ${item.name} 缺少估算说明`);
 }
-assert.equal(curatedExerciseCount,88,"首批逐项复核动作必须为88项");
+assert.equal(curatedExerciseCount,98,"已逐项复核动作必须为98项");
 const reviewedExercises=exerciseLibrary.filter(exercise=>exercise.reviewStatus==="首批逐项复核");
-assert.equal(reviewedExercises.length,88,"逐项复核状态数量不正确");
-assert.equal(new Set(reviewedExercises.map(exercise=>exercise.steps.join("|"))).size,88,"逐项复核动作不得共用完全相同的步骤");
+assert.equal(reviewedExercises.length,98,"逐项复核状态数量不正确");
+assert.equal(new Set(reviewedExercises.map(exercise=>exercise.steps.join("|"))).size,98,"逐项复核动作不得共用完全相同的步骤");
 assert.ok(new Set(reviewedExercises.map(exercise=>exercise.breathing)).size>=5,"不同类型动作必须使用适配的呼吸说明");
-for(const exercise of reviewedExercises)assert.ok(exercise.sources.length&&exercise.cues.length===3&&exercise.errors.length===3,`${exercise.name} 缺少独立来源或要点`);
-assert.equal(motionExercises.length,6,"只有当前轨迹与动作确切匹配的6项动画可以发布");
+for(const exercise of reviewedExercises)assert.ok(exercise.sources.length>=2&&exercise.cues.length===3&&exercise.errors.length===3,`${exercise.name} 缺少独立来源或要点`);
+assert.equal(motionExercises.length,0,"用户否决的程序化关节动画必须全部撤下");
 for(const motion of motionExercises){
   assert.ok(exerciseIds.has(motion.exerciseId),`动作演示引用不存在的动作：${motion.exerciseId}`);
   assert.ok(["single-angle","multi-angle"].includes(motion.mode)&&motion.fps>=30,`${motion.name} 演示配置不完整`);
