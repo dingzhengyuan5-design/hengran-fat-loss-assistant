@@ -159,9 +159,19 @@
         </section>
 
         <section class="page" id="calculator" data-title="把菜名拆成可以核算的原料" data-eyebrow="热量计算器">
-          <div class="section-intro"><div><h2>家庭菜谱与中国大陆外食热量</h2><p>标准家庭配方按原料和用油计算；品牌菜品按份展示，并明确区分官方入口与配方估算。</p></div><div class="recipe-stats"><b id="recipeCount">0</b><span>条可查询内容</span></div></div>
-          <div class="calculator-tabs"><button class="active" data-calculator-tab="recipe">家庭菜谱</button><button data-calculator-tab="dining">外食与连锁品牌</button></div>
-          <div class="calculator-layout calculator-tab-panel active" id="recipeCalculatorPanel">
+          <div class="section-intro"><div><h2>单品、家庭菜谱与中国大陆外食热量</h2><p>基础食物和简单菜可按克重或常用份量计算；家庭配方按原料和用油计算；品牌菜品按份展示并标注数据置信度。</p></div><div class="recipe-stats"><b id="recipeCount">0</b><span>条可查询内容</span></div></div>
+          <div class="calculator-tabs" role="tablist" aria-label="热量计算器类别"><button class="active" data-calculator-tab="single" role="tab">单品食物与简单菜</button><button data-calculator-tab="recipe" role="tab">家庭菜谱</button><button data-calculator-tab="dining" role="tab">外食与连锁品牌</button></div>
+          <div class="single-food-calculator calculator-tab-panel active" id="singleFoodCalculatorPanel">
+            <aside class="single-food-browser">
+              <div class="single-food-stats"><b id="singleFoodCount">0</b><span>种基础食物、简单菜和即食单品</span></div>
+              <input id="singleFoodSearch" placeholder="搜索蒸蛋、水煮蛋、红薯、牛奶">
+              <select id="singleFoodType"><option value="all">全部单品类型</option></select>
+              <select id="singleFoodCategory"><option value="all">全部食物类别</option></select>
+              <div id="singleFoodList" class="single-food-list"></div>
+            </aside>
+            <section id="singleFoodDetail" class="single-food-detail"></section>
+          </div>
+          <div class="calculator-layout calculator-tab-panel" id="recipeCalculatorPanel">
             <aside class="recipe-browser">
               <div class="recipe-filters"><input id="recipeSearch" placeholder="搜索炒饭、炒面、家常菜"><select id="recipeCategory"><option value="all">全部类别</option></select></div>
               <div id="recipeList" class="recipe-list"></div>

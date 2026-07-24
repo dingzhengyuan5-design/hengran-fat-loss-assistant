@@ -1,7 +1,18 @@
 const 来源={
   nasm:{title:"NASM Exercise Library",url:"https://www.nasm.org/workout-exercise-guidance"},
+  nasmDumbbellFront:{title:"NASM Dumbbell Front Squat",url:"https://www.nasm.org/resource-center/exercise-library/dumbbell-front-squat"},
+  nasmLegPress:{title:"NASM Leg Press",url:"https://www.nasm.org/resource-center/exercise-library/leg-press"},
+  nasmSquatGuide:{title:"NASM Guide to Squats and Deadlifts",url:"https://trainer.nasm.org/hubfs/NASM_Free%20Guide_Squats%20and%20Deadlifts.pdf"},
   ace:{title:"ACE Exercise Library",url:"https://www.acefitness.org/resources/everyone/exercise-library/"},
+  aceBackSquat:{title:"ACE Back Squat",url:"https://www.acefitness.org/resources/everyone/exercise-library/11/back-squat/"},
+  aceGoblet:{title:"ACE Goblet Squat",url:"https://www.acefitness.org/resources/everyone/exercise-library/362/goblet-squat/"},
+  aceSquatAssessment:{title:"ACE Body-weight Squat Assessment Protocol",url:"https://www.acefitness.org/images/webcontent/assets/certification/ace-answers/forms/pt/37_Bodyweight_Squat_Assessment_Protocol.pdf"},
   nhs:{title:"NHS Strength and Flex how-to videos",url:"https://www.nhs.uk/live-well/exercise/strength-and-flex-exercise-plan-how-to-videos/"},
+  nhsLower:{title:"NHS Inside Guide Lower Body Exercises",url:"https://insideguide.nhs.uk/hospitals/helping-yourself/healthy-body/exercise/lower-body-exercises/"},
+  strongerSquat:{title:"Stronger by Science - How to Squat",url:"https://www.strongerbyscience.com/how-to-squat/"},
+  squatUniversity:{title:"Squat University - How to Teach a Perfect Squat",url:"https://squatuniversity.com/2016/02/05/how-to-teach-a-perfect-squat/"},
+  barbendFront:{title:"BarBend - Front Squat",url:"https://barbend.com/front-squat/"},
+  barbendHack:{title:"BarBend - Hack Squat and Landmine Squat",url:"https://barbend.com/hack-squat/"},
   wger:{title:"wger 开放动作库（CC BY-SA）",url:"https://wger.readthedocs.io/en/latest/"}
 };
 
@@ -19,6 +30,10 @@ const 记=(name,setup,execute,finish,cue,error,standard,sourceKey="ace",motionKe
   const primary=来源[sourceKey],secondary=sourceKey==="nasm"?来源.ace:sourceKey==="ace"?来源.nasm:来源.ace;
   条目.push([name,{steps:[setup,execute,finish],cues:[cue,"动作全程保持可控速度","出现锐痛、麻木或眩晕立即停止"],errors:[error,"借摆动或反弹完成动作","姿态失控后仍继续重复"],breathing:呼吸(name),standard,sources:[primary,secondary],source:`${primary.title}与${secondary.title}交叉核对；本站逐项中文复核`,verifiedOn:"2026-07-23",reviewStatus:"首批逐项复核",motionKey,motionApproved:Boolean(motionKey)}]);
 };
+const 记严=(name,steps,cues,errors,standard,sourceKeys)=>{
+  const sources=sourceKeys.map(key=>来源[key]);
+  条目.push([name,{steps,cues,errors,breathing:呼吸(name),standard,sources,source:`${sources.map(item=>item.title).join("、")}交叉核对；本站按器械和轨迹逐项中文复核`,verifiedOn:"2026-07-24",reviewStatus:"首批逐项复核",motionKey:"",motionApproved:false}]);
+};
 
 // 下肢力量
 记("徒手深蹲","双脚约肩宽，脚尖自然外展，肋骨位于骨盆上方。","髋膝同步屈曲，膝盖沿第二脚趾方向下降。","脚掌三点压地，髋膝同步伸展站直。","脚跟和大脚趾根部持续着地","膝内扣或脚跟抬起","正面双膝轨迹稳定，侧面腰背不突然塌陷。","ace","squat");
@@ -27,8 +42,58 @@ const 记=(name,setup,execute,finish,cue,error,standard,sourceKey="ace",motionKe
 记("相扑徒手深蹲","宽于肩站立，脚尖按髋部舒适范围外展。","髋部向下，双膝沿外展脚尖方向打开。","脚跟和内侧前掌共同发力站起。","宽站距来自髋部而非扭膝","膝盖内塌或脚内侧离地","底部双膝与脚尖同向，内侧脚掌不抬。");
 记("深蹲触椅","椅子靠墙固定，站位保证臀部能轻触椅缘。","髋膝屈曲下降，触椅即停，不完全坐下。","保持胸髋同步站起。","椅子只作触点而非休息面","坐下休息后再用摆动起身","可连续触到相同位置且椅子不被撞动。","nhs");
 记("抱胸深蹲","双臂交叉抱胸，采用舒适深蹲站距。","不用摆臂，髋膝同步下降。","胸口与髋部同时上升。","手臂位置全程不变","含胸或先抬臀后抬胸","无摆臂条件下仍能维持相同深度和轨迹。");
-记("高脚杯深蹲","双手把哑铃或壶铃贴近胸前，肘部朝下。","负重贴近身体，髋膝屈曲下蹲。","脚掌压地站起，负重不离开胸口。","手腕中立且负重靠近重心","把重量举离身体或用肘强压膝盖","负重路径接近垂直，最后一次仍能控制底部。","nasm");
+记("哑铃高脚杯深蹲","双手托住一只哑铃上端，哑铃竖直贴近胸前。","保持负重靠近重心，髋膝同步屈曲下蹲。","全脚掌压地站起，哑铃与胸口距离基本不变。","手腕中立且哑铃竖直稳定","把哑铃举离身体或让一侧手先松开","负重路径接近垂直，最后一次仍能控制底部。","ace");
 记("双哑铃前蹲","两只哑铃置于肩前，两侧高度一致。","保持哑铃稳定，髋膝同步屈曲。","双脚均匀发力，躯干不过度后仰。","肘部略向前且手腕舒适","一侧哑铃下坠或左右躯干侧倾","左右轨迹对称，哑铃不碰撞头颈。","nasm");
+记严("哑铃相扑深蹲",
+  ["双脚明显宽于肩，脚尖在髋部舒适范围外展；双手让一只哑铃竖直悬于骨盆下方。","髋部向双脚之间下降，哑铃垂直下行，双膝沿脚尖方向打开。","脚掌三点压地站起，顶端自然伸直但不向后挺腰。"],
+  ["先用空手确认宽站距不会夹髋","哑铃始终位于两脚之间","深度以脚掌稳定和无痛为限"],
+  ["把动作做成窄站距硬拉","膝盖向内折而脚尖继续外转","哑铃前后摆动或触地反弹"],
+  "正面看双膝与脚尖同向，侧面看哑铃路径近垂直且腰背形状稳定。",["aceGoblet","strongerSquat"]);
+记严("壶铃高脚杯深蹲",
+  ["双手握住壶铃两侧角部，铃体贴近胸骨，前臂稳定。","先建立腹压，再让髋膝同步屈曲；壶铃不离开胸前。","全脚掌发力站起，髋膝同步伸展。"],
+  ["握住铃角而非只捏指尖","肘部自然向下，不用肘强压膝","壶铃全程贴近身体重心"],
+  ["壶铃远离胸口造成前坠","用手臂上下举铃代替下蹲","底部脚跟抬起或膝明显内扣"],
+  "壶铃与胸口距离稳定，负重路径平滑，底部仍能维持脚掌三点受力。",["nasmSquatGuide","aceGoblet"]);
+记严("杠铃后蹲",
+  ["在深蹲架内设置安全销，杠铃放在上背承重位置；握紧杠、建立腹压后直立出架。","以最少步数后退站稳，让杠铃保持在足中部上方，髋膝同步屈曲下降。","胸髋同步上升，站稳后向前回架，确认两端入钩再松手。"],
+  ["先用空杠确认高杠或低杠位置","每次重复前重新建立躯干张力","训练架安全销略低于计划最低点"],
+  ["把杠压在颈椎骨突上","出架后连续碎步寻找站位","臀部先冲起导致杠铃明显前移"],
+  "侧面杠铃大致停留在足中部上方；正面左右杠端高度一致，回架过程可控。",["aceBackSquat","strongerSquat","squatUniversity"]);
+记严("杠铃前蹲",
+  ["杠铃落在前三角肌形成的肩架上，采用交叉或举重式握法；肘部抬高、腹部收紧。","保持肘朝前上方，髋膝同步下降，杠铃位于足中部上方。","脚掌压地站起，避免肘部先下坠；站稳后回架。"],
+  ["杠铃由肩部承重而不是手腕硬托","肘尖持续朝前并保持上背张力","先用轻重量确认腕肩活动度"],
+  ["杠铃压在喉部或仅靠手掌承重","下降时肘部塌落导致上背圆曲","为保持直立而脚跟离地"],
+  "从侧面看杠铃路径接近垂直，底部杠铃仍稳定在肩架上，双肘未明显下坠。",["barbendFront","strongerSquat"]);
+记严("安全杠深蹲",
+  ["把安全深蹲杠的肩垫居中放在上背，设置安全销；双手轻握前方把手并直立出架。","保持把手位置稳定而不向下猛拉，建立腹压后髋膝同步下降。","胸髋同步上升，站稳后回架并确认两侧挂稳。"],
+  ["确认肩垫、把手和配重锁扣安装正确","手只稳定把手，不用手臂把躯干折弯","先以轻重量适应负重前移感"],
+  ["把手向下猛拉造成胸椎过度弯曲","垫块偏向一侧或杠铃未居中","省略安全销或疲劳后独自冲重量"],
+  "两侧杠端高度一致，把手不剧烈摆动；上升时胸与髋没有明显分离。",["nasmSquatGuide","strongerSquat"]);
+记严("史密斯深蹲",
+  ["确认史密斯机导轨方向、挂钩和安全挡块；把杠置于上背，双脚调整到能让全脚掌稳定的位置。","旋开挂钩后沿固定导轨下降，双膝随脚尖方向移动，骨盆和上背保持受控。","沿导轨推起，在接近站直处重新挂钩，并目视确认两侧锁定。"],
+  ["不同史密斯机导轨可能垂直或倾斜，站位需按设备调整","先空杠测试底部位置和挂钩方向","安全挡块设在失力时可接住杠的位置"],
+  ["照搬自由杠站位导致脚掌受力失衡","下降到底部时骨盆卷离稳定位置","未完全挂钩就松手离开"],
+  "整个重复中脚掌不抬、膝髋无痛，固定导轨与身体关节轨迹不相互顶撞。",["aceBackSquat","nasmSquatGuide"]);
+记严("史密斯箱式深蹲",
+  ["把稳固箱凳固定在导轨下方，设置安全挡块；空杠确认触箱位置不会让骨盆被迫前后滑动。","旋开挂钩后受控下降，臀部轻触箱面并保持躯干张力，不向后跌坐。","双脚发力沿导轨站起；完成后重新挂钩并确认锁定。"],
+  ["箱面只提供深度反馈，不用于卸力休息","箱高和脚位需与该台史密斯机的导轨匹配","先空杠排除箱凳与导轨冲突"],
+  ["臀部砸向箱面或在箱上完全放松","触箱后用摇摆和反弹启动","箱凳未固定或安全挡块过低"],
+  "每次轻触同一位置，箱体不移动，离箱时胸髋同步且无明显摇摆。",["nhsLower","nasmSquatGuide"]);
+记严("哈克深蹲",
+  ["调整肩垫和平台站位，让背部与骨盆贴稳靠垫；伸腿解锁安全机构。","屈髋屈膝让滑架受控下降，仅到骨盆仍能贴住靠垫且脚跟稳定的深度。","全脚掌推平台使滑架上升，膝盖保留柔和伸展；完成后重新锁住安全机构。"],
+  ["先用空载或轻载确认安全把手方向","膝盖始终沿脚尖方向移动","平台站位需服从无痛和脚掌稳定"],
+  ["下降过深导致骨盆卷起离开靠垫","顶端暴力锁膝或让配重撞击","脚放太低仍强行追求深度"],
+  "靠垫接触稳定、滑架不撞击，双膝轨迹对称且顶端能安全重置锁扣。",["barbendHack","nasmLegPress"]);
+记严("腿举",
+  ["调节座椅和靠背，头、上背与骨盆贴垫；双脚在平台上约髋至肩宽，先确认安全把手。","解锁后受控屈髋屈膝，让平台靠近，仅到骨盆不卷起、脚跟不抬的深度。","全脚掌推开平台，膝盖接近伸直但不猛烈锁死；结束时重新锁定安全机构。"],
+  ["座椅距离应允许起点有可控膝角","双手握把稳定骨盆而非拉动身体","负重以回程可控为前提"],
+  ["膝盖内扣或双脚在平台滑动","下降过深使腰骨盆离开靠垫","用手推膝或顶端锁膝休息"],
+  "全程头背骨盆贴垫，平台回程平稳，双膝沿脚尖方向且安全机构能可靠复位。",["nasmLegPress","aceSquatAssessment"]);
+记严("地雷管深蹲",
+  ["把杠铃固定在地雷管底座并锁紧配重片；双手托住杠铃末端贴近胸前，身体面对锚点并略后站。","顺应杠铃弧形轨迹屈髋屈膝下蹲，让脚掌保持稳定，杠端不压向喉部。","脚掌发力站起，胸口与杠端距离稳定，顶端不过度后仰。"],
+  ["必须使用可靠地雷管底座，不能让未固定杠端自由滑动","站位需让身体顺应杠铃弧线","杠端贴近胸前并用双手对称承托"],
+  ["误当徒手深蹲或把杠铃竖直举离身体","站得太靠近锚点导致重心后倒","底座松动、配重片未锁紧仍继续"],
+  "杠铃沿固定弧线平稳移动，底座无位移；人物脚掌不抬且躯干不被杠端推得后仰。",["barbendHack","strongerSquat"]);
 
 // 髋部力量
 记("徒手髋铰链","双脚髋宽，膝微屈，双手放在髋部。","臀部向后推，躯干作为整体前倾。","夹臀把髋向前送，回到直立但不后仰。","小腿位置变化很小","把动作做成深蹲或腰部弯曲","主要感到臀腿后侧牵拉，腰部无锐痛。","nasm","hinge");

@@ -94,6 +94,14 @@ const result=await evaluate(`(async()=>{
   const firstRestored=document.querySelector('#overviewProfile').textContent==='已完成'&&!document.querySelector('#planContent').hidden;
 
   document.querySelector('[data-page="calculator"]').click();await pause(50);
+  document.querySelector('#singleFoodSearch').value='蒸鸡蛋羹';
+  document.querySelector('#singleFoodSearch').dispatchEvent(new Event('input',{bubbles:true}));await pause(20);
+  document.querySelector('#singleFoodList [data-single-food]')?.click();await pause(20);
+  const singleBefore=Number(document.querySelector('.single-food-kcal strong').textContent);
+  const singleGrams=document.querySelector('#singleFoodGrams');singleGrams.value='240';singleGrams.dispatchEvent(new Event('change',{bubbles:true}));await pause(20);
+  const singleAfter=Number(document.querySelector('.single-food-kcal strong').textContent);
+  const singleDetail=document.querySelector('#singleFoodDetail').innerText;
+  document.querySelector('[data-calculator-tab="recipe"]').click();await pause(20);
   const oilRow=[...document.querySelectorAll('.recipe-ingredient-row')].find(row=>row.querySelector('select').selectedOptions[0].textContent.includes('油'));
   const nutritionBefore=document.querySelector('#recipeNutrition').innerText;
   const oilInput=oilRow?.querySelector('.recipe-grams-input');
@@ -145,6 +153,8 @@ const result=await evaluate(`(async()=>{
     members:afterCreate.members.length,
     secondIsEmpty,
     firstRestored,
+    singleChanged:singleAfter===singleBefore*2,
+    singleComplete:singleDetail.includes('简单烹调菜')&&singleDetail.includes('估算区间'),
     recipeChanged:nutritionBefore!==nutritionAfter,
     diningMatches,
     diningChanged:diningAfter>diningBefore,
@@ -175,10 +185,10 @@ if(!direct){
   await call("Emulation.clearDeviceMetricsOverride");
   const reviewUrl=new URL("动作演示审核.html",url).href;
   await call("Page.navigate",{url:reviewUrl});
-  await waitFor("document.querySelector('#readyCount')?.textContent==='6'");
+  await waitFor("document.querySelector('#readyCount')?.textContent==='0'");
   review=await evaluate(`({total:document.querySelector('#totalCount').textContent,reviewed:document.querySelector('#reviewedCount').textContent,ready:document.querySelector('#readyCount').textContent,pending:document.querySelector('#pendingCount').textContent,cards:document.querySelectorAll('.card').length,firstLink:document.querySelector('.card a:not(.disabled)')?.href})`);
   await call("Page.navigate",{url:review.firstLink});
-  review.deepLinkOpened=await waitFor("Boolean(document.querySelector('#exerciseDialog')?.open&&document.querySelector('#motionPlayer'))");
+  review.deepLinkOpened=await waitFor("Boolean(document.querySelector('#exerciseDialog')?.open&&!document.querySelector('#motionPlayer'))");
 }
 const output={mode:direct?"直接打开文件":"HTTP服务器",target:{url:page.url,title:page.title},initial,migration,result,mobile,review,consoleErrors:errors};
 console.log(JSON.stringify(output,null,2));
@@ -187,13 +197,13 @@ await Promise.race([new Promise(resolve=>proc.once("exit",resolve)),wait(1500)])
 await rm(profile,{recursive:true,force:true,maxRetries:3,retryDelay:300}).catch(()=>{});
 
 const failed=
-  initial.pages!==9||initial.foods!=="300"||initial.recipes!=="606"||initial.exercises!=="220"||initial.diningBrands!=="27"||initial.diningItems!=="486"||!initial.logoLoaded||
+  initial.pages!==9||initial.foods!=="300"||initial.recipes!=="906"||initial.exercises!=="220"||initial.diningBrands!=="27"||initial.diningItems!=="486"||!initial.logoLoaded||
   migration.schema!==4||migration.members!==1||migration.plans<1||migration.planSchema!==5||
   !result.unsavedPrompt||result.saveState!=="已保存"||!result.weekProgressed||
   result.scheduledSessions!==4||!result.scheduleVisible||!result.scheduleEntryComplete||
-  result.members!==2||!result.secondIsEmpty||!result.firstRestored||
+  result.members!==2||!result.secondIsEmpty||!result.firstRestored||!result.singleChanged||!result.singleComplete||
   !result.recipeChanged||result.diningMatches!==18||!result.diningChanged||!result.diningConfidence||
-  result.exerciseCards!==36||!result.guideOpen||result.guideFrames!==3||result.guideSources<2||!result.motionPlayer||!result.motionMoved||!result.unreviewedBlocked||!result.guideComplete||
+  result.exerciseCards!==36||!result.guideOpen||result.guideFrames!==3||result.guideSources<2||result.motionPlayer||result.motionMoved||!result.unreviewedBlocked||!result.guideComplete||
   result.reportDefault!=="45"||!result.printed||result.reportWeeks!==4||result.reportDays!==7||!result.reportComplete||
-  mobile.overflow||(!direct&&(review.total!=="220"||review.reviewed!=="88"||review.ready!=="6"||review.pending!=="214"||review.cards!==220||!review.deepLinkOpened))||errors.length;
+  mobile.overflow||(!direct&&(review.total!=="220"||review.reviewed!=="98"||review.ready!=="0"||review.pending!=="220"||review.cards!==220||!review.deepLinkOpened))||errors.length;
 if(failed)process.exitCode=1;
