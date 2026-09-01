@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-09-01T02:30:26.423Z",
+  "dataVersion": "2026.07-b",
+  "note": "自动任务只报告差异，不自动修改健康结论。视频指标需白名单与人工审核。",
+  "sources": [
+    {
+      "title": "成人肥胖食养指南（2024年版）",
+      "url": "https://www.nhc.gov.cn/sps/c100088/202402/9ba512ba8e314a47a181db11d2fa188d/files/1743476135429_97340.pdf",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "title": "肥胖症诊疗指南（2024年版）",
+      "url": "https://www.nhc.gov.cn/wjw/c100378/202410/bcf804e19e0c4246b5aea6cd338b55e1.shtml",
+      "status": 412,
+      "ok": false
+    },
+    {
+      "title": "中国居民膳食指南（2022）",
+      "url": "https://dg.cnsoc.org/article/04/J4-AsD_DR3OLQMnHG0-jZA.html",
+      "status": null,
+      "ok": false,
+      "error": "fetch failed"
+    },
+    {
+      "title": "WHO身体活动与久坐行为指南",
+      "url": "https://www.who.int/publications/i/item/9789240015128",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "title": "Resistance Training Prescription for Muscle Function, Hypertrophy, and Physical Performance（2026）",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41843416/",
+      "status": 203,
+      "ok": true
+    },
+    {
+      "title": "Progression Models in Resistance Training for Healthy Adults",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11828249/",
+      "status": 203,
+      "ok": true
+    },
+    {
+      "title": "ACSM减重与体重反弹预防立场文件",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/19127177/",
+      "status": 203,
+      "ok": true
+    },
+    {
+      "title": "ACSM 2026抗阻训练指南更新",
+      "url": "https://acsm.org/resistance-training-guidelines-update-2026/",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "title": "ACE动作库",
+      "url": "https://www.acefitness.org/resources/everyone/exercise-library/",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "title": "FoodData Central 下载与数据说明",
+      "url": "https://fdc.nal.usda.gov/download-datasets/",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "title": "蛋白质摄入与抗阻训练荟萃分析",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28698222/",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "title": "饮食与运动对体重及瘦体重影响的随机试验",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28514618/",
+      "status": 203,
+      "ok": true
+    }
+  ],
+  "videos": [
+    {
+      "platform": "YouTube",
+      "author": "Jeff Nippard",
+      "url": "https://www.youtube.com/watch?v=ytN366VCGls",
+      "status": "内容已复核·指标待API"
+    },
+    {
+      "platform": "YouTube",
+      "author": "Renaissance Periodization",
+      "url": "https://www.youtube.com/watch?v=Z0_72YUZ15Y",
+      "status": "内容已复核·指标待API"
+    },
+    {
+      "platform": "YouTube",
+      "author": "Renaissance Periodization",
+      "url": "https://www.youtube.com/watch?v=I_2cX8BzkcM",
+      "status": "内容已复核·指标待API"
+    },
+    {
+      "platform": "YouTube",
+      "author": "Renaissance Periodization",
+      "url": "https://www.youtube.com/watch?v=2bAjfXcj5Fs",
+      "status": "内容已复核·指标待API"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "健身运动营养科普",
+      "url": "https://www.bilibili.com/video/BV1AM411r7z3/",
+      "status": "人工快照已核验"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "帅soserious",
+      "url": "https://www.bilibili.com/video/BV1qq4y1E7GN/",
+      "status": "人工快照已核验"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "叔贵",
+      "url": "https://www.bilibili.com/video/BV1aU4y1G7ek/",
+      "status": "人工快照已核验"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "范老师硬核减脂",
+      "url": "https://www.bilibili.com/video/BV1534y1x78m/",
+      "status": "人工快照已核验"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "李祥JasonLee",
+      "url": "https://www.bilibili.com/video/BV1v89iYqE8C/",
+      "status": "公开页快照"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "健身食材科普",
+      "url": "https://www.bilibili.com/video/BV13ZZUYrEjE/",
+      "status": "公开页快照"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "运动营养科普",
+      "url": "https://www.bilibili.com/video/BV1SP4y1Q7Le/",
+      "status": "公开页快照"
+    },
+    {
+      "platform": "哔哩哔哩",
+      "author": "暴躁野哥讲健身",
+      "url": "https://www.bilibili.com/video/BV1SD421T7Pc/",
+      "status": "公开页快照"
+    }
+  ],
+  "youtubeApiConfigured": false,
+  "youtube": []
+}
